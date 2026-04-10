@@ -24,24 +24,36 @@
 
 ## 응답 계약
 - `request`
-  - 정규화된 요청 입력
+  - `purposeId`
+  - `originLabel`
+  - `origin.lat`
+  - `origin.lng`
+  - `mode`
 - `meta`
-  - 계약 버전
-  - 요청 시각
-  - 모드
-  - 데이터 출처
-  - demo 시나리오 식별자
-  - 민원 목적 매핑 버전
+  - `contractVersion`
+  - `requestedAt`
+  - `mode`
+  - `dataSource`
+  - `scenarioId`
+  - `purposeMappingVersion`
 - `summary`
-  - 전체 후보 수
-  - 반환 추천 수
+  - `totalCandidateCount`
+  - `returnedRecommendationCount`
 - `recommendations`
-  - 민원실 기본 정보
-  - 지원 민원 목적 목록
-  - 실제 매칭된 `taskNm` 추적 정보
-  - 대기 인원 스냅샷
-  - 이동시간 추정
-  - 추천 점수 상세
+  - `id`
+  - `name`
+  - `address`
+  - `coordinates`
+  - `supportedPurposeIds`
+  - `supportedTaskMatches`
+  - `waiting`
+  - `travel`
+  - `recommendation`
+
+## 오류 응답 계약
+- 최상위 구조는 `error`, `details`, `contractVersion`로 고정한다.
+- `contractVersion`은 성공 응답의 `meta.contractVersion`과 같은 값을 쓴다.
+- 검증 실패, upstream 오류, 추천 결과 없음 모두 같은 오류 스키마를 쓴다.
 
 ## 민원 목적 카탈로그 원칙
 - 프론트 선택지와 백엔드 필터의 기준 키는 `purposeId` 하나로 통일한다.

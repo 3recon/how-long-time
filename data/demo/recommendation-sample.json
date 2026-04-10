@@ -9,12 +9,12 @@
     "mode": "demo"
   },
   "meta": {
-    "contractVersion": "2026-04-stage-2",
+    "contractVersion": "2026-04-stage-6",
     "requestedAt": "2026-04-10T09:00:00.000Z",
     "mode": "demo",
     "dataSource": "demo-sample",
     "scenarioId": "demo-seoul-cityhall-passport",
-    "purposeMappingVersion": "2026-04-stage-2"
+    "purposeMappingVersion": "2026-04-stage-4"
   },
   "summary": {
     "totalCandidateCount": 2,
@@ -42,7 +42,7 @@
       ],
       "waiting": {
         "count": 8,
-        "updatedAt": "2026-04-10T08:55:00.000Z"
+        "updatedAt": "2026-04-10T08:55:00.000+09:00"
       },
       "travel": {
         "minutes": 19,
@@ -51,9 +51,9 @@
       "recommendation": {
         "score": 91,
         "rank": 1,
-        "waitingPenalty": 4,
-        "travelPenalty": 5,
-        "reason": "이동시간이 짧고 현재 대기 인원이 낮아 가장 균형이 좋습니다."
+        "waitingPenalty": 5,
+        "travelPenalty": 4,
+        "reason": "대기 인원과 이동 시간이 모두 부담이 적은 편입니다."
       }
     },
     {
@@ -64,31 +64,35 @@
         "lat": 37.5641,
         "lng": 126.9979
       },
-      "supportedPurposeIds": ["passport-reissue", "certificate-issuance"],
+      "supportedPurposeIds": [
+        "passport-reissue",
+        "passport-pickup",
+        "certificate-issuance"
+      ],
       "supportedTaskMatches": [
         {
           "taskName": "여권 재발급",
           "ruleType": "keyword"
         },
         {
-          "taskName": "제증명 발급",
+          "taskName": "증명서 발급",
           "ruleType": "keyword"
         }
       ],
       "waiting": {
         "count": 11,
-        "updatedAt": "2026-04-10T08:55:00.000Z"
+        "updatedAt": "2026-04-10T08:55:00.000+09:00"
       },
       "travel": {
         "minutes": 16,
         "distanceKm": 2.6
       },
       "recommendation": {
-        "score": 84,
+        "score": 87,
         "rank": 2,
-        "waitingPenalty": 7,
-        "travelPenalty": 9,
-        "reason": "가깝지만 대기 인원이 더 많아 2순위로 정렬됩니다."
+        "waitingPenalty": 9,
+        "travelPenalty": 4,
+        "reason": "이동 시간은 짧지만 대기 인원이 조금 더 있습니다."
       }
     }
   ]
