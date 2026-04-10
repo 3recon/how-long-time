@@ -93,14 +93,14 @@ public/images/      정적 이미지 자산
 ### GET 예시
 
 ```text
-/api/recommend?purpose=여권%20재발급&originLabel=서울시청&lat=37.5665&lng=126.9780&mode=demo
+/api/recommend?purposeId=passport-reissue&originLabel=서울시청&lat=37.5665&lng=126.9780&mode=demo
 ```
 
 ### POST 예시
 
 ```json
 {
-  "purpose": "여권 재발급",
+  "purposeId": "passport-reissue",
   "originLabel": "서울시청",
   "origin": {
     "lat": 37.5665,
@@ -110,8 +110,9 @@ public/images/      정적 이미지 자산
 }
 ```
 
-지금은 검증 후 demo 샘플 응답을 반환하고, 이후 단계에서 live 연동과
-추천 로직을 이 라우트에 연결할 예정입니다.
+응답 구조는 `request`, `meta`, `summary`, `recommendations`로 고정하고,
+`demo`와 `live`는 같은 스키마를 사용합니다. 모드별 차이는
+`meta.dataSource`와 `meta.scenarioId`로만 구분합니다.
 
 ## 다음 작업
 

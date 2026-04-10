@@ -44,7 +44,7 @@ export const demoRecommendationSample: RecommendResponse = {
       ],
       waiting: {
         count: 8,
-        updatedAt: "2026-04-10T08:55:00.000Z",
+        updatedAt: "2026-04-10T08:55:00.000+09:00",
       },
       travel: {
         minutes: 19,
@@ -66,7 +66,11 @@ export const demoRecommendationSample: RecommendResponse = {
         lat: 37.5641,
         lng: 126.9979,
       },
-      supportedPurposeIds: ["passport-reissue", "certificate-issuance"],
+      supportedPurposeIds: [
+        "passport-reissue",
+        "passport-pickup",
+        "certificate-issuance",
+      ],
       supportedTaskMatches: [
         {
           taskName: "여권 재발급",
@@ -79,7 +83,7 @@ export const demoRecommendationSample: RecommendResponse = {
       ],
       waiting: {
         count: 11,
-        updatedAt: "2026-04-10T08:55:00.000Z",
+        updatedAt: "2026-04-10T08:55:00.000+09:00",
       },
       travel: {
         minutes: 16,

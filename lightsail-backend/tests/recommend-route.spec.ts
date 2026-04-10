@@ -111,6 +111,25 @@ async function main() {
     assert.equal(requests[1]?.mode, "demo");
     assert.equal((await postResponse.json()).meta.scenarioId, "demo-seoul-cityhall-passport");
 
+    const defaultModeResponse = await fetch(
+      `${baseUrl}/api/recommend?purposeId=passport-reissue&originLabel=${encodeURIComponent("서울시청")}&lat=37.5665&lng=126.978`,
+    );
+
+    assert.equal(defaultModeResponse.status, 200);
+    assert.equal(requests[2]?.mode, "demo");
+
+    const legacyPurposeResponse = await fetch(
+      `${baseUrl}/api/recommend?purpose=${encodeURIComponent("여권 재발급")}&originLabel=${encodeURIComponent("서울시청")}&lat=37.5665&lng=126.978&mode=demo`,
+    );
+
+    assert.equal(legacyPurposeResponse.status, 400);
+    assert.deepEqual(await legacyPurposeResponse.json(), {
+      error: "INVALID_REQUEST",
+      details:
+        'Invalid option: expected one of "passport-reissue"|"passport-pickup"|"certificate-issuance"|"family-relation-certificate"|"resident-registration"',
+      contractVersion: "2026-04-stage-6",
+    });
+
     const invalidJsonResponse = await fetch(`${baseUrl}/api/recommend`, {
       method: "POST",
       headers: {

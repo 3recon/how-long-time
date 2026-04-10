@@ -1,5 +1,7 @@
 import assert from "node:assert/strict";
+import { readFileSync } from "node:fs";
 
+import { demoRecommendationSample } from "../src/data/demo/recommendation-sample.js";
 import { createRecommendService, RecommendServiceError } from "../src/recommend/service.js";
 
 async function main() {
@@ -85,6 +87,39 @@ async function main() {
       },
     ],
   );
+
+  const demoResponse = await createRecommendService().recommend({
+    purposeId: "passport-pickup",
+    originLabel: "서울시청",
+    origin: {
+      lat: 37.5665,
+      lng: 126.978,
+    },
+    mode: "demo",
+  });
+
+  assert.equal(demoResponse.meta.mode, "demo");
+  assert.equal(demoResponse.meta.dataSource, "demo-sample");
+  assert.equal(demoResponse.meta.scenarioId, "demo-seoul-cityhall-passport");
+  assert.match(
+    demoResponse.recommendations[0]?.waiting.updatedAt ?? "",
+    /\+09:00$/,
+  );
+  assert.deepEqual(
+    demoResponse.recommendations.find(
+      (office) => office.id === "jung-gu-civil-service",
+    )?.supportedPurposeIds,
+    ["passport-reissue", "passport-pickup", "certificate-issuance"],
+  );
+
+  const demoSampleJson = JSON.parse(
+    readFileSync(
+      new URL("../src/data/demo/recommendation-sample.json", import.meta.url),
+      "utf8",
+    ),
+  );
+
+  assert.deepEqual(demoSampleJson, demoRecommendationSample);
 
   const emptyService = createRecommendService({
     fetchWaitingItems: async () => ({
