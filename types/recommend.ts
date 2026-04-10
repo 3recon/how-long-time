@@ -56,6 +56,7 @@ export interface PurposeTaskMapping {
   includeRules: PurposeTaskRule[];
   excludeRules: PurposeTaskRule[];
   sampleTaskNames: string[];
+  ambiguousTaskNames: string[];
   failureMessage: string;
 }
 
