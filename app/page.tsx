@@ -1,6 +1,11 @@
 "use client";
 
-import { useEffect, useState, type FormEvent } from "react";
+import {
+  useEffect,
+  useId,
+  useState,
+  type FormEvent,
+} from "react";
 
 import { KakaoMapPanel } from "@/components/recommend/kakao-map-panel";
 import {
@@ -8,6 +13,7 @@ import {
   purposeOptions,
 } from "@/data/recommend/purpose-options";
 import { appConfig } from "@/lib/env";
+import { createClientDemoRecommendResponse } from "@/lib/recommend/client-demo";
 import {
   buildDemoRecommendRequest,
   validateRecommendForm,
@@ -74,6 +80,47 @@ function StatChip(props: { label: string; value: string }) {
         {props.value}
       </p>
     </div>
+  );
+}
+
+function PurposeOptionCard(props: {
+  label: string;
+  description: string;
+  selected: boolean;
+  onClick: () => void;
+}) {
+  const { label, description, selected, onClick } = props;
+
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className={`group w-full rounded-[24px] border px-4 py-4 text-left transition-all duration-200 ${
+        selected
+          ? "border-[var(--accent-blue)] bg-[linear-gradient(180deg,rgba(255,249,227,0.98)_0%,rgba(255,255,255,1)_100%)] shadow-[0_24px_48px_rgba(29,78,216,0.12)]"
+          : "border-[rgba(17,17,17,0.08)] bg-white/94 hover:-translate-y-0.5 hover:border-[rgba(17,17,17,0.16)] hover:shadow-[0_18px_32px_rgba(17,17,17,0.08)]"
+      }`}
+      aria-pressed={selected}
+    >
+      <div className="flex items-start justify-between gap-3">
+        <div>
+          <p className="text-base font-semibold tracking-[-0.03em]">{label}</p>
+          <p className="mt-1 text-sm leading-6 text-[var(--muted)]">
+            {description}
+          </p>
+        </div>
+        <span
+          className={`mt-1 flex h-6 w-6 flex-none items-center justify-center rounded-full border transition-colors ${
+            selected
+              ? "border-[var(--accent-blue)] bg-[var(--accent-blue)] text-white"
+              : "border-[rgba(17,17,17,0.18)] bg-white text-transparent group-hover:border-[rgba(17,17,17,0.28)]"
+          }`}
+          aria-hidden
+        >
+          ●
+        </span>
+      </div>
+    </button>
   );
 }
 
@@ -144,6 +191,7 @@ function RecommendationCard(props: {
 }
 
 export default function Home() {
+  const purposeDialogId = useId();
   const [originLabel, setOriginLabel] = useState("");
   const [purposeId, setPurposeId] = useState("");
   const [coordinates, setCoordinates] = useState<LocationPoint | null>(
@@ -154,6 +202,7 @@ export default function Home() {
     purposeId?: string;
   }>({});
   const [requestError, setRequestError] = useState<string | null>(null);
+  const [requestNotice, setRequestNotice] = useState<string | null>(null);
   const [locationStatus, setLocationStatus] = useState(
     "demo 모드에서는 서울시청 기본 좌표로 동일한 결과를 재현할 수 있습니다.",
   );
@@ -161,14 +210,50 @@ export default function Home() {
   const [selectedOfficeId, setSelectedOfficeId] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isLocating, setIsLocating] = useState(false);
+  const [isPurposePickerOpen, setIsPurposePickerOpen] = useState(false);
 
   useEffect(() => {
     setSelectedOfficeId(getInitialSelectedOfficeId(result));
   }, [result]);
 
+  useEffect(() => {
+    if (!isPurposePickerOpen) {
+      return;
+    }
+
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    const handleEscape = (event: globalThis.KeyboardEvent) => {
+      if (event.key === "Escape") {
+        closePurposePicker();
+      }
+    };
+    document.addEventListener("keydown", handleEscape);
+
+    return () => {
+      document.body.style.overflow = previousOverflow;
+      document.removeEventListener("keydown", handleEscape);
+    };
+  }, [isPurposePickerOpen]);
+
   const selectedOffice = result
     ? resolveSelectedOffice(result.recommendations, selectedOfficeId)
     : null;
+  const selectedPurpose =
+    purposeOptions.find((purpose) => purpose.id === purposeId) ?? null;
+
+  function closePurposePicker() {
+    setIsPurposePickerOpen(false);
+  }
+
+  function handleSelectPurpose(nextPurposeId: RecommendPurposeId) {
+    setPurposeId(nextPurposeId);
+    setFieldErrors((current) => ({
+      ...current,
+      purposeId: undefined,
+    }));
+    closePurposePicker();
+  }
 
   async function handleUseCurrentLocation() {
     if (!("geolocation" in navigator)) {
@@ -220,6 +305,7 @@ export default function Home() {
 
     setFieldErrors(nextErrors);
     setRequestError(null);
+    setRequestNotice(null);
 
     if (Object.keys(nextErrors).length > 0) {
       setResult(null);
@@ -229,26 +315,37 @@ export default function Home() {
     setIsSubmitting(true);
 
     try {
+      const requestPayload = buildDemoRecommendRequest({
+        originLabel,
+        purposeId: purposeId as RecommendPurposeId,
+        coordinates,
+        fallbackOrigin: appConfig.defaultCenter,
+      });
+
       const response = await fetch("/api/recommend", {
         method: "POST",
         headers: {
           Accept: "application/json",
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(
-          buildDemoRecommendRequest({
-            originLabel,
-            purposeId: purposeId as RecommendPurposeId,
-            coordinates,
-            fallbackOrigin: appConfig.defaultCenter,
-          }),
-        ),
+        body: JSON.stringify(requestPayload),
       });
 
       if (!response.ok) {
         const errorBody = (await response.json().catch(() => null)) as
           | RecommendErrorResponse
           | null;
+
+        if (requestPayload.mode === "demo") {
+          const fallbackResponse = createClientDemoRecommendResponse(requestPayload);
+
+          setResult(fallbackResponse);
+          setRequestNotice(
+            "추천 백엔드 연결이 불안정해 로컬 demo 샘플 결과로 계속 진행합니다.",
+          );
+          setLocationStatus("로컬 demo 샘플 결과를 불러왔습니다.");
+          return;
+        }
 
         setResult(null);
         setRequestError(getRequestErrorMessage(errorBody));
@@ -257,6 +354,7 @@ export default function Home() {
 
       const responseBody = (await response.json()) as RecommendResponse;
       setResult(responseBody);
+      setRequestNotice(null);
       setLocationStatus(
         responseBody.request.originLabel === "현재 위치"
           ? "현재 위치 기준 demo 추천 결과를 불러왔습니다."
@@ -271,16 +369,16 @@ export default function Home() {
   }
 
   return (
-    <main className="relative min-h-dvh overflow-hidden">
+    <main className="relative min-h-dvh overflow-hidden lg:h-dvh">
       <div className="absolute inset-0 grid-pattern opacity-45" aria-hidden />
       <div
         className="absolute inset-x-0 top-0 h-[28rem] bg-[radial-gradient(circle_at_top_left,rgba(255,212,0,0.28),transparent_55%),linear-gradient(180deg,rgba(255,255,255,0.98)_0%,rgba(255,249,230,0.92)_100%)]"
         aria-hidden
       />
 
-      <div className="relative mx-auto flex w-full max-w-[1600px] flex-col gap-6 px-4 py-5 sm:px-6 lg:grid lg:min-h-dvh lg:grid-cols-[minmax(0,420px)_minmax(0,1fr)] lg:gap-8 lg:px-8 lg:py-6 xl:grid-cols-[minmax(0,460px)_minmax(0,1fr)]">
-        <section className="soft-card rounded-[32px] border-[rgba(17,17,17,0.08)] p-5 sm:p-6 lg:sticky lg:top-6 lg:h-[calc(100vh-3rem)] lg:overflow-auto">
-          <div className="space-y-4 border-b border-[var(--line)] pb-6">
+      <div className="relative mx-auto flex w-full max-w-[1600px] flex-col gap-4 px-4 py-4 sm:px-6 lg:grid lg:h-dvh lg:grid-cols-[minmax(0,390px)_minmax(0,1fr)] lg:gap-5 lg:overflow-hidden lg:px-6 lg:py-4 xl:grid-cols-[minmax(0,420px)_minmax(0,1fr)]">
+        <section className="soft-card rounded-[32px] border-[rgba(17,17,17,0.08)] p-5 sm:p-6 lg:flex lg:h-[calc(100dvh-2rem)] lg:min-h-0 lg:flex-col lg:overflow-hidden lg:p-5">
+          <div className="space-y-3 border-b border-[var(--line)] pb-4 lg:space-y-2 lg:pb-3">
             <div className="flex flex-wrap items-center gap-3">
               <span className="rounded-full bg-[var(--accent)] px-3 py-1 text-xs font-semibold uppercase tracking-[0.3em] text-[var(--foreground)]">
                 Minwon Now
@@ -290,22 +388,25 @@ export default function Home() {
               </span>
             </div>
 
-            <div className="space-y-2">
-              <h1 className="text-4xl font-semibold leading-[0.96] tracking-[-0.06em] text-balance sm:text-[3.4rem]">
+            <div className="space-y-2 lg:space-y-1.5">
+              <h1 className="text-4xl font-semibold leading-[0.96] tracking-[-0.06em] text-balance sm:text-[3.15rem] lg:text-[2.45rem]">
                 대기 인원과 이동시간을
                 <span className="block text-[var(--accent-strong)]">
                   한 번에 비교합니다.
                 </span>
               </h1>
-              <p className="max-w-xl text-sm leading-6 text-[var(--muted)] sm:text-[0.97rem]">
+              <p className="max-w-xl text-sm leading-6 text-[var(--muted)] sm:text-[0.95rem] lg:text-[0.88rem] lg:leading-5">
                 출발지와 민원 목적을 입력하면 방문 후보를 리스트와 지도에 함께
                 보여줍니다. 카드 선택과 지도 포커스가 같은 흐름으로 연결됩니다.
               </p>
             </div>
           </div>
 
-          <form className="space-y-6 pt-6" onSubmit={handleSubmit}>
-            <section className="space-y-3">
+          <form
+            className="space-y-4 pt-4 lg:flex lg:min-h-0 lg:flex-1 lg:flex-col lg:space-y-3 lg:pt-4"
+            onSubmit={handleSubmit}
+          >
+            <section className="space-y-3 lg:space-y-2">
               <div className="flex items-center justify-between gap-3">
                 <label
                   htmlFor="originLabel"
@@ -318,7 +419,7 @@ export default function Home() {
                 </span>
               </div>
 
-              <div className="rounded-[24px] border border-[rgba(17,17,17,0.08)] bg-[rgba(255,255,255,0.86)] p-4 shadow-[0_18px_40px_rgba(17,17,17,0.06)]">
+              <div className="rounded-[24px] border border-[rgba(17,17,17,0.08)] bg-[rgba(255,255,255,0.88)] p-4 shadow-[0_18px_40px_rgba(17,17,17,0.06)] lg:p-3.5">
                 <input
                   id="originLabel"
                   value={originLabel}
@@ -337,7 +438,7 @@ export default function Home() {
                   aria-describedby="origin-help"
                 />
 
-                <div className="mt-4 flex flex-col gap-3 sm:flex-row">
+                <div className="mt-3 flex flex-col gap-3 sm:flex-row">
                   <button
                     type="button"
                     onClick={handleUseCurrentLocation}
@@ -352,7 +453,7 @@ export default function Home() {
                 </div>
               </div>
 
-              <p id="origin-help" className="text-sm leading-6 text-[var(--muted)]">
+              <p id="origin-help" className="text-sm leading-6 text-[var(--muted)] lg:text-[0.85rem] lg:leading-5">
                 {locationStatus}
               </p>
               {fieldErrors.originLabel ? (
@@ -362,62 +463,46 @@ export default function Home() {
               ) : null}
             </section>
 
-            <section className="space-y-3">
+            <section className="space-y-3 lg:space-y-2">
               <div className="flex items-center justify-between gap-3">
                 <label className="text-sm font-semibold text-[var(--foreground)]">
                   민원 목적
                 </label>
                 <span className="text-xs uppercase tracking-[0.22em] text-[var(--muted)]">
-                  {purposeOptions.length} options
+                  quick picker
                 </span>
               </div>
 
-              <div className="grid gap-3">
-                {purposeOptions.map((purpose) => {
-                  const selected = purposeId === purpose.id;
-
-                  return (
-                    <button
-                      key={purpose.id}
-                      type="button"
-                      onClick={() => {
-                        setPurposeId(purpose.id);
-                        if (fieldErrors.purposeId) {
-                          setFieldErrors((current) => ({
-                            ...current,
-                            purposeId: undefined,
-                          }));
-                        }
-                      }}
-                      className={`rounded-[22px] border px-4 py-4 text-left transition-all duration-200 ${
-                        selected
-                          ? "border-[var(--accent-blue)] bg-[rgba(29,78,216,0.06)] shadow-[0_20px_42px_rgba(29,78,216,0.08)]"
-                          : "border-[rgba(17,17,17,0.08)] bg-white hover:-translate-y-0.5 hover:border-[rgba(17,17,17,0.16)]"
-                      }`}
-                      aria-pressed={selected}
-                    >
-                      <div className="flex items-start justify-between gap-3">
-                        <div>
-                          <p className="text-base font-semibold tracking-[-0.03em]">
-                            {purpose.label}
-                          </p>
-                          <p className="mt-1 text-sm leading-6 text-[var(--muted)]">
-                            {purpose.description}
-                          </p>
-                        </div>
-                        <span
-                          className={`mt-1 h-3.5 w-3.5 rounded-full border ${
-                            selected
-                              ? "border-[var(--accent-blue)] bg-[var(--accent-blue)]"
-                              : "border-[rgba(17,17,17,0.22)]"
-                          }`}
-                          aria-hidden
-                        />
-                      </div>
-                    </button>
-                  );
-                })}
-              </div>
+              <button
+                type="button"
+                onClick={() => setIsPurposePickerOpen(true)}
+                className={`w-full rounded-[26px] border px-4 py-4 text-left shadow-[0_18px_38px_rgba(17,17,17,0.06)] transition-all duration-200 hover:-translate-y-0.5 ${
+                  selectedPurpose
+                    ? "border-[rgba(255,184,0,0.55)] bg-[linear-gradient(180deg,rgba(255,248,215,0.98)_0%,rgba(255,255,255,1)_100%)]"
+                    : "border-[rgba(17,17,17,0.08)] bg-white"
+                }`}
+                aria-haspopup="dialog"
+                aria-expanded={isPurposePickerOpen}
+                aria-controls={purposeDialogId}
+              >
+                <div className="flex items-center justify-between gap-4">
+                  <div className="min-w-0">
+                    <p className="text-xs font-semibold uppercase tracking-[0.24em] text-[var(--accent-strong)]">
+                      Purpose Picker
+                    </p>
+                    <p className="mt-2 text-base font-semibold tracking-[-0.03em]">
+                      {selectedPurpose?.label ?? "민원 목적을 선택하세요"}
+                    </p>
+                    <p className="mt-1 text-sm leading-6 text-[var(--muted)]">
+                      {selectedPurpose?.description ??
+                        "목적을 팝업에서 고르면 입력 영역 높이를 줄이고, 결과 화면을 더 안정적으로 유지합니다."}
+                    </p>
+                  </div>
+                  <div className="flex h-12 w-12 flex-none items-center justify-center rounded-2xl border border-[rgba(17,17,17,0.08)] bg-white text-lg shadow-[0_12px_24px_rgba(17,17,17,0.06)]">
+                    ▾
+                  </div>
+                </div>
+              </button>
 
               {fieldErrors.purposeId ? (
                 <p className="text-sm font-medium text-[var(--accent-red)]">
@@ -426,7 +511,7 @@ export default function Home() {
               ) : null}
             </section>
 
-            <section className="grid gap-3 sm:grid-cols-2">
+            <section className="grid gap-3 sm:grid-cols-2 lg:gap-2">
               <div className="rounded-[22px] border border-[rgba(17,17,17,0.08)] bg-white px-4 py-4">
                 <p className="text-xs uppercase tracking-[0.22em] text-[var(--muted)]">
                   API 프록시
@@ -451,30 +536,36 @@ export default function Home() {
               </div>
             ) : null}
 
+            {requestNotice ? (
+              <div className="rounded-[20px] border border-[rgba(245,158,11,0.2)] bg-[rgba(255,212,0,0.12)] px-4 py-3 text-sm font-medium text-[var(--foreground)]">
+                {requestNotice}
+              </div>
+            ) : null}
+
             <button
               type="submit"
               disabled={isSubmitting || isLocating}
-              className="min-h-13 w-full rounded-[22px] border border-[var(--foreground)] bg-[var(--foreground)] px-5 text-base font-semibold text-white shadow-[0_20px_44px_rgba(17,17,17,0.16)] hover:-translate-y-0.5 hover:border-[var(--accent-blue)] hover:bg-[var(--accent-blue)] disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:translate-y-0"
+              className="min-h-13 w-full rounded-[22px] border border-[var(--foreground)] bg-[var(--foreground)] px-5 text-base font-semibold text-white shadow-[0_20px_44px_rgba(17,17,17,0.16)] hover:-translate-y-0.5 hover:border-[var(--accent-blue)] hover:bg-[var(--accent-blue)] disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:translate-y-0 lg:mt-auto"
             >
               {isSubmitting ? "추천 요청 중.." : "추천 결과와 지도 보기"}
             </button>
           </form>
         </section>
 
-        <section className="flex min-w-0 flex-col gap-6">
-          <header className="soft-card rounded-[32px] border-[rgba(17,17,17,0.08)] p-5 sm:p-6">
+        <section className="flex min-w-0 flex-col gap-5 lg:h-[calc(100dvh-2rem)] lg:min-h-0 lg:overflow-hidden">
+          <header className="soft-card rounded-[32px] border-[rgba(17,17,17,0.08)] p-5 sm:p-6 lg:flex-none lg:p-5">
             <div className="flex flex-col gap-4 xl:flex-row xl:items-end xl:justify-between">
               <div>
                 <p className="text-xs font-semibold uppercase tracking-[0.28em] text-[var(--accent-strong)]">
                   Recommendation Board
                 </p>
-                <h2 className="mt-2 text-2xl font-semibold tracking-[-0.04em] sm:text-[2.4rem]">
+                <h2 className="mt-2 text-2xl font-semibold tracking-[-0.04em] sm:text-[2.4rem] lg:text-[2rem]">
                   결과 리스트와 지도 포커스를
                   <span className="block">같은 화면에서 확인합니다.</span>
                 </h2>
               </div>
 
-              <div className="grid gap-3 sm:grid-cols-3">
+              <div className="grid gap-3 sm:grid-cols-3 lg:min-w-[360px] lg:gap-2">
                 <StatChip
                   label="선택 목적"
                   value={purposeId ? getPurposeLabel(purposeId) : "선택 대기"}
@@ -495,7 +586,7 @@ export default function Home() {
             </div>
           </header>
 
-          <div className="grid min-w-0 gap-6 xl:grid-cols-[minmax(0,1.1fr)_minmax(360px,0.9fr)]">
+          <div className="grid min-w-0 gap-5 lg:min-h-0 lg:flex-1 lg:grid-cols-[minmax(0,1.12fr)_minmax(320px,0.88fr)] lg:overflow-hidden xl:grid-cols-[minmax(0,1.14fr)_minmax(340px,0.86fr)]">
             <KakaoMapPanel
               appKey={appConfig.kakaoMapAppKey}
               origin={result?.request.origin ?? coordinates ?? appConfig.defaultCenter}
@@ -505,7 +596,7 @@ export default function Home() {
               onSelectOffice={setSelectedOfficeId}
             />
 
-            <section className="soft-card min-w-0 rounded-[28px] border-[rgba(17,17,17,0.08)] p-5 sm:p-6">
+            <section className="soft-card min-w-0 rounded-[28px] border-[rgba(17,17,17,0.08)] p-5 sm:p-6 lg:flex lg:min-h-0 lg:flex-col lg:overflow-hidden lg:p-5">
               <div className="flex flex-wrap items-start justify-between gap-3 border-b border-[var(--line)] pb-4">
                 <div>
                   <p className="text-xs font-semibold uppercase tracking-[0.28em] text-[var(--accent-strong)]">
@@ -523,13 +614,13 @@ export default function Home() {
               </div>
 
               {selectedOffice ? (
-                <div className="mt-5 rounded-[24px] border border-[rgba(17,17,17,0.08)] bg-[linear-gradient(180deg,rgba(255,250,232,0.95)_0%,rgba(255,255,255,1)_100%)] p-5 shadow-[0_22px_46px_rgba(17,17,17,0.06)]">
+                <div className="mt-5 rounded-[24px] border border-[rgba(17,17,17,0.08)] bg-[linear-gradient(180deg,rgba(255,250,232,0.95)_0%,rgba(255,255,255,1)_100%)] p-5 shadow-[0_22px_46px_rgba(17,17,17,0.06)] lg:mt-4 lg:p-4">
                   <div className="flex flex-wrap items-start justify-between gap-3">
                     <div>
                       <p className="text-xs font-semibold uppercase tracking-[0.22em] text-[var(--accent-strong)]">
                         현재 선택한 민원실
                       </p>
-                      <h4 className="mt-2 text-2xl font-semibold tracking-[-0.04em]">
+                      <h4 className="mt-2 text-2xl font-semibold tracking-[-0.04em] lg:text-[1.55rem]">
                         {selectedOffice.name}
                       </h4>
                     </div>
@@ -550,7 +641,7 @@ export default function Home() {
                     {selectedOffice.recommendation.reason}
                   </p>
 
-                  <div className="mt-5 grid gap-3 sm:grid-cols-3">
+                  <div className="mt-5 grid gap-3 sm:grid-cols-3 lg:mt-4 lg:gap-2">
                     <StatChip
                       label="이동시간"
                       value={`${selectedOffice.travel.minutes}분`}
@@ -574,7 +665,7 @@ export default function Home() {
                 </div>
               )}
 
-              <div className="mt-5 space-y-4">
+              <div className="mt-5 space-y-4 lg:mt-4 lg:min-h-0 lg:flex-1 lg:space-y-3 lg:overflow-auto lg:pr-1">
                 {(result?.recommendations ?? []).map((office) => (
                   <RecommendationCard
                     key={office.id}
@@ -588,6 +679,61 @@ export default function Home() {
           </div>
         </section>
       </div>
+
+      {isPurposePickerOpen ? (
+        <div
+          className="fixed inset-0 z-50 flex items-end bg-[rgba(17,17,17,0.45)] px-4 pb-4 pt-10 backdrop-blur-[6px] sm:items-center sm:justify-center sm:px-6"
+          onClick={closePurposePicker}
+        >
+          <div
+            id={purposeDialogId}
+            role="dialog"
+            aria-modal="true"
+            aria-label="민원 목적 선택"
+            className="w-full max-w-3xl overflow-hidden rounded-[32px] border border-[rgba(255,255,255,0.22)] bg-[linear-gradient(180deg,rgba(255,251,237,0.98)_0%,rgba(255,255,255,1)_100%)] shadow-[0_30px_80px_rgba(17,17,17,0.26)]"
+            onClick={(event) => event.stopPropagation()}
+          >
+            <div className="border-b border-[rgba(17,17,17,0.08)] px-5 py-4 sm:px-6">
+              <div className="flex items-start justify-between gap-4">
+                <div>
+                  <p className="text-xs font-semibold uppercase tracking-[0.28em] text-[var(--accent-strong)]">
+                    Purpose Picker
+                  </p>
+                  <h2 className="mt-2 text-2xl font-semibold tracking-[-0.04em]">
+                    민원 목적을 빠르게 선택하세요
+                  </h2>
+                  <p className="mt-2 text-sm leading-6 text-[var(--muted)]">
+                    목적 선택을 팝업으로 분리해 입력 패널 높이를 줄이고, 결과 보드가
+                    한 화면 안에서 더 안정적으로 보이도록 맞췄습니다.
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={closePurposePicker}
+                  className="flex h-11 w-11 flex-none items-center justify-center rounded-2xl border border-[rgba(17,17,17,0.08)] bg-white text-lg shadow-[0_12px_24px_rgba(17,17,17,0.08)]"
+                  aria-label="민원 목적 선택 닫기"
+                >
+                  ✕
+                </button>
+              </div>
+            </div>
+
+            <div className="max-h-[72dvh] overflow-auto px-5 py-5 sm:px-6">
+              <div className="grid gap-3 sm:grid-cols-2">
+                {purposeOptions.map((purpose) => (
+                  <PurposeOptionCard
+                    key={purpose.id}
+                    label={purpose.label}
+                    description={purpose.description}
+                    selected={purposeId === purpose.id}
+                    onClick={() => handleSelectPurpose(purpose.id)}
+                  />
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      ) : null}
     </main>
   );
 }

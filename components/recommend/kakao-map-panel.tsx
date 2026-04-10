@@ -103,6 +103,92 @@ function loadKakaoMapSdk(appKey: string): Promise<void> {
   return kakaoMapSdkPromise;
 }
 
+function clamp(value: number, min: number, max: number): number {
+  return Math.min(Math.max(value, min), max);
+}
+
+function FallbackMap(props: {
+  origin: LocationPoint;
+  originLabel: string;
+  recommendations: RecommendedOffice[];
+  selectedOfficeId: string | null;
+  onSelectOffice: (officeId: string) => void;
+  reason: string;
+}) {
+  const points = [props.origin, ...props.recommendations.map((office) => office.coordinates)];
+  const latMin = Math.min(...points.map((point) => point.lat));
+  const latMax = Math.max(...points.map((point) => point.lat));
+  const lngMin = Math.min(...points.map((point) => point.lng));
+  const lngMax = Math.max(...points.map((point) => point.lng));
+  const latRange = latMax - latMin || 0.01;
+  const lngRange = lngMax - lngMin || 0.01;
+
+  return (
+    <div className="relative h-[380px] overflow-hidden bg-[radial-gradient(circle_at_20%_20%,rgba(255,255,255,0.9),rgba(255,244,199,0.92)_42%,rgba(255,230,138,0.94)_100%)] sm:h-[420px] lg:h-full">
+      <div className="absolute inset-0 opacity-50 [background-image:linear-gradient(rgba(17,17,17,0.06)_1px,transparent_1px),linear-gradient(90deg,rgba(17,17,17,0.06)_1px,transparent_1px)] [background-size:28px_28px]" />
+      <div className="absolute left-4 top-4 right-4 rounded-[20px] border border-[rgba(17,17,17,0.08)] bg-white/88 px-4 py-3 text-sm shadow-[0_18px_34px_rgba(17,17,17,0.08)] backdrop-blur-sm">
+        <p className="font-semibold">지도 fallback 보기</p>
+        <p className="mt-1 leading-6 text-[var(--muted)]">{props.reason}</p>
+      </div>
+
+      <div className="absolute inset-0 px-8 pb-8 pt-24">
+        <div className="relative h-full rounded-[28px] border border-[rgba(17,17,17,0.08)] bg-[rgba(255,255,255,0.26)] shadow-[inset_0_1px_0_rgba(255,255,255,0.5)]">
+          <div
+            className="absolute flex -translate-x-1/2 -translate-y-1/2 flex-col items-center gap-2"
+            style={{
+              left: "14%",
+              top: "74%",
+            }}
+          >
+            <div className="flex h-5 w-5 items-center justify-center rounded-full border-2 border-white bg-[var(--accent-blue)] shadow-[0_12px_22px_rgba(29,78,216,0.28)]" />
+            <div className="rounded-full bg-white/92 px-3 py-1 text-xs font-semibold shadow-[0_10px_20px_rgba(17,17,17,0.08)]">
+              {props.originLabel}
+            </div>
+          </div>
+
+          {props.recommendations.map((office) => {
+            const left = 12 + ((office.coordinates.lng - lngMin) / lngRange) * 76;
+            const top = 16 + (1 - (office.coordinates.lat - latMin) / latRange) * 66;
+            const selected = office.id === props.selectedOfficeId;
+
+            return (
+              <button
+                key={office.id}
+                type="button"
+                onClick={() => props.onSelectOffice(office.id)}
+                className="absolute -translate-x-1/2 -translate-y-1/2"
+                style={{
+                  left: `${clamp(left, 12, 88)}%`,
+                  top: `${clamp(top, 14, 84)}%`,
+                }}
+              >
+                <span
+                  className={`flex h-6 w-6 items-center justify-center rounded-full border-2 border-white text-[11px] font-semibold text-white shadow-[0_16px_26px_rgba(17,17,17,0.16)] transition-transform duration-200 ${
+                    selected
+                      ? "scale-110 bg-[var(--accent-red)]"
+                      : "bg-[var(--foreground)] hover:scale-105"
+                  }`}
+                >
+                  {office.recommendation.rank}
+                </span>
+                <span
+                  className={`mt-2 block rounded-full px-3 py-1 text-xs font-semibold shadow-[0_10px_20px_rgba(17,17,17,0.1)] ${
+                    selected
+                      ? "bg-[var(--foreground)] text-white"
+                      : "bg-white/92 text-[var(--foreground)]"
+                  }`}
+                >
+                  {office.name}
+                </span>
+              </button>
+            );
+          })}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export function KakaoMapPanel(props: {
   appKey: string;
   origin: LocationPoint;
@@ -351,10 +437,27 @@ export function KakaoMapPanel(props: {
       </div>
 
       <div className="relative">
-        <div
-          ref={mapContainerRef}
-          className="h-[420px] w-full bg-[linear-gradient(180deg,#fffdf4_0%,#fff7d6_100%)] sm:h-[500px]"
-        />
+        {sdkStatus === "ready" ? (
+          <div
+            ref={mapContainerRef}
+          className="h-[380px] w-full bg-[linear-gradient(180deg,#fffdf4_0%,#fff7d6_100%)] sm:h-[420px] lg:h-full"
+          />
+        ) : (
+          <FallbackMap
+            origin={origin}
+            originLabel={originLabel}
+            recommendations={recommendations}
+            selectedOfficeId={selectedOfficeId}
+            onSelectOffice={onSelectOffice}
+            reason={
+              sdkStatus === "missing-key"
+                ? "Kakao 앱 키가 없어 좌표 기반 fallback 지도를 보여줍니다."
+                : sdkStatus === "error"
+                  ? "브라우저에서 Kakao SDK를 불러오지 못해 fallback 지도를 보여줍니다."
+                  : "지도를 준비하는 동안 fallback 지도를 먼저 보여줍니다."
+            }
+          />
+        )}
 
         {recommendations.length === 0 ? (
           <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 bg-[rgba(255,255,255,0.72)] px-6 text-center backdrop-blur-sm">
@@ -374,23 +477,6 @@ export function KakaoMapPanel(props: {
           </div>
         ) : null}
 
-        {sdkStatus === "missing-key" ? (
-          <div className="absolute inset-0 flex items-center justify-center bg-[rgba(255,255,255,0.84)] px-6 text-center">
-            <p className="max-w-md text-sm leading-6 text-[var(--muted)]">
-              `NEXT_PUBLIC_KAKAO_MAP_APP_KEY`가 없어 지도를 렌더링할 수 없습니다.
-              추천 리스트는 계속 확인할 수 있습니다.
-            </p>
-          </div>
-        ) : null}
-
-        {sdkStatus === "error" ? (
-          <div className="absolute inset-0 flex items-center justify-center bg-[rgba(255,255,255,0.84)] px-6 text-center">
-            <p className="max-w-md text-sm leading-6 text-[var(--muted)]">
-              Kakao 지도 SDK를 불러오지 못했습니다. 네트워크 또는 앱 키 설정을
-              확인해 주세요.
-            </p>
-          </div>
-        ) : null}
       </div>
     </section>
   );
