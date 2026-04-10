@@ -2,7 +2,7 @@ import sampleRecommendation from "@/data/demo/recommendation-sample.json";
 import { appConfig } from "@/lib/env";
 
 export default function Home() {
-  const topOffice = sampleRecommendation.offices[0];
+  const topOffice = sampleRecommendation.recommendations[0];
 
   return (
     <main className="relative flex-1 overflow-hidden">
@@ -48,7 +48,7 @@ export default function Home() {
               </article>
               <article className="rounded-[1.5rem] border border-[var(--line)] bg-white/70 p-4">
                 <p className="text-sm text-[var(--muted)]">기본 모드</p>
-                <p className="mt-2 font-semibold">{sampleRecommendation.mode}</p>
+                <p className="mt-2 font-semibold">{sampleRecommendation.meta.mode}</p>
               </article>
               <article className="rounded-[1.5rem] border border-[var(--line)] bg-white/70 p-4">
                 <p className="text-sm text-[var(--muted)]">샘플 추천 1위</p>
@@ -88,30 +88,33 @@ export default function Home() {
                 <div>
                   <h3 className="text-xl font-semibold">{topOffice.name}</h3>
                   <p className="mt-1 text-sm text-[var(--muted)]">
-                    처리 가능 업무: {topOffice.supportedTasks.join(", ")}
+                    처리 가능 업무:{" "}
+                    {topOffice.supportedTaskMatches
+                      .map((task) => task.taskName)
+                      .join(", ")}
                   </p>
                 </div>
                 <div className="rounded-full bg-[var(--surface-strong)] px-4 py-2 text-sm font-semibold">
-                  score {topOffice.score}
+                  score {topOffice.recommendation.score}
                 </div>
               </div>
               <dl className="mt-6 grid gap-4 sm:grid-cols-3">
                 <div>
                   <dt className="text-sm text-[var(--muted)]">대기 인원</dt>
                   <dd className="mt-1 text-lg font-semibold">
-                    {topOffice.waitingCount}명
+                    {topOffice.waiting.count}명
                   </dd>
                 </div>
                 <div>
                   <dt className="text-sm text-[var(--muted)]">예상 이동시간</dt>
                   <dd className="mt-1 text-lg font-semibold">
-                    {topOffice.travelMinutes}분
+                    {topOffice.travel.minutes}분
                   </dd>
                 </div>
                 <div>
                   <dt className="text-sm text-[var(--muted)]">추천 순위</dt>
                   <dd className="mt-1 text-lg font-semibold">
-                    {topOffice.rank}위
+                    {topOffice.recommendation.rank}위
                   </dd>
                 </div>
               </dl>
