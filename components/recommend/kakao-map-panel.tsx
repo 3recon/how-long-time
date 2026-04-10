@@ -124,7 +124,7 @@ function FallbackMap(props: {
   const lngRange = lngMax - lngMin || 0.01;
 
   return (
-    <div className="relative h-[380px] overflow-hidden bg-[radial-gradient(circle_at_20%_20%,rgba(255,255,255,0.9),rgba(255,244,199,0.92)_42%,rgba(255,230,138,0.94)_100%)] sm:h-[420px] lg:h-full">
+    <div className="relative h-[380px] overflow-hidden bg-[linear-gradient(180deg,rgba(244,238,223,0.98)_0%,rgba(235,227,207,0.98)_100%)] sm:h-[420px] lg:h-full">
       <div className="absolute inset-0 opacity-50 [background-image:linear-gradient(rgba(17,17,17,0.06)_1px,transparent_1px),linear-gradient(90deg,rgba(17,17,17,0.06)_1px,transparent_1px)] [background-size:28px_28px]" />
       <div className="absolute left-4 top-4 right-4 rounded-[20px] border border-[rgba(17,17,17,0.08)] bg-white/88 px-4 py-3 text-sm shadow-[0_18px_34px_rgba(17,17,17,0.08)] backdrop-blur-sm">
         <p className="font-semibold">지도 fallback 보기</p>
@@ -140,7 +140,7 @@ function FallbackMap(props: {
               top: "74%",
             }}
           >
-            <div className="flex h-5 w-5 items-center justify-center rounded-full border-2 border-white bg-[var(--accent-blue)] shadow-[0_12px_22px_rgba(29,78,216,0.28)]" />
+            <div className="flex h-5 w-5 items-center justify-center rounded-full border-2 border-white bg-[var(--accent-blue)] shadow-[0_12px_22px_rgba(31,58,95,0.28)]" />
             <div className="rounded-full bg-white/92 px-3 py-1 text-xs font-semibold shadow-[0_10px_20px_rgba(17,17,17,0.08)]">
               {props.originLabel}
             </div>
@@ -430,7 +430,7 @@ export function KakaoMapPanel(props: {
           </h3>
         </div>
         {selectedOffice ? (
-          <div className="rounded-full border border-[rgba(17,17,17,0.12)] bg-[rgba(255,212,0,0.14)] px-3 py-1.5 text-sm font-medium text-[var(--foreground)]">
+          <div className="rounded-full border border-[rgba(17,17,17,0.12)] bg-[rgba(211,166,63,0.14)] px-3 py-1.5 text-sm font-medium text-[var(--foreground)]">
             현재 포커스: {selectedOffice.name}
           </div>
         ) : null}
@@ -440,7 +440,7 @@ export function KakaoMapPanel(props: {
         {sdkStatus === "ready" ? (
           <div
             ref={mapContainerRef}
-          className="h-[380px] w-full bg-[linear-gradient(180deg,#fffdf4_0%,#fff7d6_100%)] sm:h-[420px] lg:h-full"
+          className="h-[380px] w-full bg-[linear-gradient(180deg,#fffdf8_0%,#ebe3cf_100%)] sm:h-[420px] lg:h-full"
           />
         ) : (
           <FallbackMap

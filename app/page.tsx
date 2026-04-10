@@ -97,7 +97,7 @@ function PurposeOptionCard(props: {
       onClick={onClick}
       className={`group w-full rounded-[24px] border px-4 py-4 text-left transition-all duration-200 ${
         selected
-          ? "border-[var(--accent-blue)] bg-[linear-gradient(180deg,rgba(255,249,227,0.98)_0%,rgba(255,255,255,1)_100%)] shadow-[0_24px_48px_rgba(29,78,216,0.12)]"
+          ? "border-[var(--accent-blue)] bg-[linear-gradient(180deg,rgba(244,238,223,0.98)_0%,rgba(255,253,248,1)_100%)] shadow-[0_24px_48px_rgba(31,58,95,0.12)]"
           : "border-[rgba(17,17,17,0.08)] bg-white/94 hover:-translate-y-0.5 hover:border-[rgba(17,17,17,0.16)] hover:shadow-[0_18px_32px_rgba(17,17,17,0.08)]"
       }`}
       aria-pressed={selected}
@@ -137,7 +137,7 @@ function RecommendationCard(props: {
       onClick={onSelect}
       className={`w-full rounded-[24px] border px-5 py-4 text-left transition-all duration-200 ${
         selected
-          ? "border-[var(--accent-blue)] bg-[linear-gradient(180deg,rgba(255,248,220,0.95)_0%,rgba(255,255,255,1)_100%)] shadow-[0_24px_48px_rgba(29,78,216,0.12)]"
+          ? "border-[var(--accent-blue)] bg-[linear-gradient(180deg,rgba(244,238,223,0.95)_0%,rgba(255,253,248,1)_100%)] shadow-[0_24px_48px_rgba(31,58,95,0.12)]"
           : "border-[rgba(17,17,17,0.08)] bg-white hover:-translate-y-0.5 hover:border-[rgba(17,17,17,0.16)] hover:shadow-[0_20px_40px_rgba(17,17,17,0.08)]"
       }`}
       aria-pressed={selected}
@@ -145,7 +145,7 @@ function RecommendationCard(props: {
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
           <div className="flex items-center gap-2">
-            <span className="rounded-full border border-[rgba(17,17,17,0.08)] bg-[rgba(255,212,0,0.18)] px-2.5 py-1 text-xs font-semibold uppercase tracking-[0.18em] text-[var(--foreground)]">
+            <span className="rounded-full border border-[rgba(17,17,17,0.08)] bg-[rgba(211,166,63,0.18)] px-2.5 py-1 text-xs font-semibold uppercase tracking-[0.18em] text-[var(--foreground)]">
               #{office.recommendation.rank}
             </span>
             {selected ? (
@@ -211,6 +211,7 @@ export default function Home() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isLocating, setIsLocating] = useState(false);
   const [isPurposePickerOpen, setIsPurposePickerOpen] = useState(false);
+  const [draftPurposeId, setDraftPurposeId] = useState("");
 
   useEffect(() => {
     setSelectedOfficeId(getInitialSelectedOfficeId(result));
@@ -241,13 +242,20 @@ export default function Home() {
     : null;
   const selectedPurpose =
     purposeOptions.find((purpose) => purpose.id === purposeId) ?? null;
+  const draftPurpose =
+    purposeOptions.find((purpose) => purpose.id === draftPurposeId) ?? null;
+
+  function openPurposePicker() {
+    setDraftPurposeId(purposeId);
+    setIsPurposePickerOpen(true);
+  }
 
   function closePurposePicker() {
     setIsPurposePickerOpen(false);
   }
 
-  function handleSelectPurpose(nextPurposeId: RecommendPurposeId) {
-    setPurposeId(nextPurposeId);
+  function applySelectedPurpose() {
+    setPurposeId(draftPurposeId);
     setFieldErrors((current) => ({
       ...current,
       purposeId: undefined,
@@ -370,12 +378,6 @@ export default function Home() {
 
   return (
     <main className="relative min-h-dvh overflow-hidden lg:h-dvh">
-      <div className="absolute inset-0 grid-pattern opacity-45" aria-hidden />
-      <div
-        className="absolute inset-x-0 top-0 h-[28rem] bg-[radial-gradient(circle_at_top_left,rgba(255,212,0,0.28),transparent_55%),linear-gradient(180deg,rgba(255,255,255,0.98)_0%,rgba(255,249,230,0.92)_100%)]"
-        aria-hidden
-      />
-
       <div className="relative mx-auto flex w-full max-w-[1600px] flex-col gap-4 px-4 py-4 sm:px-6 lg:grid lg:h-dvh lg:grid-cols-[minmax(0,390px)_minmax(0,1fr)] lg:gap-5 lg:overflow-hidden lg:px-6 lg:py-4 xl:grid-cols-[minmax(0,420px)_minmax(0,1fr)]">
         <section className="soft-card rounded-[32px] border-[rgba(17,17,17,0.08)] p-5 sm:p-6 lg:flex lg:h-[calc(100dvh-2rem)] lg:min-h-0 lg:flex-col lg:overflow-hidden lg:p-5">
           <div className="space-y-3 border-b border-[var(--line)] pb-4 lg:space-y-2 lg:pb-3">
@@ -443,7 +445,7 @@ export default function Home() {
                     type="button"
                     onClick={handleUseCurrentLocation}
                     disabled={isLocating || isSubmitting}
-                    className="min-h-12 rounded-2xl border border-[rgba(17,17,17,0.12)] bg-[var(--accent)] px-4 text-sm font-semibold text-[var(--foreground)] shadow-[0_14px_28px_rgba(255,212,0,0.22)] hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:translate-y-0"
+                    className="min-h-12 rounded-2xl border border-[rgba(17,17,17,0.12)] bg-[var(--accent)] px-4 text-sm font-semibold text-[var(--foreground)] shadow-[0_14px_28px_rgba(211,166,63,0.22)] hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:translate-y-0"
                   >
                     {isLocating ? "위치 확인 중.." : "현재 위치 사용"}
                   </button>
@@ -475,10 +477,10 @@ export default function Home() {
 
               <button
                 type="button"
-                onClick={() => setIsPurposePickerOpen(true)}
+                onClick={openPurposePicker}
                 className={`w-full rounded-[26px] border px-4 py-4 text-left shadow-[0_18px_38px_rgba(17,17,17,0.06)] transition-all duration-200 hover:-translate-y-0.5 ${
                   selectedPurpose
-                    ? "border-[rgba(255,184,0,0.55)] bg-[linear-gradient(180deg,rgba(255,248,215,0.98)_0%,rgba(255,255,255,1)_100%)]"
+                    ? "border-[rgba(211,166,63,0.55)] bg-[linear-gradient(180deg,rgba(244,238,223,0.98)_0%,rgba(255,253,248,1)_100%)]"
                     : "border-[rgba(17,17,17,0.08)] bg-white"
                 }`}
                 aria-haspopup="dialog"
@@ -537,7 +539,7 @@ export default function Home() {
             ) : null}
 
             {requestNotice ? (
-              <div className="rounded-[20px] border border-[rgba(245,158,11,0.2)] bg-[rgba(255,212,0,0.12)] px-4 py-3 text-sm font-medium text-[var(--foreground)]">
+              <div className="rounded-[20px] border border-[rgba(211,166,63,0.24)] bg-[rgba(211,166,63,0.12)] px-4 py-3 text-sm font-medium text-[var(--foreground)]">
                 {requestNotice}
               </div>
             ) : null}
@@ -607,14 +609,14 @@ export default function Home() {
                   </h3>
                 </div>
                 {selectedOffice ? (
-                  <div className="rounded-2xl border border-[rgba(17,17,17,0.08)] bg-[rgba(255,212,0,0.12)] px-4 py-2 text-sm font-medium">
+                  <div className="rounded-2xl border border-[rgba(17,17,17,0.08)] bg-[rgba(211,166,63,0.12)] px-4 py-2 text-sm font-medium">
                     최근 대기 정보 {formatUpdatedAt(selectedOffice.waiting.updatedAt)}
                   </div>
                 ) : null}
               </div>
 
               {selectedOffice ? (
-                <div className="mt-5 rounded-[24px] border border-[rgba(17,17,17,0.08)] bg-[linear-gradient(180deg,rgba(255,250,232,0.95)_0%,rgba(255,255,255,1)_100%)] p-5 shadow-[0_22px_46px_rgba(17,17,17,0.06)] lg:mt-4 lg:p-4">
+                <div className="mt-5 rounded-[24px] border border-[rgba(17,17,17,0.08)] bg-[linear-gradient(180deg,rgba(244,238,223,0.95)_0%,rgba(255,253,248,1)_100%)] p-5 shadow-[0_22px_46px_rgba(17,17,17,0.06)] lg:mt-4 lg:p-4">
                   <div className="flex flex-wrap items-start justify-between gap-3">
                     <div>
                       <p className="text-xs font-semibold uppercase tracking-[0.22em] text-[var(--accent-strong)]">
@@ -703,8 +705,7 @@ export default function Home() {
                     민원 목적을 빠르게 선택하세요
                   </h2>
                   <p className="mt-2 text-sm leading-6 text-[var(--muted)]">
-                    목적 선택을 팝업으로 분리해 입력 패널 높이를 줄이고, 결과 보드가
-                    한 화면 안에서 더 안정적으로 보이도록 맞췄습니다.
+                    옵션을 먼저 둘러본 뒤 확인 버튼으로 적용할 수 있습니다.
                   </p>
                 </div>
                 <button
@@ -725,10 +726,35 @@ export default function Home() {
                     key={purpose.id}
                     label={purpose.label}
                     description={purpose.description}
-                    selected={purposeId === purpose.id}
-                    onClick={() => handleSelectPurpose(purpose.id)}
+                    selected={draftPurposeId === purpose.id}
+                    onClick={() => setDraftPurposeId(purpose.id)}
                   />
                 ))}
+              </div>
+
+              <div className="mt-5 flex flex-col-reverse gap-3 border-t border-[rgba(17,17,17,0.08)] pt-5 sm:flex-row sm:items-center sm:justify-between">
+                <p className="text-sm text-[var(--muted)]">
+                  {draftPurpose
+                    ? `선택 예정: ${draftPurpose.label}`
+                    : "목적을 하나 선택한 뒤 확인을 누르세요."}
+                </p>
+                <div className="flex gap-3">
+                  <button
+                    type="button"
+                    onClick={closePurposePicker}
+                    className="min-h-11 rounded-2xl border border-[rgba(17,17,17,0.1)] bg-white px-4 text-sm font-semibold text-[var(--foreground)]"
+                  >
+                    취소
+                  </button>
+                  <button
+                    type="button"
+                    onClick={applySelectedPurpose}
+                    disabled={!draftPurposeId}
+                    className="min-h-11 rounded-2xl border border-[var(--foreground)] bg-[var(--foreground)] px-5 text-sm font-semibold text-white shadow-[0_16px_32px_rgba(17,17,17,0.14)] disabled:cursor-not-allowed disabled:opacity-50"
+                  >
+                    확인
+                  </button>
+                </div>
               </div>
             </div>
           </div>
