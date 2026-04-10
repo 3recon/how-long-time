@@ -1,16 +1,16 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #111111;
-  --surface: #ffffff;
-  --surface-strong: #ffd84d;
+  --background: #f4eedf;
+  --foreground: #111827;
+  --surface: #fffdf8;
+  --surface-strong: #ebe3cf;
   --line: rgba(17, 17, 17, 0.16);
-  --accent: #ffd400;
-  --accent-strong: #ffb800;
-  --accent-blue: #1d4ed8;
+  --accent: #d3a63f;
+  --accent-strong: #1f3a5f;
+  --accent-blue: #1f3a5f;
   --accent-red: #dc2626;
-  --muted: #5f5f5f;
+  --muted: #5b6472;
   --shadow: 0 18px 42px rgba(17, 17, 17, 0.06);
 }
 
@@ -37,18 +37,10 @@ body {
   color: var(--foreground);
   font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
-  background-image:
-    linear-gradient(rgba(17, 17, 17, 0.03) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(17, 17, 17, 0.03) 1px, transparent 1px),
-    linear-gradient(180deg, #ffffff 0%, #fffef8 100%);
-  background-size:
-    32px 32px,
-    32px 32px,
-    auto;
 }
 
 body::selection {
-  background: rgba(244, 180, 0, 0.22);
+  background: rgba(211, 166, 63, 0.24);
 }
 
 a,
@@ -69,8 +61,4 @@ button {
 }
 
 .grid-pattern {
-  background-image:
-    linear-gradient(rgba(17, 17, 17, 0.04) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(17, 17, 17, 0.04) 1px, transparent 1px);
-  background-size: 26px 26px;
 }
