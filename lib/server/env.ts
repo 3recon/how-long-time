@@ -2,6 +2,7 @@ export interface ServerRuntimeConfig {
   kakaoRestApiKey: string | null;
   odsayApiKey: string | null;
   publicDataApiKey: string | null;
+  recommendBackendBaseUrl: string | null;
   requestTimeoutMs: number;
 }
 
@@ -20,6 +21,10 @@ export function getServerRuntimeConfig(): ServerRuntimeConfig {
     kakaoRestApiKey: process.env.KAKAO_REST_API_KEY ?? null,
     odsayApiKey: process.env.ODSAY_API_KEY ?? null,
     publicDataApiKey: process.env.PUBLIC_DATA_API_KEY ?? null,
+    recommendBackendBaseUrl:
+      process.env.RECOMMEND_BACKEND_BASE_URL ??
+      process.env.NEXT_PUBLIC_API_BASE_URL ??
+      null,
     requestTimeoutMs: parseTimeoutMs(process.env.REQUEST_TIMEOUT_MS),
   };
 }

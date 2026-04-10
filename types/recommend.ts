@@ -60,6 +60,15 @@ export interface PurposeTaskMapping {
   failureMessage: string;
 }
 
+export interface RecommendOfficeCatalogItem {
+  id: string;
+  name: string;
+  address: string;
+  coordinates: LocationPoint;
+  aliases: string[];
+  supportedPurposeIds: RecommendPurposeId[];
+}
+
 export interface SupportedTaskMatch {
   taskName: string;
   ruleType: MatchingRuleType;
