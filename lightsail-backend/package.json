@@ -7,7 +7,7 @@
     "dev": "tsx watch src/index.ts",
     "build": "tsc -p tsconfig.build.json",
     "start": "node dist/index.js",
-    "test": "tsx tests/health.spec.ts && tsx tests/recommend-route.spec.ts && tsx tests/recommend-service.spec.ts && tsx tests/public-data.spec.ts && tsx tests/mobility.spec.ts"
+    "test": "tsx tests/health.spec.ts && tsx tests/recommend-route.spec.ts && tsx tests/recommend-scoring.spec.ts && tsx tests/recommend-service.spec.ts && tsx tests/public-data.spec.ts && tsx tests/mobility.spec.ts"
   },
   "dependencies": {
     "cors": "^2.8.5",
