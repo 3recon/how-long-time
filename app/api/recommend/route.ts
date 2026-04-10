@@ -12,7 +12,11 @@ function errorResponse(
   error: string,
   details?: string,
 ) {
-  const body: RecommendErrorResponse = { error, details };
+  const body: RecommendErrorResponse = {
+    error,
+    details,
+    contractVersion: "2026-04-stage-2",
+  };
 
   return NextResponse.json(body, { status });
 }
@@ -21,7 +25,7 @@ export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
 
   const parsed = parseRecommendRequest({
-    purpose: searchParams.get("purpose") ?? undefined,
+    purposeId: searchParams.get("purposeId") ?? undefined,
     originLabel: searchParams.get("originLabel") ?? undefined,
     origin: {
       lat: searchParams.get("lat")

@@ -1,39 +1,94 @@
 {
-  "requestedAt": "2026-04-10T09:00:00.000Z",
-  "mode": "demo",
-  "purpose": "여권 재발급",
-  "originLabel": "서울시청",
-  "origin": {
-    "lat": 37.5665,
-    "lng": 126.978
+  "request": {
+    "purposeId": "passport-reissue",
+    "originLabel": "서울시청",
+    "origin": {
+      "lat": 37.5665,
+      "lng": 126.978
+    },
+    "mode": "demo"
   },
-  "offices": [
+  "meta": {
+    "contractVersion": "2026-04-stage-2",
+    "requestedAt": "2026-04-10T09:00:00.000Z",
+    "mode": "demo",
+    "dataSource": "demo-sample",
+    "scenarioId": "demo-seoul-cityhall-passport",
+    "purposeMappingVersion": "2026-04-stage-2"
+  },
+  "summary": {
+    "totalCandidateCount": 2,
+    "returnedRecommendationCount": 2
+  },
+  "recommendations": [
     {
       "id": "jongno-passport-office",
       "name": "종로구청 여권 민원실",
-      "rank": 1,
-      "score": 91,
-      "waitingCount": 8,
-      "travelMinutes": 19,
       "address": "서울 종로구 삼봉로 43",
-      "supportedTasks": ["여권 재발급", "여권 수령"],
       "coordinates": {
         "lat": 37.5721,
         "lng": 126.9794
+      },
+      "supportedPurposeIds": ["passport-reissue", "passport-pickup"],
+      "supportedTaskMatches": [
+        {
+          "taskName": "여권 재발급",
+          "ruleType": "keyword"
+        },
+        {
+          "taskName": "여권 수령",
+          "ruleType": "keyword"
+        }
+      ],
+      "waiting": {
+        "count": 8,
+        "updatedAt": "2026-04-10T08:55:00.000Z"
+      },
+      "travel": {
+        "minutes": 19,
+        "distanceKm": 3.2
+      },
+      "recommendation": {
+        "score": 91,
+        "rank": 1,
+        "waitingPenalty": 4,
+        "travelPenalty": 5,
+        "reason": "이동시간이 짧고 현재 대기 인원이 낮아 가장 균형이 좋습니다."
       }
     },
     {
       "id": "jung-gu-civil-service",
       "name": "중구청 민원여권과",
-      "rank": 2,
-      "score": 84,
-      "waitingCount": 11,
-      "travelMinutes": 16,
       "address": "서울 중구 창경궁로 17",
-      "supportedTasks": ["여권 재발급", "제증명 발급"],
       "coordinates": {
         "lat": 37.5641,
         "lng": 126.9979
+      },
+      "supportedPurposeIds": ["passport-reissue", "certificate-issuance"],
+      "supportedTaskMatches": [
+        {
+          "taskName": "여권 재발급",
+          "ruleType": "keyword"
+        },
+        {
+          "taskName": "제증명 발급",
+          "ruleType": "keyword"
+        }
+      ],
+      "waiting": {
+        "count": 11,
+        "updatedAt": "2026-04-10T08:55:00.000Z"
+      },
+      "travel": {
+        "minutes": 16,
+        "distanceKm": 2.6
+      },
+      "recommendation": {
+        "score": 84,
+        "rank": 2,
+        "waitingPenalty": 7,
+        "travelPenalty": 9,
+        "reason": "가깝지만 대기 인원이 더 많아 2순위로 정렬됩니다."
       }
     }
   ]

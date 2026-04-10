@@ -1,5 +1,6 @@
 import type {
   RecommendMode,
+  RecommendPurposeId,
   RecommendRequest,
   RecommendRequestInput,
 } from "@/types/recommend";
@@ -21,18 +22,25 @@ export type ParseRecommendRequestResult = ParseSuccess | ParseFailure;
 const isRecommendMode = (value: unknown): value is RecommendMode =>
   value === "live" || value === "demo";
 
+const isRecommendPurposeId = (value: unknown): value is RecommendPurposeId =>
+  value === "passport-reissue" ||
+  value === "passport-pickup" ||
+  value === "certificate-issuance" ||
+  value === "family-relation-certificate" ||
+  value === "resident-registration";
+
 const isFiniteNumber = (value: unknown): value is number =>
   typeof value === "number" && Number.isFinite(value);
 
 export function parseRecommendRequest(
   input: RecommendRequestInput,
 ): ParseRecommendRequestResult {
-  if (typeof input.purpose !== "string" || input.purpose.trim().length === 0) {
+  if (!isRecommendPurposeId(input.purposeId)) {
     return {
       ok: false,
       status: 400,
       error: "INVALID_REQUEST",
-      details: "purpose는 비어 있지 않은 문자열이어야 합니다.",
+      details: "purposeId는 지원되는 민원 목적 ID여야 합니다.",
     };
   }
 
@@ -82,7 +90,7 @@ export function parseRecommendRequest(
   return {
     ok: true,
     value: {
-      purpose: input.purpose.trim(),
+      purposeId: input.purposeId,
       originLabel: input.originLabel.trim(),
       origin: { lat, lng },
       mode,
