@@ -32,6 +32,14 @@ const isRecommendPurposeId = (value: unknown): value is RecommendPurposeId =>
 const isFiniteNumber = (value: unknown): value is number =>
   typeof value === "number" && Number.isFinite(value);
 
+function isLatitude(value: number): boolean {
+  return value >= -90 && value <= 90;
+}
+
+function isLongitude(value: number): boolean {
+  return value >= -180 && value <= 180;
+}
+
 export function parseRecommendRequest(
   input: RecommendRequestInput,
 ): ParseRecommendRequestResult {
@@ -40,7 +48,7 @@ export function parseRecommendRequest(
       ok: false,
       status: 400,
       error: "INVALID_REQUEST",
-      details: "purposeId는 지원되는 민원 목적 ID여야 합니다.",
+      details: "purposeId must be a supported purpose id.",
     };
   }
 
@@ -52,7 +60,7 @@ export function parseRecommendRequest(
       ok: false,
       status: 400,
       error: "INVALID_REQUEST",
-      details: "originLabel은 비어 있지 않은 문자열이어야 합니다.",
+      details: "originLabel must be a non-empty string.",
     };
   }
 
@@ -61,7 +69,7 @@ export function parseRecommendRequest(
       ok: false,
       status: 400,
       error: "INVALID_REQUEST",
-      details: "origin 좌표가 필요합니다.",
+      details: "origin coordinates are required.",
     };
   }
 
@@ -72,7 +80,16 @@ export function parseRecommendRequest(
       ok: false,
       status: 400,
       error: "INVALID_REQUEST",
-      details: "origin.lat, origin.lng는 숫자여야 합니다.",
+      details: "origin.lat and origin.lng must be valid numbers.",
+    };
+  }
+
+  if (!isLatitude(lat) || !isLongitude(lng)) {
+    return {
+      ok: false,
+      status: 400,
+      error: "INVALID_REQUEST",
+      details: "origin coordinates are out of range.",
     };
   }
 
@@ -83,7 +100,7 @@ export function parseRecommendRequest(
       ok: false,
       status: 400,
       error: "INVALID_REQUEST",
-      details: "mode는 live 또는 demo만 허용됩니다.",
+      details: "mode must be either live or demo.",
     };
   }
 
