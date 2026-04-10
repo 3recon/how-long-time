@@ -75,6 +75,40 @@ export interface TravelEstimate {
   distanceKm: number | null;
 }
 
+export interface ResolvedLocation {
+  label: string;
+  coordinates: LocationPoint;
+}
+
+export type MobilityDestination = ResolvedLocation;
+
+export interface MobilityLookupInput {
+  originAddress: string;
+  destination: MobilityDestination;
+}
+
+export interface MobilityLookupFallbackInfo {
+  code: "MOBILITY_TIMEOUT" | "MOBILITY_LOOKUP_FAILED";
+  message: string;
+  travel: TravelEstimate;
+}
+
+export interface MobilityLookupSuccess {
+  ok: true;
+  origin: ResolvedLocation;
+  destination: MobilityDestination;
+  travel: TravelEstimate;
+}
+
+export interface MobilityLookupFallback {
+  ok: false;
+  fallback: MobilityLookupFallbackInfo;
+}
+
+export type MobilityLookupResult =
+  | MobilityLookupSuccess
+  | MobilityLookupFallback;
+
 export interface RecommendationBreakdown {
   score: number;
   rank: number;
