@@ -1,0 +1,40 @@
+{
+  "requestedAt": "2026-04-10T09:00:00.000Z",
+  "mode": "demo",
+  "purpose": "여권 재발급",
+  "originLabel": "서울시청",
+  "origin": {
+    "lat": 37.5665,
+    "lng": 126.978
+  },
+  "offices": [
+    {
+      "id": "jongno-passport-office",
+      "name": "종로구청 여권 민원실",
+      "rank": 1,
+      "score": 91,
+      "waitingCount": 8,
+      "travelMinutes": 19,
+      "address": "서울 종로구 삼봉로 43",
+      "supportedTasks": ["여권 재발급", "여권 수령"],
+      "coordinates": {
+        "lat": 37.5721,
+        "lng": 126.9794
+      }
+    },
+    {
+      "id": "jung-gu-civil-service",
+      "name": "중구청 민원여권과",
+      "rank": 2,
+      "score": 84,
+      "waitingCount": 11,
+      "travelMinutes": 16,
+      "address": "서울 중구 창경궁로 17",
+      "supportedTasks": ["여권 재발급", "제증명 발급"],
+      "coordinates": {
+        "lat": 37.5641,
+        "lng": 126.9979
+      }
+    }
+  ]
+}
