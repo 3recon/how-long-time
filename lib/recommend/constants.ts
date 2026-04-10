@@ -1,3 +1,4 @@
-export const recommendContractVersion = "2026-04-stage-6";
-
-export const defaultTravelFallbackMinutes = 60;
+export {
+  defaultTravelFallbackMinutes,
+  recommendContractVersion,
+} from "../../lightsail-backend/src/recommend/constants";

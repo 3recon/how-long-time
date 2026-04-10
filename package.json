@@ -6,6 +6,9 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
+    "backend:dev": "npm --prefix lightsail-backend run dev",
+    "backend:build": "npm --prefix lightsail-backend run build",
+    "backend:test": "npm --prefix lightsail-backend run test",
     "lint": "eslint .",
     "format": "prettier --write .",
     "format:check": "prettier --check ."
