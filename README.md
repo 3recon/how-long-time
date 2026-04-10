@@ -58,6 +58,8 @@ npm run format:check
 - ESLint + Prettier 기본 설정
 - 추천 API 요청/응답 타입 초안
 - demo 모드 샘플 데이터 초안
+- 공공데이터 민원실 실시간 정보 API 파서/변환 모듈
+- 공공데이터 API 테스트용 샘플 응답
 - 민원나우용 초기 랜딩 화면
 
 ## 폴더 구조
@@ -110,6 +112,12 @@ public/images/      정적 이미지 자산
 
 ## 다음 작업
 
-- `/api/recommend` 계약 구체화
-- 공공데이터 API 응답 타입 정리
-- 민원 목적과 `taskNm` 매핑 규칙 설계
+- 민원 목적과 `taskNm` 매핑 규칙 구체화
+- 공공데이터 live 데이터와 추천 로직 연결
+
+## 공공데이터 API 메모
+
+- 엔드포인트: `https://apis.data.go.kr/B551982/cso_v2/cso_realtime_v2`
+- 필수 서버 키: `PUBLIC_DATA_API_KEY`
+- 테스트용 샘플: [data/public-data/cso-realtime-sample.json](C:/dev/how_long_time/data/public-data/cso-realtime-sample.json)
+- 서버 모듈: [lib/server/public-data.ts](C:/dev/how_long_time/lib/server/public-data.ts)

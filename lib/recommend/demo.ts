@@ -3,6 +3,8 @@ import { purposeCatalog } from "@/data/recommend/purposes";
 import { purposeMappingVersion } from "@/data/recommend/task-mappings";
 import type { RecommendRequest, RecommendResponse } from "@/types/recommend";
 
+const demoRecommendationSample = sampleRecommendation as RecommendResponse;
+
 export function createDemoRecommendResponse(
   request: RecommendRequest,
 ): RecommendResponse {
@@ -11,10 +13,10 @@ export function createDemoRecommendResponse(
   );
 
   return {
-    ...sampleRecommendation,
+    ...demoRecommendationSample,
     request,
     meta: {
-      ...sampleRecommendation.meta,
+      ...demoRecommendationSample.meta,
       requestedAt: new Date().toISOString(),
       mode: request.mode,
       scenarioId: selectedPurpose?.demoScenarioId ?? null,

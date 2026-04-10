@@ -1,0 +1,48 @@
+{
+  "header": {
+    "resultCode": "K0",
+    "resultMsg": "NORMAL_SERVICE",
+    "context": "https://ido.sharedata.go.kr/dcat/catalog/c0005.json",
+    "dataset": "KLID-DATASET-d0005",
+    "service": "KLID-d0005-s0002"
+  },
+  "body": {
+    "items": {
+      "item": [
+        {
+          "stdgCd": "1111000000",
+          "csoSn": "CS0001",
+          "csoNm": "종로구청 여권 민원실",
+          "taskNo": "1",
+          "taskNm": "4.여권신청",
+          "clotNo": "12",
+          "wtngCnt": "8",
+          "totDt": "20260410103000"
+        },
+        {
+          "stdgCd": "1114000000",
+          "csoSn": "CS0002",
+          "csoNm": "중구청 민원여권과",
+          "taskNo": "2",
+          "taskNm": "여권교부",
+          "clotNo": "7",
+          "wtngCnt": "3",
+          "totDt": "20260410103100"
+        },
+        {
+          "stdgCd": "1120000000",
+          "csoSn": "CS0003",
+          "csoNm": "성동구청 민원여권과",
+          "taskNo": "3",
+          "taskNm": "등본,인감/가족관계",
+          "clotNo": "4",
+          "wtngCnt": "5",
+          "totDt": "20260410103200"
+        }
+      ]
+    },
+    "numOfRows": 100,
+    "pageNo": 1,
+    "totalCount": 3
+  }
+}
