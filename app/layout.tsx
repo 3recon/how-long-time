@@ -1,10 +1,11 @@
 import type { Metadata } from "next";
+
 import "./globals.css";
 
 export const metadata: Metadata = {
   title: "민원나우",
   description:
-    "대기 인원과 이동 시간을 함께 고려해 방문할 민원실을 추천하는 서비스",
+    "대기 인원과 이동시간을 함께 고려해 방문할 민원실을 추천하는 서비스",
 };
 
 export default function RootLayout({
