@@ -9,12 +9,15 @@ export const purposeTaskMappings: PurposeTaskMapping[] = [
       { type: "keyword", keyword: "여권접수" },
       { type: "keyword", keyword: "여권 접수" },
       { type: "keyword", keyword: "여권발급" },
-      { type: "keyword", keyword: "여권신고" },
     ],
     excludeRules: [
       { type: "keyword", keyword: "찾기" },
       { type: "keyword", keyword: "수령" },
       { type: "keyword", keyword: "교부" },
+      { type: "keyword", keyword: "심사" },
+      { type: "exact", keyword: "여권신고" },
+      { type: "exact", keyword: "여권접수 교부인원" },
+      { type: "exact", keyword: "여권접수 대기인원" },
     ],
     sampleTaskNames: [
       "4.여권신청",
@@ -23,9 +26,13 @@ export const purposeTaskMappings: PurposeTaskMapping[] = [
       "여권 접수",
       "신청서 작성후, 여권 신청",
       "여권발급 신청하기\n(4~7번 창구)",
-      "여권신고",
     ],
-    ambiguousTaskNames: ["여권 심사•교부", "여권접수 교부인원", "여권접수 대기인원"],
+    ambiguousTaskNames: [
+      "여권 심사•교부",
+      "여권신고",
+      "여권접수 교부인원",
+      "여권접수 대기인원",
+    ],
     failureMessage:
       "선택한 민원 목적과 일치하는 여권 재발급 업무를 찾지 못했습니다.",
   },
@@ -40,7 +47,11 @@ export const purposeTaskMappings: PurposeTaskMapping[] = [
       { type: "keyword", keyword: "여권 찾기" },
       { type: "keyword", keyword: "여권 찾는곳" },
     ],
-    excludeRules: [{ type: "keyword", keyword: "신청" }],
+    excludeRules: [
+      { type: "keyword", keyword: "접수" },
+      { type: "keyword", keyword: "발급" },
+      { type: "keyword", keyword: "심사" },
+    ],
     sampleTaskNames: [
       "4.여권교부",
       "여권교부",
@@ -59,12 +70,15 @@ export const purposeTaskMappings: PurposeTaskMapping[] = [
     purposeId: "certificate-issuance",
     includeRules: [
       { type: "keyword", keyword: "제증명" },
-      { type: "keyword", keyword: "증명서" },
+      { type: "keyword", keyword: "증명서 발급" },
       { type: "keyword", keyword: "민원발급" },
+      { type: "keyword", keyword: "통합제증명" },
+      { type: "keyword", keyword: "통합증명발급" },
       { type: "keyword", keyword: "통합민원" },
     ],
     excludeRules: [
       { type: "keyword", keyword: "가족관계" },
+      { type: "keyword", keyword: "주민등록" },
       { type: "keyword", keyword: "여권" },
       { type: "keyword", keyword: "지방세" },
       { type: "keyword", keyword: "자동차" },
@@ -91,19 +105,24 @@ export const purposeTaskMappings: PurposeTaskMapping[] = [
   {
     purposeId: "family-relation-certificate",
     includeRules: [
-      { type: "keyword", keyword: "가족관계" },
       { type: "alias", keyword: "가압관계" },
+      { type: "keyword", keyword: "가족관계" },
+      { type: "keyword", keyword: "가족관계등록신고" },
+      { type: "keyword", keyword: "가족관계신고" },
       { type: "keyword", keyword: "혼인" },
+      { type: "keyword", keyword: "이혼" },
       { type: "keyword", keyword: "출생" },
       { type: "keyword", keyword: "사망" },
     ],
     excludeRules: [
       { type: "keyword", keyword: "여권" },
       { type: "keyword", keyword: "주민등록" },
+      { type: "keyword", keyword: "등본" },
+      { type: "keyword", keyword: "인감" },
+      { type: "keyword", keyword: "어디서나 민원" },
     ],
     sampleTaskNames: [
       "가족관계 발급•접수",
-      "등본,인감/가족관계",
       "5.가족관계등록신고",
       "가족관계등록신고",
       "가족관계신고",
@@ -112,7 +131,10 @@ export const purposeTaskMappings: PurposeTaskMapping[] = [
       "혼인•이혼•개명•출생•사망",
       "가압관계 신고(혼인,출생,이혼,사망등)",
     ],
-    ambiguousTaskNames: ["주민등록•인감,가압관계 어디서나 민원"],
+    ambiguousTaskNames: [
+      "등본,인감/가족관계",
+      "주민등록•인감,가압관계 어디서나 민원",
+    ],
     failureMessage:
       "선택한 민원 목적과 일치하는 가족관계 증명 업무를 찾지 못했습니다.",
   },
@@ -121,12 +143,13 @@ export const purposeTaskMappings: PurposeTaskMapping[] = [
     includeRules: [
       { type: "keyword", keyword: "주민등록" },
       { type: "keyword", keyword: "등본" },
+      { type: "keyword", keyword: "초본" },
       { type: "keyword", keyword: "인감" },
+      { type: "keyword", keyword: "전입" },
       { type: "keyword", keyword: "통합제증명" },
-      { type: "keyword", keyword: "증명서 발급" },
+      { type: "keyword", keyword: "통합증명발급" },
     ],
     excludeRules: [
-      { type: "keyword", keyword: "가족관계" },
       { type: "keyword", keyword: "여권" },
       { type: "keyword", keyword: "자동차" },
       { type: "keyword", keyword: "지방세" },
@@ -137,12 +160,11 @@ export const purposeTaskMappings: PurposeTaskMapping[] = [
       "6.통합제증명 발급",
       "통합제증명",
       "통합증명발급",
-      "증명서 발급",
     ],
-    ambiguousTaskNames: ["민원발급", "통합민원"],
+    ambiguousTaskNames: ["민원발급", "통합민원", "증명서 발급"],
     failureMessage:
       "선택한 민원 목적과 일치하는 주민등록 업무를 찾지 못했습니다.",
   },
 ];
 
-export const purposeMappingVersion = "2026-04-stage-2";
+export const purposeMappingVersion = "2026-04-stage-4";
