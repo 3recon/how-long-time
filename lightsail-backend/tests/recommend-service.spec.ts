@@ -159,6 +159,147 @@ async function main() {
       error.status === 404,
   );
 
+  const fallbackService = createRecommendService({
+    fetchWaitingItems: async () => ({
+      items: [
+        {
+          officeName: "종로구청 여권 민원실",
+          taskName: "4.여권신청",
+          waitingCount: null,
+          totalDateTime: null,
+        },
+        {
+          officeName: "중구청 민원여권과",
+          taskName: "여권발급 신청하기",
+          waitingCount: 4,
+          totalDateTime: "20260410103100",
+        },
+      ],
+      totalCount: 2,
+      pageNo: 1,
+      numOfRows: 100,
+    }),
+    getTravelEstimate: async ({ office }) => {
+      if (office.id === "jongno-passport-office") {
+        return {
+          minutes: 12,
+          distanceKm: null,
+        };
+      }
+
+      return {
+        minutes: 55,
+        distanceKm: null,
+      };
+    },
+    now: () => new Date("2026-04-10T09:00:00.000Z"),
+  });
+
+  const fallbackResponse = await fallbackService.recommend({
+    purposeId: "passport-reissue",
+    originLabel: "서울시청",
+    origin: {
+      lat: 37.5665,
+      lng: 126.978,
+    },
+    mode: "live",
+  });
+
+  assert.deepEqual(
+    fallbackResponse.recommendations.map((office) => ({
+      id: office.id,
+      rank: office.recommendation.rank,
+      score: office.recommendation.score,
+      waitingCount: office.waiting.count,
+      waitingPenalty: office.recommendation.waitingPenalty,
+      distanceKm: office.travel.distanceKm,
+    })),
+    [
+      {
+        id: "jongno-passport-office",
+        rank: 1,
+        score: 78,
+        waitingCount: 0,
+        waitingPenalty: 18,
+        distanceKm: null,
+      },
+      {
+        id: "jung-gu-civil-service",
+        rank: 2,
+        score: 76,
+        waitingCount: 4,
+        waitingPenalty: 2,
+        distanceKm: null,
+      },
+    ],
+  );
+  assert.equal(fallbackResponse.summary.totalCandidateCount, 2);
+  assert.equal(fallbackResponse.meta.dataSource, "live-api");
+  assert.equal(fallbackResponse.recommendations[0]?.waiting.updatedAt, null);
+
+  const aggregatedOfficeService = createRecommendService({
+    fetchWaitingItems: async () => ({
+      items: [
+        {
+          officeName: "종로구청",
+          taskName: "여권 신청",
+          waitingCount: 10,
+          totalDateTime: "20260410102000",
+        },
+        {
+          officeName: "종로구청 여권 민원실",
+          taskName: "여권 신청",
+          waitingCount: 3,
+          totalDateTime: "20260410104500",
+        },
+      ],
+      totalCount: 2,
+      pageNo: 1,
+      numOfRows: 100,
+    }),
+    getTravelEstimate: async () => ({
+      minutes: 18,
+      distanceKm: 3.1,
+    }),
+    now: () => new Date("2026-04-10T09:00:00.000Z"),
+  });
+
+  const aggregatedOfficeResponse = await aggregatedOfficeService.recommend({
+    purposeId: "passport-reissue",
+    originLabel: "서울시청",
+    origin: {
+      lat: 37.5665,
+      lng: 126.978,
+    },
+    mode: "live",
+  });
+
+  assert.deepEqual(aggregatedOfficeResponse.summary, {
+    totalCandidateCount: 1,
+    returnedRecommendationCount: 1,
+  });
+  assert.deepEqual(
+    aggregatedOfficeResponse.recommendations.map((office) => ({
+      id: office.id,
+      waitingCount: office.waiting.count,
+      updatedAt: office.waiting.updatedAt,
+      supportedTaskMatches: office.supportedTaskMatches,
+    })),
+    [
+      {
+        id: "jongno-passport-office",
+        waitingCount: 3,
+        updatedAt: "2026-04-10T10:45:00+09:00",
+        supportedTaskMatches: [
+          {
+            taskName: "여권 신청",
+            ruleType: "keyword",
+          },
+        ],
+      },
+    ],
+  );
+
   console.log("recommend service spec passed");
 }
 
