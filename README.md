@@ -34,6 +34,9 @@ SERVER_BASE_URL=http://3.34.168.45:3001
 자세한 설명은 [.env.example.md](C:/dev/how_long_time/.env.example.md)를
 참고하면 됩니다.
 
+mobility API 연동을 확인하려면 `KAKAO_REST_API_KEY`,
+`ODSAY_API_KEY`, `REQUEST_TIMEOUT_MS`도 함께 설정해야 합니다.
+
 ### 3. 개발 서버 실행
 
 ```bash
