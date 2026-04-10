@@ -12,6 +12,16 @@ export const recommendPurposeIds = [
 
 export type RecommendPurposeId = (typeof recommendPurposeIds)[number];
 
+export const recommendDemoScenarioIds = [
+  "demo-seoul-cityhall-passport",
+  "demo-seoul-cityhall-certificate",
+  "demo-seoul-cityhall-family",
+  "demo-seoul-cityhall-resident",
+] as const;
+
+export type RecommendDemoScenarioId =
+  (typeof recommendDemoScenarioIds)[number];
+
 export type RecommendDataSource = "live-api" | "demo-sample";
 
 export type MatchingRuleType = "exact" | "keyword" | "alias";
@@ -48,7 +58,8 @@ export interface PurposeCatalogItem {
   label: string;
   description: string;
   keywords: string[];
-  demoScenarioId: string;
+  defaultDemoScenarioId: RecommendDemoScenarioId;
+  demoScenarioIds: RecommendDemoScenarioId[];
 }
 
 export interface PurposeTaskMapping {
@@ -143,7 +154,7 @@ export interface RecommendResponseMeta {
   requestedAt: string;
   mode: RecommendMode;
   dataSource: RecommendDataSource;
-  scenarioId: string | null;
+  scenarioId: RecommendDemoScenarioId | null;
   purposeMappingVersion: string;
 }
 

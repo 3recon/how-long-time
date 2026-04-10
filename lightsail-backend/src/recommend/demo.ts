@@ -1,4 +1,4 @@
-import { demoRecommendationSample } from "../data/demo/recommendation-sample.js";
+import { getDemoRecommendScenario } from "../data/demo/scenarios.js";
 import { purposeCatalog } from "../data/recommend/purposes.js";
 import { purposeMappingVersion } from "../data/recommend/task-mappings.js";
 import type { RecommendRequest, RecommendResponse } from "../contracts/recommend.js";
@@ -10,16 +10,20 @@ export function createDemoRecommendResponse(
   const selectedPurpose = purposeCatalog.find(
     (purpose) => purpose.id === request.purposeId,
   );
+  const scenarioId = selectedPurpose?.defaultDemoScenarioId;
+  const demoScenario = scenarioId
+    ? getDemoRecommendScenario(scenarioId)
+    : getDemoRecommendScenario("demo-seoul-cityhall-passport");
 
   return {
-    ...demoRecommendationSample,
+    ...demoScenario,
     request,
     meta: {
-      ...demoRecommendationSample.meta,
+      ...demoScenario.meta,
       contractVersion: recommendContractVersion,
       requestedAt: new Date().toISOString(),
       mode: request.mode,
-      scenarioId: selectedPurpose?.demoScenarioId ?? null,
+      scenarioId: scenarioId ?? null,
       purposeMappingVersion,
     },
   };

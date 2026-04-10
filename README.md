@@ -72,7 +72,7 @@ app/                라우팅과 페이지 엔트리
 components/         재사용 UI 컴포넌트
 components/ui/      기초 UI 조각
 components/home/    메인 화면 전용 UI
-data/demo/          심사용 고정 샘플 데이터
+data/demo/          scenarioId 기준 심사용 고정 샘플 데이터
 data/mappings/      민원 목적 매핑 데이터 예정 위치
 lib/                공용 유틸과 환경설정
 lib/server/         서버 전용 API 연동 모듈 예정 위치
@@ -113,6 +113,10 @@ public/images/      정적 이미지 자산
 응답 구조는 `request`, `meta`, `summary`, `recommendations`로 고정하고,
 `demo`와 `live`는 같은 스키마를 사용합니다. 모드별 차이는
 `meta.dataSource`와 `meta.scenarioId`로만 구분합니다.
+
+demo 샘플은 `data/demo/<scenarioId>.json` 파일 단위로 관리하고,
+민원 목적별 기본 선택 규칙은 purpose 카탈로그의
+`defaultDemoScenarioId`에 맞춥니다.
 
 ## 다음 작업
 

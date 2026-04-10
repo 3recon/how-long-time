@@ -58,7 +58,8 @@
 ## 민원 목적 카탈로그 원칙
 - 프론트 선택지와 백엔드 필터의 기준 키는 `purposeId` 하나로 통일한다.
 - 라벨과 설명은 카탈로그에서만 관리한다.
-- demo 시나리오 선택도 카탈로그의 `demoScenarioId`를 기준으로 연결한다.
+- demo 시나리오 선택은 카탈로그의 `defaultDemoScenarioId`를 기준으로 한다.
+- 같은 목적에 여러 demo 샘플이 필요해지면 `demoScenarioIds`에 가능한 시나리오 ID를 추가한다.
 
 ## `taskNm` 매핑 원칙
 - 포함 규칙과 제외 규칙을 분리한다.
@@ -69,4 +70,5 @@
 ## demo 데이터 원칙
 - demo JSON도 실제 API 응답과 동일한 최상위 구조를 유지한다.
 - demo 전용 차이는 `meta.dataSource = "demo-sample"`와 `meta.scenarioId`로만 표현한다.
-- 발표 시나리오가 늘어나면 파일을 추가하되 스키마는 유지한다.
+- 시나리오별 샘플은 `data/demo/<scenarioId>.json` 파일로 관리한다.
+- 발표 시나리오가 늘어나면 시나리오 파일을 추가하되 스키마는 유지한다.

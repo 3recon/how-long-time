@@ -88,29 +88,57 @@ async function main() {
     ],
   );
 
-  const demoResponse = await createRecommendService().recommend({
-    purposeId: "passport-pickup",
-    originLabel: "서울시청",
-    origin: {
-      lat: 37.5665,
-      lng: 126.978,
+  const demoExpectations = [
+    {
+      purposeId: "passport-pickup",
+      scenarioId: "demo-seoul-cityhall-passport",
+      officeIds: ["jongno-passport-office", "jung-gu-civil-service"],
     },
-    mode: "demo",
-  });
+    {
+      purposeId: "certificate-issuance",
+      scenarioId: "demo-seoul-cityhall-certificate",
+      officeIds: ["jung-gu-civil-service"],
+    },
+    {
+      purposeId: "family-relation-certificate",
+      scenarioId: "demo-seoul-cityhall-family",
+      officeIds: ["seongdong-civil-service"],
+    },
+    {
+      purposeId: "resident-registration",
+      scenarioId: "demo-seoul-cityhall-resident",
+      officeIds: ["seongdong-civil-service"],
+    },
+  ] as const;
 
-  assert.equal(demoResponse.meta.mode, "demo");
-  assert.equal(demoResponse.meta.dataSource, "demo-sample");
-  assert.equal(demoResponse.meta.scenarioId, "demo-seoul-cityhall-passport");
-  assert.match(
-    demoResponse.recommendations[0]?.waiting.updatedAt ?? "",
-    /\+09:00$/,
-  );
-  assert.deepEqual(
-    demoResponse.recommendations.find(
-      (office) => office.id === "jung-gu-civil-service",
-    )?.supportedPurposeIds,
-    ["passport-reissue", "passport-pickup", "certificate-issuance"],
-  );
+  for (const expectation of demoExpectations) {
+    const demoResponse = await createRecommendService().recommend({
+      purposeId: expectation.purposeId,
+      originLabel: "서울시청",
+      origin: {
+        lat: 37.5665,
+        lng: 126.978,
+      },
+      mode: "demo",
+    });
+
+    assert.equal(demoResponse.meta.mode, "demo");
+    assert.equal(demoResponse.meta.dataSource, "demo-sample");
+    assert.equal(demoResponse.meta.scenarioId, expectation.scenarioId);
+    assert.match(
+      demoResponse.recommendations[0]?.waiting.updatedAt ?? "",
+      /\+09:00$/,
+    );
+    assert.deepEqual(
+      demoResponse.recommendations.map((office) => office.id),
+      expectation.officeIds,
+    );
+    assert.ok(
+      demoResponse.recommendations.every((office) =>
+        office.supportedPurposeIds.includes(expectation.purposeId),
+      ),
+    );
+  }
 
   const demoSampleJson = JSON.parse(
     readFileSync(

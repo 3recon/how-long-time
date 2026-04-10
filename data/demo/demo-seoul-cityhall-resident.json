@@ -1,0 +1,64 @@
+{
+  "request": {
+    "purposeId": "resident-registration",
+    "originLabel": "서울시청",
+    "origin": {
+      "lat": 37.5665,
+      "lng": 126.978
+    },
+    "mode": "demo"
+  },
+  "meta": {
+    "contractVersion": "2026-04-stage-6",
+    "requestedAt": "2026-04-10T09:00:00.000Z",
+    "mode": "demo",
+    "dataSource": "demo-sample",
+    "scenarioId": "demo-seoul-cityhall-resident",
+    "purposeMappingVersion": "2026-04-stage-4"
+  },
+  "summary": {
+    "totalCandidateCount": 1,
+    "returnedRecommendationCount": 1
+  },
+  "recommendations": [
+    {
+      "id": "seongdong-civil-service",
+      "name": "성동구청 민원여권과",
+      "address": "서울 성동구 고산자로 270",
+      "coordinates": {
+        "lat": 37.5634,
+        "lng": 127.0369
+      },
+      "supportedPurposeIds": [
+        "passport-pickup",
+        "family-relation-certificate",
+        "resident-registration"
+      ],
+      "supportedTaskMatches": [
+        {
+          "taskName": "등본,초본/가족관계",
+          "ruleType": "keyword"
+        },
+        {
+          "taskName": "주민등록 확인",
+          "ruleType": "keyword"
+        }
+      ],
+      "waiting": {
+        "count": 7,
+        "updatedAt": "2026-04-10T08:59:00.000+09:00"
+      },
+      "travel": {
+        "minutes": 33,
+        "distanceKm": 8.4
+      },
+      "recommendation": {
+        "score": 80,
+        "rank": 1,
+        "waitingPenalty": 5,
+        "travelPenalty": 15,
+        "reason": "주민등록 업무를 바로 처리할 수 있지만 이동 시간은 조금 더 듭니다."
+      }
+    }
+  ]
+}
