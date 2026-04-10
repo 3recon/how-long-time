@@ -1,15 +1,17 @@
 @import "tailwindcss";
 
 :root {
-  --background: #fffdf4;
-  --foreground: #22201a;
-  --surface: rgba(255, 248, 214, 0.85);
-  --surface-strong: #fff1a6;
-  --line: rgba(95, 77, 13, 0.14);
-  --accent: #f4b400;
-  --accent-strong: #d29a00;
-  --muted: #6d6655;
-  --shadow: 0 24px 70px rgba(155, 120, 0, 0.12);
+  --background: #ffffff;
+  --foreground: #111111;
+  --surface: #ffffff;
+  --surface-strong: #ffd84d;
+  --line: rgba(17, 17, 17, 0.16);
+  --accent: #ffd400;
+  --accent-strong: #ffb800;
+  --accent-blue: #1d4ed8;
+  --accent-red: #dc2626;
+  --muted: #5f5f5f;
+  --shadow: 0 18px 42px rgba(17, 17, 17, 0.06);
 }
 
 @theme inline {
@@ -34,10 +36,15 @@ body {
   background: var(--background);
   color: var(--foreground);
   font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
   background-image:
-    radial-gradient(circle at top left, rgba(255, 213, 74, 0.28), transparent 28%),
-    radial-gradient(circle at 85% 20%, rgba(255, 232, 153, 0.6), transparent 22%),
-    linear-gradient(180deg, #fff8d6 0%, #fffdf4 45%, #fffaf0 100%);
+    linear-gradient(rgba(17, 17, 17, 0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(17, 17, 17, 0.03) 1px, transparent 1px),
+    linear-gradient(180deg, #ffffff 0%, #fffef8 100%);
+  background-size:
+    32px 32px,
+    32px 32px,
+    auto;
 }
 
 body::selection {
@@ -63,7 +70,7 @@ button {
 
 .grid-pattern {
   background-image:
-    linear-gradient(rgba(95, 77, 13, 0.05) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(95, 77, 13, 0.05) 1px, transparent 1px);
+    linear-gradient(rgba(17, 17, 17, 0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(17, 17, 17, 0.04) 1px, transparent 1px);
   background-size: 26px 26px;
 }

@@ -63,7 +63,7 @@ function getRequestErrorMessage(errorBody: RecommendErrorResponse | null): strin
     case "UPSTREAM_CONFIG_ERROR":
       return "추천 서버 설정을 확인해 주세요.";
     case "UPSTREAM_API_ERROR":
-      return "추천 서버에 연결하지 못했습니다.";
+      return "추천 서버와 연결하지 못했습니다.";
     default:
       return "추천 정보를 불러오지 못했습니다. 잠시 후 다시 시도해 주세요.";
   }
@@ -80,8 +80,8 @@ export default function Home() {
     purposeId?: string;
   }>({});
   const [requestError, setRequestError] = useState<string | null>(null);
-  const [locationStatus, setLocationStatus] = useState<string>(
-    "demo 모드에서는 기본 좌표로 서울시청 기준 추천을 확인할 수 있습니다.",
+  const [locationStatus, setLocationStatus] = useState(
+    "demo 모드에서는 서울시청 기본 좌표로 동일한 결과를 재현할 수 있습니다.",
   );
   const [result, setResult] = useState<RecommendResponse | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -111,9 +111,11 @@ export default function Home() {
         setIsLocating(false);
       },
       () => {
-        setRequestError("현재 위치를 가져오지 못했습니다. 출발지를 직접 입력해 주세요.");
+        setRequestError(
+          "현재 위치를 가져오지 못했습니다. 출발지를 직접 입력해 주세요.",
+        );
         setLocationStatus(
-          "위치 권한이 없으면 서울시청 기준 demo 추천으로도 확인할 수 있습니다.",
+          "위치 권한이 없어도 서울시청 기준 demo 추천 결과를 확인할 수 있습니다.",
         );
         setIsLocating(false);
       },
@@ -171,7 +173,6 @@ export default function Home() {
       }
 
       const responseBody = (await response.json()) as RecommendResponse;
-
       setResult(responseBody);
       setLocationStatus(
         responseBody.request.originLabel === "현재 위치"
@@ -189,284 +190,308 @@ export default function Home() {
   return (
     <main className="relative flex-1 overflow-hidden">
       <div className="absolute inset-0 grid-pattern opacity-40" aria-hidden />
-      <section className="relative mx-auto flex min-h-screen w-full max-w-6xl flex-col gap-6 px-6 py-8 sm:px-8 lg:px-10 lg:py-10">
-        <header className="flex flex-col gap-4 rounded-[2rem] border border-[var(--line)] bg-white/75 px-5 py-5 backdrop-blur sm:flex-row sm:items-center sm:justify-between sm:px-6">
+      <div
+        className="absolute inset-x-0 top-0 h-48 bg-gradient-to-b from-[rgba(255,212,0,0.22)] via-[rgba(255,255,255,0.92)] to-transparent"
+        aria-hidden
+      />
+
+      <section className="relative mx-auto flex min-h-dvh w-full max-w-[1820px] flex-col px-4 py-5 sm:px-6 lg:h-screen lg:max-h-screen lg:px-8 lg:py-4 xl:px-12">
+        <header className="grid gap-4 border-b border-[var(--line)] pb-4 lg:grid-cols-[minmax(0,1.4fr)_minmax(25rem,0.6fr)] lg:items-end lg:gap-10 lg:pb-4">
           <div className="space-y-2">
-            <p className="text-xs font-semibold uppercase tracking-[0.32em] text-[var(--accent-strong)]">
+            <p className="text-xs font-semibold uppercase tracking-[0.42em] text-[var(--accent-strong)]">
               Minwon Now
             </p>
-            <h1 className="text-2xl font-semibold sm:text-3xl">{appConfig.appName}</h1>
-            <p className="max-w-2xl text-sm leading-7 text-[var(--muted)] sm:text-base">
-              대기 인원과 이동시간을 한 화면에서 비교해, 지금 방문하기 더 나은 민원실을
+            <h1 className="max-w-3xl text-3xl font-semibold leading-none tracking-[-0.05em] text-balance sm:text-4xl lg:text-[3.3rem]">
+              민원나우
+            </h1>
+            <p className="max-w-2xl text-sm leading-6 text-[var(--muted)] [text-wrap:pretty] lg:text-[0.98rem]">
+              대기 인원과 이동시간을 함께 비교해 지금 방문하기 더 나은 민원실을
               빠르게 찾습니다.
             </p>
           </div>
 
-          <div className="flex flex-wrap gap-3 text-sm">
-            <span className="rounded-full bg-[var(--surface-strong)] px-4 py-2 font-semibold text-[var(--foreground)]">
+          <div className="flex flex-wrap items-center gap-3 justify-self-start lg:justify-self-end">
+            <span className="border border-[var(--foreground)] bg-[var(--accent)] px-4 py-2 text-sm font-semibold text-[var(--foreground)] shadow-[4px_4px_0_rgba(17,17,17,0.12)]">
               현재 모드: demo
             </span>
-            <span className="rounded-full border border-[var(--line)] bg-white/80 px-4 py-2 text-[var(--muted)]">
+            <span className="border border-[var(--accent-blue)] bg-white px-4 py-2 text-sm font-medium text-[var(--accent-blue)] shadow-[4px_4px_0_rgba(29,78,216,0.08)]">
               API 프록시: /api/recommend
             </span>
           </div>
         </header>
 
-        <div className="grid gap-6 lg:grid-cols-[1.1fr_0.9fr]">
-          <section className="soft-card relative overflow-hidden rounded-[2rem] px-6 py-7 sm:px-8 sm:py-8">
-            <div
-              className="absolute -right-16 top-0 h-40 w-40 rounded-full bg-[rgba(255,208,64,0.22)] blur-3xl"
-              aria-hidden
-            />
-
-            <div className="space-y-4">
-              <p className="text-sm font-semibold uppercase tracking-[0.24em] text-[var(--accent-strong)]">
-                메인 입력 화면
+        <form
+          className="grid gap-6 pt-5 lg:h-full lg:flex-1 lg:grid-cols-12 lg:grid-rows-[auto_auto_1fr_auto] lg:gap-x-10 lg:gap-y-5"
+          onSubmit={handleSubmit}
+        >
+          <section className="space-y-4 border-b border-[var(--line)] pb-5 lg:col-span-5 lg:border-b-0 lg:border-r lg:pb-0 lg:pr-8">
+            <div className="space-y-3">
+              <p className="text-sm font-semibold uppercase tracking-[0.26em] text-[var(--accent-strong)]">
+                Input Flow
               </p>
-              <h2 className="max-w-2xl text-3xl font-semibold leading-tight sm:text-4xl">
-                출발지와 민원 목적을 고르면,
+              <h2 className="max-w-2xl text-3xl font-semibold leading-[1.04] tracking-[-0.05em] text-balance lg:text-[2.85rem]">
+                출발지와 민원 목적을 고르면
                 <span className="block text-[var(--accent-strong)]">
-                  demo 추천 결과를 바로 확인할 수 있습니다.
+                  추천 요청까지 한 화면에서 끝납니다.
                 </span>
               </h2>
-              <p className="max-w-2xl text-sm leading-7 text-[var(--muted)] sm:text-base">
-                현재 위치를 사용할 수 있고, 위치 권한이 없더라도 서울시청 기본 좌표로
-                동일한 심사용 결과를 재현할 수 있습니다.
-              </p>
             </div>
 
-            <form className="mt-8 space-y-5" onSubmit={handleSubmit}>
-              <div className="space-y-2">
+            <div className="space-y-3 pt-1">
+              <div className="flex items-center justify-between gap-3">
                 <label
                   htmlFor="originLabel"
                   className="text-sm font-semibold text-[var(--foreground)]"
                 >
                   출발지
                 </label>
-                <div className="flex flex-col gap-3 sm:flex-row">
-                  <input
-                    id="originLabel"
-                    value={originLabel}
-                    onChange={(event) => {
-                      setOriginLabel(event.target.value);
-                      if (fieldErrors.originLabel) {
+                <span className="text-xs uppercase tracking-[0.24em] text-[var(--muted)]">
+                  origin
+                </span>
+              </div>
+              <div className="flex flex-col gap-3 sm:flex-row lg:items-end lg:gap-3">
+                <input
+                  id="originLabel"
+                  value={originLabel}
+                  onChange={(event) => {
+                    setOriginLabel(event.target.value);
+                    if (fieldErrors.originLabel) {
+                      setFieldErrors((current) => ({
+                        ...current,
+                        originLabel: undefined,
+                      }));
+                    }
+                  }}
+                  placeholder="예: 서울시청, 집, 회사"
+                  className="min-h-12 flex-1 border-b-2 border-[var(--foreground)] bg-transparent px-0 pb-2.5 text-base outline-none placeholder:text-[var(--muted)] focus:border-[var(--accent-blue)]"
+                  aria-invalid={Boolean(fieldErrors.originLabel)}
+                  aria-describedby="origin-help"
+                />
+                <button
+                  type="button"
+                  onClick={handleUseCurrentLocation}
+                  disabled={isLocating || isSubmitting}
+                  className="min-h-12 border border-[var(--foreground)] bg-[var(--accent)] px-4 text-sm font-semibold text-[var(--foreground)] shadow-[4px_4px_0_rgba(17,17,17,0.12)] hover:-translate-y-px hover:shadow-[6px_6px_0_rgba(17,17,17,0.12)] active:scale-[0.96] disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:translate-y-0"
+                >
+                  {isLocating ? "위치 확인 중.." : "현재 위치 사용"}
+                </button>
+              </div>
+              <p
+                id="origin-help"
+                className="text-sm leading-5 text-[var(--muted)] lg:text-[0.9rem]"
+              >
+                {locationStatus}
+              </p>
+              {fieldErrors.originLabel ? (
+                <p className="text-sm font-medium text-[var(--accent-red)]">
+                  {fieldErrors.originLabel}
+                </p>
+              ) : null}
+            </div>
+          </section>
+
+          <aside className="space-y-3 border-b border-[var(--line)] pb-5 lg:col-span-3 lg:row-span-2 lg:border-b-0 lg:border-r lg:pb-0 lg:pr-8">
+            <div className="space-y-1.5 border-b border-[var(--line)] pb-3">
+              <p className="text-sm font-semibold uppercase tracking-[0.24em] text-[var(--accent-strong)]">
+                Request Notes
+              </p>
+              <p className="text-sm leading-5 text-[var(--muted)] lg:text-[0.88rem]">
+                입력 후 `/api/recommend`로 demo POST 요청을 보내고, 프록시가 추천
+                백엔드와 연결해 결과를 가져옵니다.
+              </p>
+            </div>
+
+            <div className="space-y-2">
+              <p className="text-sm font-semibold uppercase tracking-[0.24em] text-[var(--accent-strong)]">
+                상태
+              </p>
+              <dl className="grid gap-3 text-sm">
+                <div>
+                  <dt className="text-[var(--muted)]">전송 모드</dt>
+                  <dd className="mt-1 font-semibold tabular-nums">demo</dd>
+                </div>
+                <div>
+                  <dt className="text-[var(--muted)]">기준 좌표</dt>
+                  <dd className="mt-1 font-semibold tabular-nums">
+                    {formatCoordinates(coordinates)}
+                  </dd>
+                </div>
+                <div>
+                  <dt className="text-[var(--muted)]">백엔드 후보</dt>
+                  <dd className="mt-1 break-all font-semibold leading-5 lg:text-[0.84rem]">
+                    {appConfig.apiBaseUrl}
+                  </dd>
+                </div>
+              </dl>
+            </div>
+
+            {requestError ? (
+              <div className="border-l-4 border-[var(--accent-red)] bg-[rgba(220,38,38,0.06)] px-4 py-3 text-sm font-medium text-[var(--foreground)]">
+                {requestError}
+              </div>
+            ) : null}
+
+            <div className="border-t border-dashed border-[var(--line)] pt-3">
+              <p className="text-xs uppercase tracking-[0.22em] text-[var(--muted)]">
+                demo mode
+              </p>
+              <p className="mt-2 text-sm leading-5 text-[var(--muted)] lg:text-[0.84rem]">
+                현재는 심사 재현성을 우선합니다. 추천 요청은 구현되어 있고,
+                결과는 demo 응답이 돌아오면 즉시 오른쪽 영역에 반영됩니다.
+              </p>
+            </div>
+          </aside>
+
+          <section className="space-y-3 border-b border-[var(--line)] pb-5 lg:col-span-4 lg:row-span-4 lg:border-b-0 lg:pb-0 lg:pl-2">
+            <div className="flex items-end justify-between gap-4">
+              <div>
+                <p className="text-sm font-semibold uppercase tracking-[0.24em] text-[var(--accent-strong)]">
+                  Recommendation
+                </p>
+                <p className="mt-1 max-w-sm text-sm text-[var(--muted)] lg:text-[0.88rem]">
+                  추천 결과와 비교 포인트를 화면 오른쪽에 모아 보여줍니다.
+                </p>
+              </div>
+              {result ? (
+                <span className="text-sm font-semibold tabular-nums">
+                  {result.summary.returnedRecommendationCount}개
+                </span>
+              ) : null}
+            </div>
+
+            {result ? (
+              <div className="grid gap-4">
+                {result.recommendations.slice(0, 2).map((office) => (
+                  <article
+                    key={office.id}
+                    className="space-y-2 border-t-2 border-[rgba(17,17,17,0.12)] pt-4"
+                  >
+                    <div className="flex items-start justify-between gap-3">
+                      <div>
+                        <p className="text-xs font-semibold uppercase tracking-[0.22em] text-[var(--accent-strong)]">
+                          추천 {office.recommendation.rank}
+                        </p>
+                        <h3 className="mt-1.5 text-lg font-semibold tracking-[-0.03em] lg:text-[1.08rem]">
+                          {office.name}
+                        </h3>
+                      </div>
+                      <span className="border border-[var(--foreground)] bg-[var(--accent)] px-2 py-1 text-sm font-semibold tabular-nums shadow-[3px_3px_0_rgba(17,17,17,0.1)]">
+                        {office.recommendation.score}점
+                      </span>
+                    </div>
+
+                    <p className="text-sm leading-5 text-[var(--muted)] lg:text-[0.84rem]">
+                      {office.address}
+                    </p>
+                    <p className="text-sm leading-5 text-[var(--foreground)] lg:text-[0.84rem]">
+                      {office.recommendation.reason}
+                    </p>
+
+                    <dl className="grid gap-3 text-sm sm:grid-cols-3 lg:grid-cols-1 lg:text-[0.82rem]">
+                      <div>
+                        <dt className="text-[var(--muted)]">대기 인원</dt>
+                        <dd className="mt-1 font-semibold tabular-nums">
+                          {office.waiting.count}명
+                        </dd>
+                      </div>
+                      <div>
+                        <dt className="text-[var(--muted)]">이동시간</dt>
+                        <dd className="mt-1 font-semibold tabular-nums">
+                          {office.travel.minutes}분
+                        </dd>
+                      </div>
+                      <div>
+                        <dt className="text-[var(--muted)]">처리 업무</dt>
+                        <dd className="mt-1 leading-5 font-semibold">
+                          {office.supportedTaskMatches
+                            .map((task) => task.taskName)
+                            .join(", ")}
+                        </dd>
+                      </div>
+                    </dl>
+                  </article>
+                ))}
+              </div>
+            ) : (
+              <div className="border-t-2 border-dashed border-[rgba(17,17,17,0.18)] pt-4 text-sm leading-6 text-[var(--muted)] lg:text-[0.9rem]">
+                아직 추천 결과가 없습니다. 출발지와 민원 목적을 입력하고 demo
+                추천을 요청해 보세요.
+              </div>
+            )}
+          </section>
+
+          <section className="space-y-3 border-b border-[var(--line)] pb-5 lg:col-span-8 lg:border-b-0 lg:border-t lg:pt-5">
+            <div className="flex items-center justify-between gap-3">
+              <label className="text-sm font-semibold text-[var(--foreground)]">
+                민원 목적
+              </label>
+              <span className="text-xs uppercase tracking-[0.24em] text-[var(--muted)]">
+                5 options
+              </span>
+            </div>
+            <div className="grid gap-x-6 gap-y-3 sm:grid-cols-2 xl:grid-cols-3">
+              {purposeOptions.map((purpose) => {
+                const selected = purposeId === purpose.id;
+
+                return (
+                  <button
+                    key={purpose.id}
+                    type="button"
+                    onClick={() => {
+                      setPurposeId(purpose.id);
+                      if (fieldErrors.purposeId) {
                         setFieldErrors((current) => ({
                           ...current,
-                          originLabel: undefined,
+                          purposeId: undefined,
                         }));
                       }
                     }}
-                    placeholder="예: 서울시청, 집, 회사"
-                    className="min-h-14 flex-1 rounded-[1.25rem] border border-[var(--line)] bg-white px-4 text-base outline-none ring-0 placeholder:text-[var(--muted)] focus:border-[var(--accent-strong)]"
-                    aria-invalid={Boolean(fieldErrors.originLabel)}
-                    aria-describedby="origin-help"
-                  />
-                  <button
-                    type="button"
-                    onClick={handleUseCurrentLocation}
-                    disabled={isLocating || isSubmitting}
-                    className="min-h-14 rounded-[1.25rem] border border-[var(--line)] bg-[var(--surface-strong)] px-5 text-sm font-semibold text-[var(--foreground)] hover:-translate-y-0.5 hover:shadow-[0_14px_30px_rgba(210,154,0,0.16)] disabled:cursor-not-allowed disabled:opacity-60"
+                    className={`border-b-2 pb-3 text-left transition-transform transition-colors duration-200 ${
+                      selected
+                        ? "border-[var(--accent-blue)]"
+                        : "border-[rgba(17,17,17,0.14)] hover:-translate-y-px hover:border-[var(--foreground)]"
+                    }`}
+                    aria-pressed={selected}
                   >
-                    {isLocating ? "위치 확인 중..." : "현재 위치 사용"}
-                  </button>
-                </div>
-                <p id="origin-help" className="text-sm text-[var(--muted)]">
-                  {locationStatus}
-                </p>
-                {fieldErrors.originLabel ? (
-                  <p className="text-sm font-medium text-[var(--accent-strong)]">
-                    {fieldErrors.originLabel}
-                  </p>
-                ) : null}
-              </div>
-
-              <div className="space-y-3">
-                <div className="flex items-center justify-between gap-3">
-                  <label className="text-sm font-semibold text-[var(--foreground)]">
-                    민원 목적
-                  </label>
-                  <span className="text-xs uppercase tracking-[0.22em] text-[var(--muted)]">
-                    5개 demo 시나리오
-                  </span>
-                </div>
-
-                <div className="grid gap-3 sm:grid-cols-2">
-                  {purposeOptions.map((purpose) => {
-                    const selected = purposeId === purpose.id;
-
-                    return (
-                      <button
-                        key={purpose.id}
-                        type="button"
-                        onClick={() => {
-                          setPurposeId(purpose.id);
-                          if (fieldErrors.purposeId) {
-                            setFieldErrors((current) => ({
-                              ...current,
-                              purposeId: undefined,
-                            }));
-                          }
-                        }}
-                        className={`rounded-[1.4rem] border px-4 py-4 text-left ${
-                          selected
-                            ? "border-[var(--accent-strong)] bg-white shadow-[0_18px_35px_rgba(210,154,0,0.14)]"
-                            : "border-[var(--line)] bg-white/80 hover:-translate-y-0.5 hover:border-[var(--accent)]"
-                        }`}
-                        aria-pressed={selected}
-                      >
-                        <p className="text-base font-semibold text-[var(--foreground)]">
+                    <div className="flex items-start justify-between gap-3">
+                      <div>
+                        <p className="text-[1rem] font-semibold leading-5 tracking-[-0.03em]">
                           {purpose.label}
                         </p>
-                        <p className="mt-2 text-sm leading-6 text-[var(--muted)]">
+                        <p className="mt-1 text-sm leading-5 text-[var(--muted)]">
                           {purpose.description}
                         </p>
-                      </button>
-                    );
-                  })}
-                </div>
-
-                {fieldErrors.purposeId ? (
-                  <p className="text-sm font-medium text-[var(--accent-strong)]">
-                    {fieldErrors.purposeId}
-                  </p>
-                ) : null}
-              </div>
-
-              <div className="grid gap-3 rounded-[1.5rem] border border-[var(--line)] bg-white/75 p-4 sm:grid-cols-3">
-                <div>
-                  <p className="text-sm text-[var(--muted)]">전송 모드</p>
-                  <p className="mt-1 font-semibold">demo</p>
-                </div>
-                <div>
-                  <p className="text-sm text-[var(--muted)]">기준 좌표</p>
-                  <p className="mt-1 font-semibold">{formatCoordinates(coordinates)}</p>
-                </div>
-                <div>
-                  <p className="text-sm text-[var(--muted)]">백엔드 후보</p>
-                  <p className="mt-1 break-all font-semibold">{appConfig.apiBaseUrl}</p>
-                </div>
-              </div>
-
-              {requestError ? (
-                <div className="rounded-[1.25rem] border border-[rgba(210,154,0,0.24)] bg-[rgba(255,243,194,0.9)] px-4 py-3 text-sm font-medium text-[var(--foreground)]">
-                  {requestError}
-                </div>
-              ) : null}
-
-              <button
-                type="submit"
-                disabled={isSubmitting || isLocating}
-                className="flex min-h-14 w-full items-center justify-center rounded-[1.35rem] bg-[var(--accent)] px-5 text-base font-semibold text-[var(--foreground)] shadow-[0_20px_40px_rgba(210,154,0,0.2)] hover:-translate-y-0.5 hover:bg-[var(--accent-strong)] hover:text-white disabled:cursor-not-allowed disabled:opacity-60"
-              >
-                {isSubmitting ? "추천 요청 중..." : "추천 요청"}
-              </button>
-            </form>
+                      </div>
+                      <span
+                        className={`mt-1 h-3 w-3 rounded-full border ${
+                          selected
+                            ? "border-[var(--accent-blue)] bg-[var(--accent-blue)]"
+                            : "border-[rgba(17,17,17,0.25)]"
+                        }`}
+                        aria-hidden
+                      />
+                    </div>
+                  </button>
+                );
+              })}
+            </div>
+            {fieldErrors.purposeId ? (
+              <p className="text-sm font-medium text-[var(--accent-red)]">
+                {fieldErrors.purposeId}
+              </p>
+            ) : null}
           </section>
 
-          <aside className="flex flex-col gap-6">
-            <section className="soft-card rounded-[2rem] px-6 py-7">
-              <p className="text-sm font-semibold uppercase tracking-[0.24em] text-[var(--accent-strong)]">
-                요청 흐름
-              </p>
-              <ol className="mt-5 space-y-3 text-sm leading-7 text-[var(--muted)]">
-                <li className="rounded-[1.25rem] border border-[var(--line)] bg-white/80 px-4 py-3">
-                  출발지와 민원 목적을 입력합니다.
-                </li>
-                <li className="rounded-[1.25rem] border border-[var(--line)] bg-white/80 px-4 py-3">
-                  프론트가 `/api/recommend`로 demo POST 요청을 보냅니다.
-                </li>
-                <li className="rounded-[1.25rem] border border-[var(--line)] bg-white/80 px-4 py-3">
-                  프록시가 Lightsail 추천 백엔드와 연결해 결과를 받아옵니다.
-                </li>
-              </ol>
-            </section>
-
-            <section className="soft-card rounded-[2rem] px-6 py-7">
-              <p className="text-sm font-semibold uppercase tracking-[0.24em] text-[var(--accent-strong)]">
-                추천 결과
-              </p>
-
-              {result ? (
-                <div className="mt-5 space-y-4">
-                  <div className="rounded-[1.5rem] border border-[var(--line)] bg-white/85 p-5">
-                    <p className="text-sm text-[var(--muted)]">요청 요약</p>
-                    <p className="mt-2 text-lg font-semibold">
-                      {result.request.originLabel} ·{" "}
-                      {
-                        purposeOptions.find((purpose) => purpose.id === result.request.purposeId)
-                          ?.label
-                      }
-                    </p>
-                    <p className="mt-2 text-sm leading-6 text-[var(--muted)]">
-                      {result.summary.returnedRecommendationCount}곳 추천 / 데이터 소스{" "}
-                      {result.meta.dataSource}
-                    </p>
-                  </div>
-
-                  {result.recommendations.map((office) => (
-                    <article
-                      key={office.id}
-                      className="rounded-[1.5rem] border border-[var(--line)] bg-white/90 p-5"
-                    >
-                      <div className="flex items-start justify-between gap-3">
-                        <div>
-                          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[var(--accent-strong)]">
-                            추천 {office.recommendation.rank}위
-                          </p>
-                          <h3 className="mt-2 text-lg font-semibold">{office.name}</h3>
-                        </div>
-                        <span className="rounded-full bg-[var(--surface-strong)] px-3 py-2 text-sm font-semibold">
-                          {office.recommendation.score}점
-                        </span>
-                      </div>
-
-                      <p className="mt-3 text-sm leading-6 text-[var(--muted)]">
-                        {office.address}
-                      </p>
-                      <p className="mt-2 text-sm leading-6 text-[var(--foreground)]">
-                        {office.recommendation.reason}
-                      </p>
-
-                      <dl className="mt-4 grid gap-3 sm:grid-cols-3">
-                        <div className="rounded-[1rem] bg-[var(--surface)] px-3 py-3">
-                          <dt className="text-xs uppercase tracking-[0.16em] text-[var(--muted)]">
-                            대기 인원
-                          </dt>
-                          <dd className="mt-1 text-base font-semibold">
-                            {office.waiting.count}명
-                          </dd>
-                        </div>
-                        <div className="rounded-[1rem] bg-[var(--surface)] px-3 py-3">
-                          <dt className="text-xs uppercase tracking-[0.16em] text-[var(--muted)]">
-                            이동시간
-                          </dt>
-                          <dd className="mt-1 text-base font-semibold">
-                            {office.travel.minutes}분
-                          </dd>
-                        </div>
-                        <div className="rounded-[1rem] bg-[var(--surface)] px-3 py-3">
-                          <dt className="text-xs uppercase tracking-[0.16em] text-[var(--muted)]">
-                            처리 업무
-                          </dt>
-                          <dd className="mt-1 text-sm font-semibold leading-6">
-                            {office.supportedTaskMatches
-                              .map((task) => task.taskName)
-                              .join(", ")}
-                          </dd>
-                        </div>
-                      </dl>
-                    </article>
-                  ))}
-                </div>
-              ) : (
-                <div className="mt-5 rounded-[1.5rem] border border-dashed border-[var(--line)] bg-white/70 px-5 py-8 text-sm leading-7 text-[var(--muted)]">
-                  아직 추천 결과가 없습니다. 출발지와 민원 목적을 입력하고 demo 추천을
-                  요청해 보세요.
-                </div>
-              )}
-            </section>
-          </aside>
-        </div>
+          <div className="lg:col-span-8 lg:border-t lg:border-[var(--line)] lg:pt-5">
+            <button
+              type="submit"
+              disabled={isSubmitting || isLocating}
+              className="min-h-12 w-full border border-[var(--foreground)] bg-[var(--foreground)] px-5 text-base font-semibold text-white shadow-[6px_6px_0_rgba(17,17,17,0.14)] hover:-translate-y-px hover:border-[var(--accent-blue)] hover:bg-[var(--accent-blue)] hover:shadow-[8px_8px_0_rgba(29,78,216,0.12)] active:scale-[0.96] disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:translate-y-0"
+            >
+              {isSubmitting ? "추천 요청 중.." : "추천 요청"}
+            </button>
+          </div>
+        </form>
       </section>
     </main>
   );
