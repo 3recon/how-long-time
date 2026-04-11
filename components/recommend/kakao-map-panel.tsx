@@ -2,6 +2,11 @@
 
 import { useEffect, useRef, useState } from "react";
 
+import {
+  buildMapMarkerDataUri,
+  getMapLegendItems,
+  getMapMarkerPresentation,
+} from "@/lib/recommend/map-marker-presentation";
 import type { LocationPoint, RecommendedOffice } from "@/types/recommend";
 
 declare global {
@@ -28,14 +33,23 @@ declare global {
         LatLngBounds: new () => {
           extend: (latLng: unknown) => void;
         };
+        Size: new (width: number, height: number) => unknown;
+        Point: new (x: number, y: number) => unknown;
+        MarkerImage: new (
+          src: string,
+          size: unknown,
+          options?: { offset?: unknown },
+        ) => unknown;
         Marker: new (options: {
           map?: unknown;
           position: unknown;
           title?: string;
+          image?: unknown;
           zIndex?: number;
         }) => {
           setMap: (map: unknown) => void;
           setZIndex: (zIndex: number) => void;
+          setImage: (image: unknown) => void;
         };
         Polyline: new (options: {
           map?: unknown;
@@ -110,6 +124,101 @@ function clamp(value: number, min: number, max: number): number {
   return Math.min(Math.max(value, min), max);
 }
 
+function createKakaoMarkerImage(
+  kakao: NonNullable<typeof window.kakao>,
+  presentation: ReturnType<typeof getMapMarkerPresentation>,
+) {
+  return new kakao.maps.MarkerImage(
+    buildMapMarkerDataUri(presentation),
+    new kakao.maps.Size(presentation.width, presentation.height),
+    {
+      offset: new kakao.maps.Point(
+        presentation.width / 2,
+        presentation.height - 4,
+      ),
+    },
+  );
+}
+
+function getMarkerImageForOffice(
+  kakao: NonNullable<typeof window.kakao>,
+  office: RecommendedOffice,
+  selected: boolean,
+) {
+  return createKakaoMarkerImage(
+    kakao,
+    getMapMarkerPresentation({
+      kind: "office",
+      rank: office.recommendation.rank,
+      selected,
+    }),
+  );
+}
+
+function MapLegend(props: { originLabel: string }) {
+  return (
+    <div className="pointer-events-none absolute left-4 top-4 z-20 max-w-[calc(100%-2rem)] rounded-[22px] border border-[rgba(17,17,17,0.08)] bg-white/92 px-4 py-3 shadow-[0_18px_34px_rgba(17,17,17,0.08)] backdrop-blur-sm">
+      <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--accent-strong)]">
+        지도 범례
+      </p>
+      <p className="mt-1 text-sm font-semibold text-[var(--foreground)]">
+        출발지: {props.originLabel}
+      </p>
+      <div className="mt-3 flex flex-wrap gap-2.5">
+        {getMapLegendItems().map((item) => (
+          <div
+            key={item.id}
+            className="flex items-center gap-2 rounded-full border border-[rgba(17,17,17,0.08)] bg-[rgba(255,255,255,0.85)] px-2.5 py-1.5"
+          >
+            <LegendSwatch itemId={item.id} />
+            <div className="leading-none">
+              <p className="text-xs font-semibold text-[var(--foreground)]">
+                {item.label}
+              </p>
+              <p className="mt-1 text-[11px] text-[var(--muted)]">
+                {item.caption}
+              </p>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function LegendSwatch(props: {
+  itemId: ReturnType<typeof getMapLegendItems>[number]["id"];
+}) {
+  if (props.itemId === "origin") {
+    return (
+      <span className="relative inline-flex h-5 w-5 items-center justify-center">
+        <span className="absolute h-5 w-5 rounded-full bg-[rgba(125,184,255,0.34)]" />
+        <span className="relative h-3 w-3 rounded-full border-2 border-white bg-[#1f3a5f]" />
+      </span>
+    );
+  }
+
+  if (props.itemId === "selected-office") {
+    return (
+      <span className="relative inline-flex h-5 w-5 items-center justify-center">
+        <span className="absolute h-5 w-5 rounded-full bg-[rgba(245,158,11,0.28)]" />
+        <span className="relative inline-flex h-4 w-4 items-center justify-center rounded-full border-2 border-white bg-[#d97706] text-[9px] font-bold text-white">
+          1
+        </span>
+      </span>
+    );
+  }
+
+  return (
+    <span className="relative inline-flex h-5 w-5 items-center justify-center">
+      <span className="absolute h-4 w-4 rounded-full bg-[rgba(245,225,164,0.3)]" />
+      <span className="relative inline-flex h-3.5 w-3.5 items-center justify-center rounded-full border-2 border-white bg-[#2f2413] text-[8px] font-bold text-white">
+        2
+      </span>
+    </span>
+  );
+}
+
 function FallbackMap(props: {
   origin: LocationPoint;
   originLabel: string;
@@ -118,7 +227,10 @@ function FallbackMap(props: {
   onSelectOffice: (officeId: string) => void;
   reason: string;
 }) {
-  const points = [props.origin, ...props.recommendations.map((office) => office.coordinates)];
+  const points = [
+    props.origin,
+    ...props.recommendations.map((office) => office.coordinates),
+  ];
   const latMin = Math.min(...points.map((point) => point.lat));
   const latMax = Math.max(...points.map((point) => point.lat));
   const lngMin = Math.min(...points.map((point) => point.lng));
@@ -145,15 +257,22 @@ function FallbackMap(props: {
               top: "74%",
             }}
           >
-            <div className="flex h-5 w-5 items-center justify-center rounded-full border-2 border-white bg-[var(--accent-blue)] shadow-[0_12px_22px_rgba(31,58,95,0.28)]" />
-            <div className="rounded-full bg-white/92 px-3 py-1 text-xs font-semibold shadow-[0_10px_20px_rgba(17,17,17,0.08)]">
+            <div className="relative flex h-8 w-8 items-center justify-center">
+              <span className="absolute h-8 w-8 rounded-full bg-[rgba(125,184,255,0.34)]" />
+              <span className="relative flex h-5 w-5 items-center justify-center rounded-full border-2 border-white bg-[#1f3a5f] shadow-[0_12px_22px_rgba(31,58,95,0.28)]">
+                <span className="h-2 w-2 rounded-full bg-white" />
+              </span>
+            </div>
+            <div className="rounded-full border border-[rgba(17,17,17,0.08)] bg-white/92 px-3 py-1 text-xs font-semibold shadow-[0_10px_20px_rgba(17,17,17,0.08)]">
               {props.originLabel}
             </div>
           </div>
 
           {props.recommendations.map((office) => {
-            const left = 12 + ((office.coordinates.lng - lngMin) / lngRange) * 76;
-            const top = 16 + (1 - (office.coordinates.lat - latMin) / latRange) * 66;
+            const left =
+              12 + ((office.coordinates.lng - lngMin) / lngRange) * 76;
+            const top =
+              16 + (1 - (office.coordinates.lat - latMin) / latRange) * 66;
             const selected = office.id === props.selectedOfficeId;
 
             return (
@@ -168,10 +287,10 @@ function FallbackMap(props: {
                 }}
               >
                 <span
-                  className={`flex h-6 w-6 items-center justify-center rounded-full border-2 border-white text-[11px] font-semibold text-white shadow-[0_16px_26px_rgba(17,17,17,0.16)] transition-transform duration-200 ${
+                  className={`flex items-center justify-center rounded-full border-2 border-white text-[11px] font-semibold text-white shadow-[0_16px_26px_rgba(17,17,17,0.16)] transition-transform duration-200 ${
                     selected
-                      ? "scale-110 bg-[var(--accent-red)]"
-                      : "bg-[var(--foreground)] hover:scale-105"
+                      ? "h-8 w-8 scale-110 bg-[#d97706]"
+                      : "h-6 w-6 bg-[#2f2413] hover:scale-105"
                   }`}
                 >
                   {office.recommendation.rank}
@@ -179,11 +298,11 @@ function FallbackMap(props: {
                 <span
                   className={`mt-2 block rounded-full px-3 py-1 text-xs font-semibold shadow-[0_10px_20px_rgba(17,17,17,0.1)] ${
                     selected
-                      ? "bg-[var(--foreground)] text-white"
+                      ? "bg-[#2f2413] text-white"
                       : "bg-white/92 text-[var(--foreground)]"
                   }`}
                 >
-                  {office.name}
+                  {selected ? `선택 중 · ${office.name}` : office.name}
                 </span>
               </button>
             );
@@ -230,9 +349,11 @@ export function KakaoMapPanel(props: {
   const markersRef = useRef<
     Array<{
       officeId: string | null;
+      kind: "origin" | "office";
       marker: {
         setMap: (map: unknown) => void;
         setZIndex: (zIndex: number) => void;
+        setImage: (image: unknown) => void;
       };
     }>
   >([]);
@@ -282,10 +403,8 @@ export function KakaoMapPanel(props: {
       }
 
       const kakao = window.kakao;
-      const originLatLng = new kakao.maps.LatLng(
-        origin.lat,
-        origin.lng,
-      );
+      const originLatLng = new kakao.maps.LatLng(origin.lat, origin.lng);
+      const initialOffice = recommendations[0] ?? null;
 
       if (!mapRef.current) {
         mapRef.current = new kakao.maps.Map(mapContainerRef.current, {
@@ -307,10 +426,18 @@ export function KakaoMapPanel(props: {
         map,
         position: originLatLng,
         title: originLabel,
+        image: createKakaoMarkerImage(
+          kakao,
+          getMapMarkerPresentation({ kind: "origin" }),
+        ),
         zIndex: 10,
       });
 
-      markersRef.current.push({ officeId: null, marker: originMarker });
+      markersRef.current.push({
+        officeId: null,
+        kind: "origin",
+        marker: originMarker,
+      });
       bounds.extend(originLatLng);
 
       recommendations.forEach((office) => {
@@ -322,14 +449,23 @@ export function KakaoMapPanel(props: {
           map,
           position,
           title: office.name,
-          zIndex: office.id === selectedOfficeId ? 12 : 5,
+          image: getMarkerImageForOffice(
+            kakao,
+            office,
+            office.id === initialOffice?.id,
+          ),
+          zIndex: office.id === initialOffice?.id ? 12 : 5,
         });
 
         kakao.maps.event.addListener(marker, "click", () => {
           onSelectOffice(office.id);
         });
 
-        markersRef.current.push({ officeId: office.id, marker });
+        markersRef.current.push({
+          officeId: office.id,
+          kind: "office",
+          marker,
+        });
         bounds.extend(position);
       });
 
@@ -345,7 +481,6 @@ export function KakaoMapPanel(props: {
     origin.lng,
     originLabel,
     recommendations,
-    selectedOfficeId,
     sdkStatus,
   ]);
 
@@ -380,17 +515,26 @@ export function KakaoMapPanel(props: {
         selectedOffice.coordinates.lng,
       );
 
-      markersRef.current.forEach(({ officeId, marker }) => {
-        marker.setZIndex(officeId === selectedOffice.id ? 12 : 5);
+      markersRef.current.forEach(({ officeId, kind, marker }) => {
+        if (kind === "origin") {
+          marker.setZIndex(10);
+          return;
+        }
+
+        const isSelected = officeId === selectedOffice.id;
+        const office = recommendations.find((item) => item.id === officeId);
+
+        if (office) {
+          marker.setImage(getMarkerImageForOffice(kakao, office, isSelected));
+        }
+
+        marker.setZIndex(isSelected ? 12 : 5);
       });
 
       focusLineRef.current?.setMap(null);
       focusLineRef.current = new kakao.maps.Polyline({
         map,
-        path: [
-          new kakao.maps.LatLng(origin.lat, origin.lng),
-          selectedPosition,
-        ],
+        path: [new kakao.maps.LatLng(origin.lat, origin.lng), selectedPosition],
         strokeWeight: 3,
         strokeColor: "#f59e0b",
         strokeOpacity: 0.95,
@@ -403,7 +547,7 @@ export function KakaoMapPanel(props: {
 
       infoWindowRef.current?.close();
       infoWindowRef.current = new kakao.maps.InfoWindow({
-        content: `<div style="padding:10px 12px;font-size:13px;font-weight:700;color:#111;">${selectedOffice.name}</div>`,
+        content: `<div style="padding:10px 12px;min-width:156px;"><div style="font-size:11px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:#b45309;">현재 비교 중</div><div style="margin-top:4px;font-size:13px;font-weight:700;color:#111;">#${selectedOffice.recommendation.rank} ${selectedOffice.name}</div></div>`,
       });
 
       if (selectedMarker) {
@@ -413,13 +557,7 @@ export function KakaoMapPanel(props: {
       map.setLevel(5);
       map.panTo(selectedPosition);
     });
-  }, [
-    origin.lat,
-    origin.lng,
-    recommendations,
-    selectedOfficeId,
-    sdkStatus,
-  ]);
+  }, [origin.lat, origin.lng, recommendations, selectedOfficeId, sdkStatus]);
 
   const selectedOffice =
     recommendations.find((office) => office.id === selectedOfficeId) ??
@@ -449,23 +587,24 @@ export function KakaoMapPanel(props: {
           ref={mapContainerRef}
           className={`${mapViewportClassName} bg-[linear-gradient(180deg,#fffdf8_0%,#ebe3cf_100%)]`}
         />
+        <MapLegend originLabel={originLabel} />
 
         {sdkStatus !== "ready" ? (
           <div className="absolute inset-0">
-          <FallbackMap
-            origin={origin}
-            originLabel={originLabel}
-            recommendations={recommendations}
-            selectedOfficeId={selectedOfficeId}
-            onSelectOffice={onSelectOffice}
-            reason={
-              sdkStatus === "missing-key"
-                ? "Kakao 앱 키가 없어 좌표 기반 fallback 지도를 보여줍니다."
-                : sdkStatus === "error"
-                  ? "브라우저에서 Kakao SDK를 불러오지 못해 fallback 지도를 보여줍니다."
-                  : "지도를 준비하는 동안 fallback 지도를 먼저 보여줍니다."
-            }
-          />
+            <FallbackMap
+              origin={origin}
+              originLabel={originLabel}
+              recommendations={recommendations}
+              selectedOfficeId={selectedOfficeId}
+              onSelectOffice={onSelectOffice}
+              reason={
+                sdkStatus === "missing-key"
+                  ? "Kakao 앱 키가 없어 좌표 기반 fallback 지도를 보여줍니다."
+                  : sdkStatus === "error"
+                    ? "브라우저에서 Kakao SDK를 불러오지 못해 fallback 지도를 보여줍니다."
+                    : "지도를 준비하는 동안 fallback 지도를 먼저 보여줍니다."
+              }
+            />
           </div>
         ) : null}
 
@@ -475,18 +614,17 @@ export function KakaoMapPanel(props: {
               추천 결과가 준비되면 지도와 마커를 함께 보여줍니다.
             </p>
             <p className="max-w-md text-sm leading-6 text-[var(--muted)]">
-              출발지와 민원 목적을 입력한 뒤 추천 요청을 보내면 사용자 위치와 민원실
-              후보를 같은 화면에서 비교할 수 있습니다.
+              출발지와 민원 목적을 입력한 뒤 추천 요청을 보내면 사용자 위치와
+              민원실 후보를 같은 화면에서 비교할 수 있습니다.
             </p>
           </div>
         ) : null}
 
         {sdkStatus === "loading" ? (
-          <div className="absolute inset-x-4 top-4 rounded-full bg-white/90 px-4 py-2 text-sm font-medium shadow-[0_10px_28px_rgba(17,17,17,0.08)]">
+          <div className="absolute inset-x-4 bottom-4 rounded-full bg-white/92 px-4 py-2 text-sm font-medium shadow-[0_10px_28px_rgba(17,17,17,0.08)]">
             지도를 불러오는 중입니다.
           </div>
         ) : null}
-
       </div>
     </section>
   );
