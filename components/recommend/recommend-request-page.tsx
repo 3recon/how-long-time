@@ -223,15 +223,13 @@ export function RecommendRequestPage(props: {
   return (
     <main className="relative min-h-dvh overflow-hidden">
       <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(211,166,63,0.24),transparent_36%),radial-gradient(circle_at_bottom_right,rgba(31,58,95,0.08),transparent_28%)]" />
-      <div className="relative mx-auto flex min-h-dvh w-full max-w-[900px] items-center px-4 py-6 sm:px-6 lg:px-8">
-        <section className="soft-card w-full rounded-[36px] border-[rgba(17,17,17,0.08)] p-5 sm:p-7">
-          <div className="border-b border-[var(--line)] pb-6">
-            <h1 className="text-center text-5xl font-semibold leading-[0.94] tracking-[-0.08em] text-balance sm:text-[4.4rem]">
-              민원, <span className="text-[#245c9a]">어디가?</span>
-            </h1>
-          </div>
+      <div className="relative mx-auto flex min-h-dvh w-full max-w-[1040px] flex-col justify-center px-4 py-6 sm:px-6 lg:px-8">
+        <h1 className="mb-6 text-center text-5xl font-semibold leading-[0.94] tracking-[-0.08em] text-balance sm:text-[4.4rem]">
+          민원, <span className="text-[#245c9a]">어디가?</span>
+        </h1>
 
-          <form className="space-y-6 pt-6" onSubmit={handleSubmit}>
+        <section className="soft-card min-h-[460px] w-full rounded-[36px] border-[rgba(17,17,17,0.08)] p-6 sm:p-8 lg:p-10">
+          <form className="space-y-6" onSubmit={handleSubmit}>
             <section className="space-y-3">
               <div className="flex items-center gap-3">
                 <label
@@ -279,14 +277,14 @@ export function RecommendRequestPage(props: {
                 </div>
               </div>
 
-              {locationStatus ? (
-                <p
-                  id="origin-help"
-                  className="text-sm leading-6 text-[var(--muted)]"
-                >
-                  {locationStatus}
-                </p>
-              ) : null}
+              <p
+                id="origin-help"
+                className={`min-h-6 text-sm leading-6 text-[var(--muted)] ${
+                  locationStatus ? "opacity-100" : "opacity-0"
+                }`}
+              >
+                {locationStatus || " "}
+              </p>
               {fieldErrors.originLabel ? (
                 <p className="text-sm font-medium text-[var(--accent-red)]">
                   {fieldErrors.originLabel}
