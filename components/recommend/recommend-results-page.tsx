@@ -21,8 +21,6 @@ import type {
 const PUBLIC_DATA_API_LABEL = "\uacf5\uacf5\ub370\uc774\ud130 API";
 const PUBLIC_DATA_FALLBACK_NOTICE =
   "\uacf5\uacf5\ub370\uc774\ud130 API \uc7a5\uc560\ub85c \uc778\ud574 demo fallback \uacb0\uacfc\ub85c \uc804\ud658\ud588\uc2b5\ub2c8\ub2e4.";
-const DEMO_MODE_NOTICE =
-  "demo \ubaa8\ub4dc \uc0d8\ud50c \uacb0\uacfc\ub97c \ubc14\ub85c \ubd88\ub7ec\uc654\uc2b5\ub2c8\ub2e4.";
 const QUERY_DEMO_NOTICE =
   "query string \uae30\ubc18\uc73c\ub85c \uac19\uc740 demo \ucd94\ucc9c \uacb0\uacfc\ub97c \ub2e4\uc2dc \ubd88\ub7ec\uc654\uc2b5\ub2c8\ub2e4.";
 const NETWORK_DEMO_NOTICE =
@@ -124,7 +122,7 @@ export function RecommendResultsPage(props: {
 
       if (currentRequest.mode === "demo") {
         setResult(createClientDemoRecommendResponse(currentRequest));
-        setRequestNotice(DEMO_MODE_NOTICE);
+        setRequestNotice(null);
         setIsLoading(false);
         return;
       }
@@ -263,10 +261,13 @@ export function RecommendResultsPage(props: {
     <main className="relative min-h-dvh overflow-hidden">
       <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(211,166,63,0.24),transparent_36%),radial-gradient(circle_at_bottom_right,rgba(31,58,95,0.08),transparent_28%)]" />
       <div className="relative mx-auto flex w-full max-w-[1680px] flex-col gap-4 px-4 py-4 sm:px-6 lg:px-8">
-        <div className="flex justify-end">
+        <div className="flex items-center justify-between gap-4">
+          <h2 className="text-2xl font-semibold tracking-[-0.04em]">
+            총 소요시간 비교
+          </h2>
           <Link
             href="/"
-            className="inline-flex min-h-12 items-center justify-center rounded-[20px] border border-[var(--foreground)] bg-[var(--foreground)] px-4 text-sm font-semibold text-white shadow-[0_16px_32px_rgba(17,17,17,0.14)]"
+            className="inline-flex min-h-10 items-center justify-center rounded-[18px] border border-[var(--foreground)] bg-[var(--foreground)] px-3.5 text-[13px] font-semibold text-white shadow-[0_14px_28px_rgba(17,17,17,0.14)]"
           >
             {RESTART_LABEL}
           </Link>

@@ -261,27 +261,22 @@ export function RecommendationCard(props: {
               </span>
             ) : null}
           </div>
-          <h3 className="mt-3 text-lg font-semibold tracking-[-0.03em]">
-            {formatOfficeDisplayName(props.office.name)}
-          </h3>
-          <p className="mt-1 text-sm leading-6 text-[var(--muted)]">
-            {props.office.address}
-          </p>
+          <div className="mt-3 flex flex-col gap-1 sm:flex-row sm:items-center sm:gap-2">
+            <h3 className="text-lg font-semibold tracking-[-0.03em]">
+              {formatOfficeDisplayName(props.office.name)}
+            </h3>
+            <p className="text-sm leading-6 text-[var(--muted)]">
+              {props.office.address}
+            </p>
+          </div>
         </button>
 
         <div className="rounded-2xl border border-[rgba(17,17,17,0.08)] bg-white px-3 py-2 text-right shadow-[0_12px_24px_rgba(17,17,17,0.06)]">
-          <p className="text-xs uppercase tracking-[0.2em] text-[var(--muted)]">
-            total
-          </p>
-          <p className="mt-1 text-xl font-semibold tabular-nums">
+          <p className="text-xl font-semibold tabular-nums">
             {props.office.recommendation.totalMinutes}분
           </p>
         </div>
       </div>
-
-      <p className="mt-4 text-sm leading-6 text-[var(--foreground)]">
-        {props.office.recommendation.reason}
-      </p>
 
       <div className="mt-5 grid gap-3 sm:grid-cols-3">
         <StatChip

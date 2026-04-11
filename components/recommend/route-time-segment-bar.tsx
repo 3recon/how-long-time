@@ -72,7 +72,7 @@ export function RouteTimeSegmentBar(props: RouteTimeSegmentBarProps) {
 
   return (
     <div
-      className="flex h-7 overflow-hidden rounded-full bg-[rgba(17,17,17,0.08)] text-[11px] font-semibold shadow-inner ring-1 ring-[rgba(255,255,255,0.75)]"
+      className="flex h-7 overflow-hidden rounded-full bg-[rgba(17,17,17,0.08)] text-[10px] font-semibold shadow-inner ring-1 ring-[rgba(255,255,255,0.75)]"
       aria-label={labelText}
     >
       {totalMinutes > 0 ? (
