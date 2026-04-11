@@ -10,6 +10,15 @@ interface DemoScenarioDataset {
   scenarios: RecommendResponse[];
 }
 
+function assertRecommendationsSupportPurpose(response: RecommendResponse) {
+  assert.ok(
+    response.recommendations.every((recommendation) =>
+      recommendation.supportedPurposeIds.includes(response.request.purposeId),
+    ),
+    `Scenario ${response.meta.scenarioId ?? "unknown"} includes a recommendation that does not support ${response.request.purposeId}.`,
+  );
+}
+
 function readJsonFile(pathSegments: string[]): unknown {
   return JSON.parse(
     readFileSync(
@@ -44,6 +53,7 @@ async function main() {
   assert.equal(Array.isArray(rootDemoDataset.scenarios), true);
   assert.equal(rootDemoDataset.scenarios.length, 6);
   assert.deepEqual(rootDemoDataset, backendDemoDataset);
+  rootDemoDataset.scenarios.forEach(assertRecommendationsSupportPurpose);
 
   const cityHallPassportRequest: RecommendRequest = {
     purposeId: "passport-reissue",
@@ -109,6 +119,10 @@ async function main() {
     backendCertificateResponse.meta.scenarioId,
     "demo-seoul-hongdae-certificate",
   );
+  assertRecommendationsSupportPurpose(backendCityHallPassportResponse);
+  assertRecommendationsSupportPurpose(backendJamsilPassportResponse);
+  assertRecommendationsSupportPurpose(backendFallbackPassportResponse);
+  assertRecommendationsSupportPurpose(backendCertificateResponse);
 
   assert.notDeepEqual(
     backendCityHallPassportResponse.recommendations,
@@ -162,6 +176,7 @@ async function main() {
   const backendResponse = createDemoRecommendResponse(request);
   const clientResponse = createClientDemoRecommendResponse(request);
   assert.equal(backendResponse.meta.scenarioId, "demo-seoul-konkuk-resident");
+  assertRecommendationsSupportPurpose(backendResponse);
   assert.deepEqual(clientResponse, backendResponse);
 
   console.log("recommend demo contract spec passed");

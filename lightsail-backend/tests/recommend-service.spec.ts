@@ -4,6 +4,18 @@ import { readFileSync } from "node:fs";
 import { demoRecommendationDataset } from "../src/data/demo/recommendation-sample.js";
 import { createRecommendService, RecommendServiceError } from "../src/recommend/service.js";
 
+function assertRecommendationsSupportPurpose(
+  purposeId: string,
+  supportedPurposeIds: string[][],
+) {
+  assert.ok(
+    supportedPurposeIds.every((supportedPurposeIdList) =>
+      supportedPurposeIdList.includes(purposeId),
+    ),
+    `Demo response includes a recommendation that does not support ${purposeId}.`,
+  );
+}
+
 async function main() {
   const liveService = createRecommendService({
     fetchWaitingItems: async () => ({
@@ -137,6 +149,12 @@ async function main() {
     demoResponse.recommendations[0]?.waiting.updatedAt ?? "",
     /\+09:00$/,
   );
+  assertRecommendationsSupportPurpose(
+    demoResponse.request.purposeId,
+    demoResponse.recommendations.map(
+      (recommendation) => recommendation.supportedPurposeIds,
+    ),
+  );
 
   const jamsilDemoResponse = await createRecommendService().recommend({
     purposeId: "passport-reissue",
@@ -151,6 +169,12 @@ async function main() {
   assert.equal(
     jamsilDemoResponse.meta.scenarioId,
     "demo-seoul-jamsil-passport",
+  );
+  assertRecommendationsSupportPurpose(
+    jamsilDemoResponse.request.purposeId,
+    jamsilDemoResponse.recommendations.map(
+      (recommendation) => recommendation.supportedPurposeIds,
+    ),
   );
   assert.deepEqual(jamsilDemoResponse, await createRecommendService().recommend({
     purposeId: "passport-reissue",
@@ -171,6 +195,14 @@ async function main() {
 
   assert.equal(demoRecommendationDataset.scenarios.length, 6);
   assert.deepEqual(demoSampleJson, demoRecommendationDataset);
+  demoRecommendationDataset.scenarios.forEach((scenario) => {
+    assertRecommendationsSupportPurpose(
+      scenario.request.purposeId,
+      scenario.recommendations.map(
+        (recommendation) => recommendation.supportedPurposeIds,
+      ),
+    );
+  });
 
   const emptyService = createRecommendService({
     fetchWaitingItems: async () => ({

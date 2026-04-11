@@ -39,8 +39,8 @@
 
 | scenarioId | 목적 | 출발지 | 추천 후보 수 | 1순위 민원실 | 총 소요시간 | 대기 | 이동 |
 | --- | --- | --- | ---: | --- | ---: | ---: | ---: |
-| `demo-seoul-cityhall-passport` | `passport-reissue` | `서울시청` | 3 | `종로구청 여권 민원실` | 40분 | 22분 | 18분 |
-| `demo-seoul-jamsil-passport` | `passport-reissue` | `잠실역` | 3 | `성동구청 민원여권과` | 32분 | 18분 | 14분 |
+| `demo-seoul-cityhall-passport` | `passport-reissue` | `서울시청` | 2 | `종로구청 여권 민원실` | 40분 | 22분 | 18분 |
+| `demo-seoul-jamsil-passport` | `passport-reissue` | `잠실역` | 2 | `중구청 민원여권과` | 43분 | 15분 | 28분 |
 | `demo-seoul-seongsu-passport-pickup` | `passport-pickup` | `성수역` | 3 | `성동구청 민원여권과` | 18분 | 6분 | 12분 |
 | `demo-seoul-hongdae-certificate` | `certificate-issuance` | `홍대입구역` | 1 | `중구청 민원여권과` | 69분 | 42분 | 27분 |
 | `demo-seoul-gangnam-family` | `family-relation-certificate` | `강남역` | 1 | `성동구청 민원여권과` | 32분 | 3분 | 29분 |

@@ -19,8 +19,8 @@
         "purposeMappingVersion": "2026-04-stage-4"
       },
       "summary": {
-        "totalCandidateCount": 3,
-        "returnedRecommendationCount": 3
+        "totalCandidateCount": 2,
+        "returnedRecommendationCount": 2
       },
       "recommendations": [
         {
@@ -168,79 +168,6 @@
             "totalMinutes": 43,
             "reason": "도착은 빠르지만 창구 대기가 더 길어 두 번째 후보입니다."
           }
-        },
-        {
-          "id": "seongdong-civil-service",
-          "name": "성동구청 민원여권과",
-          "address": "서울 성동구 고산자로 270",
-          "coordinates": {
-            "lat": 37.5634,
-            "lng": 127.0369
-          },
-          "supportedPurposeIds": [
-            "passport-pickup",
-            "family-relation-certificate",
-            "resident-registration"
-          ],
-          "supportedTaskMatches": [
-            {
-              "taskName": "여권 접수 보조 창구",
-              "ruleType": "keyword"
-            }
-          ],
-          "waiting": {
-            "count": 3,
-            "estimatedMinutes": 9,
-            "updatedAt": "2026-04-10T08:54:00.000+09:00"
-          },
-          "travel": {
-            "minutes": 37,
-            "distanceKm": 9.1,
-            "breakdown": {
-              "walkMinutes": 6,
-              "transitRideMinutes": 26,
-              "transferEtcMinutes": 5
-            },
-            "steps": [
-              {
-                "type": "walk",
-                "title": "을지로입구역까지 도보",
-                "minutes": 4,
-                "distanceKm": 0.4,
-                "from": "서울시청",
-                "to": "을지로입구역"
-              },
-              {
-                "type": "subway",
-                "title": "2호선 탑승",
-                "minutes": 18,
-                "routeName": "2호선",
-                "from": "을지로입구역",
-                "to": "왕십리역",
-                "stopCount": 6
-              },
-              {
-                "type": "transfer-etc",
-                "title": "출구 및 방향 전환",
-                "minutes": 4,
-                "from": "왕십리역",
-                "to": "성동구청 방면"
-              },
-              {
-                "type": "walk",
-                "title": "민원실까지 도보",
-                "minutes": 5,
-                "distanceKm": 0.45,
-                "from": "성동구청 방면",
-                "to": "성동구청 민원여권과"
-              }
-            ]
-          },
-          "recommendation": {
-            "rank": 3,
-            "totalMinutes": 46,
-            "reason": "대기는 짧지만 이동 거리가 길어 발표용 보조 시나리오에 적합합니다."
-          }
         }
       ]
     },
@@ -263,83 +190,10 @@
         "purposeMappingVersion": "2026-04-stage-4"
       },
       "summary": {
-        "totalCandidateCount": 3,
-        "returnedRecommendationCount": 3
+        "totalCandidateCount": 2,
+        "returnedRecommendationCount": 2
       },
       "recommendations": [
-        {
-          "id": "seongdong-civil-service",
-          "name": "성동구청 민원여권과",
-          "address": "서울 성동구 고산자로 270",
-          "coordinates": {
-            "lat": 37.5634,
-            "lng": 127.0369
-          },
-          "supportedPurposeIds": [
-            "passport-pickup",
-            "family-relation-certificate",
-            "resident-registration"
-          ],
-          "supportedTaskMatches": [
-            {
-              "taskName": "여권 재발급 연계 상담",
-              "ruleType": "keyword"
-            }
-          ],
-          "waiting": {
-            "count": 6,
-            "estimatedMinutes": 18,
-            "updatedAt": "2026-04-10T09:01:00.000+09:00"
-          },
-          "travel": {
-            "minutes": 14,
-            "distanceKm": 4.8,
-            "breakdown": {
-              "walkMinutes": 4,
-              "transitRideMinutes": 8,
-              "transferEtcMinutes": 2
-            },
-            "steps": [
-              {
-                "type": "walk",
-                "title": "잠실역 환승 통로 이동",
-                "minutes": 2,
-                "distanceKm": 0.15,
-                "from": "잠실역",
-                "to": "2호선 승강장"
-              },
-              {
-                "type": "subway",
-                "title": "2호선 탑승",
-                "minutes": 8,
-                "routeName": "2호선",
-                "from": "잠실역",
-                "to": "왕십리역",
-                "stopCount": 4
-              },
-              {
-                "type": "transfer-etc",
-                "title": "출구 이동",
-                "minutes": 2,
-                "from": "왕십리역",
-                "to": "성동구청 방향"
-              },
-              {
-                "type": "walk",
-                "title": "민원실까지 도보",
-                "minutes": 2,
-                "distanceKm": 0.2,
-                "from": "성동구청 방향",
-                "to": "성동구청 민원여권과"
-              }
-            ]
-          },
-          "recommendation": {
-            "rank": 1,
-            "totalMinutes": 32,
-            "reason": "잠실권에서는 지하철 한 번으로 이동돼 가장 안정적으로 방문할 수 있습니다."
-          }
-        },
         {
           "id": "jung-gu-civil-service",
           "name": "중구청 민원여권과",
@@ -408,7 +262,7 @@
             ]
           },
           "recommendation": {
-            "rank": 2,
+            "rank": 1,
             "totalMinutes": 43,
             "reason": "대기는 짧지만 환승과 도보가 길어 두 번째 후보로 남깁니다."
           }
@@ -477,7 +331,7 @@
             ]
           },
           "recommendation": {
-            "rank": 3,
+            "rank": 2,
             "totalMinutes": 55,
             "reason": "버스는 단순하지만 총 소요시간이 길어 최종 우선순위는 낮습니다."
           }
