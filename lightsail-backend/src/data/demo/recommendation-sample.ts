@@ -11,7 +11,7 @@ export const demoRecommendationSample: RecommendResponse = {
     mode: "demo",
   },
   meta: {
-    contractVersion: "2026-04-stage-6",
+    contractVersion: "2026-04-stage-7",
     requestedAt: "2026-04-10T09:00:00.000Z",
     mode: "demo",
     dataSource: "demo-sample",
@@ -44,6 +44,7 @@ export const demoRecommendationSample: RecommendResponse = {
       ],
       waiting: {
         count: 8,
+        estimatedMinutes: 24,
         updatedAt: "2026-04-10T08:55:00.000+09:00",
       },
       travel: {
@@ -51,11 +52,9 @@ export const demoRecommendationSample: RecommendResponse = {
         distanceKm: 3.2,
       },
       recommendation: {
-        score: 91,
         rank: 1,
-        waitingPenalty: 5,
-        travelPenalty: 4,
-        reason: "대기 인원과 이동 시간이 모두 부담이 적은 편입니다.",
+        totalMinutes: 43,
+        reason: "대기시간 비중이 커 총 소요시간을 먼저 확인하는 편이 좋습니다.",
       },
     },
     {
@@ -83,6 +82,7 @@ export const demoRecommendationSample: RecommendResponse = {
       ],
       waiting: {
         count: 11,
+        estimatedMinutes: 33,
         updatedAt: "2026-04-10T08:55:00.000+09:00",
       },
       travel: {
@@ -90,11 +90,9 @@ export const demoRecommendationSample: RecommendResponse = {
         distanceKm: 2.6,
       },
       recommendation: {
-        score: 87,
         rank: 2,
-        waitingPenalty: 9,
-        travelPenalty: 4,
-        reason: "이동 시간은 짧지만 대기 인원이 조금 더 있습니다.",
+        totalMinutes: 49,
+        reason: "대기시간 비중이 커 총 소요시간을 먼저 확인하는 편이 좋습니다.",
       },
     },
   ],

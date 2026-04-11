@@ -1,10 +1,9 @@
 export {
-  calculateRecommendationScore,
-  calculateTravelPenalty,
-  calculateWaitingPenalty,
+  calculateTotalLeadTime,
+  estimateWaitingMinutes,
   rankRecommendationCandidates,
   type RankedRecommendationCandidate,
   type RankedRecommendationResult,
-  type RecommendationScoreInput,
-  type RecommendationScoreResult,
+  type RecommendationTimeInput,
+  type RecommendationTimeResult,
 } from "../../lightsail-backend/src/recommend/scoring";

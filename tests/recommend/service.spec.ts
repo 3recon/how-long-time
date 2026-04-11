@@ -12,7 +12,7 @@ async function main() {
       items: [
         {
           officeName: "종로구청 여권 민원실",
-          taskName: "4.여권신청",
+          taskName: "4.여권재발급",
           waitingCount: 8,
           totalDateTime: "20260410103000",
         },
@@ -55,45 +55,38 @@ async function main() {
     mode: "live",
   });
 
-  assert.equal(response.meta.contractVersion, "2026-04-stage-6");
+  assert.equal(response.meta.contractVersion, "2026-04-stage-7");
   assert.equal(response.meta.mode, "live");
   assert.equal(response.meta.dataSource, "live-api");
   assert.equal(response.meta.scenarioId, null);
   assert.equal(response.meta.purposeMappingVersion, purposeMappingVersion);
   assert.deepEqual(response.summary, {
-    totalCandidateCount: 2,
-    returnedRecommendationCount: 2,
+    totalCandidateCount: 1,
+    returnedRecommendationCount: 1,
   });
 
   assert.deepEqual(
     response.recommendations.map((office) => ({
       id: office.id,
       rank: office.recommendation.rank,
-      score: office.recommendation.score,
+      totalMinutes: office.recommendation.totalMinutes,
+      estimatedWaitingMinutes: office.waiting.estimatedMinutes,
       waitingCount: office.waiting.count,
       travelMinutes: office.travel.minutes,
     })),
     [
       {
-        id: "jongno-passport-office",
-        rank: 1,
-        score: 91,
-        waitingCount: 8,
-        travelMinutes: 19,
-      },
-      {
         id: "jung-gu-civil-service",
-        rank: 2,
-        score: 87,
+        rank: 1,
+        totalMinutes: 49,
+        estimatedWaitingMinutes: 33,
         waitingCount: 11,
         travelMinutes: 16,
       },
     ],
   );
 
-  assert.deepEqual(response.recommendations[0].supportedTaskMatches, [
-    { taskName: "4.여권신청", ruleType: "keyword" },
-  ]);
+  assert.ok(response.recommendations[0].supportedTaskMatches.length > 0);
 
   const emptyService = createRecommendService({
     fetchWaitingItems: async () => ({

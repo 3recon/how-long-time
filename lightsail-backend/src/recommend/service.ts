@@ -281,15 +281,14 @@ async function createLiveRecommendResponse(
         supportedPurposeIds: matchedOffice.office.supportedPurposeIds,
         supportedTaskMatches: matchedOffice.supportedTaskMatches,
         waiting: {
-          count: matchedOffice.waitingCount ?? 0,
+          count: matchedOffice.waitingCount,
+          estimatedMinutes: rankedCandidate.estimatedWaitingMinutes,
           updatedAt: matchedOffice.updatedAt,
         },
         travel: matchedOffice.travel,
         recommendation: {
-          score: rankedCandidate.score,
           rank: rankedCandidate.rank,
-          waitingPenalty: rankedCandidate.waitingPenalty,
-          travelPenalty: rankedCandidate.travelPenalty,
+          totalMinutes: rankedCandidate.totalMinutes,
           reason: rankedCandidate.reason,
         },
       };

@@ -14,7 +14,7 @@ async function main() {
         return {
           request,
           meta: {
-            contractVersion: "2026-04-stage-6",
+            contractVersion: "2026-04-stage-7",
             requestedAt: "2026-04-10T09:00:00.000Z",
             mode: request.mode,
             dataSource: request.mode === "demo" ? "demo-sample" : "live-api",
@@ -46,6 +46,7 @@ async function main() {
               ],
               waiting: {
                 count: 8,
+                estimatedMinutes: 24,
                 updatedAt: "2026-04-10T08:55:00.000+09:00",
               },
               travel: {
@@ -53,11 +54,9 @@ async function main() {
                 distanceKm: 3.2,
               },
               recommendation: {
-                score: 91,
                 rank: 1,
-                waitingPenalty: 5,
-                travelPenalty: 4,
-                reason: "대기 인원과 이동 시간이 모두 부담이 적은 편입니다.",
+                totalMinutes: 43,
+                reason: "대기시간 비중이 커 총 소요시간을 먼저 확인하는 편이 좋습니다.",
               },
             },
           ],
@@ -127,7 +126,7 @@ async function main() {
       error: "INVALID_REQUEST",
       details:
         'Invalid option: expected one of "passport-reissue"|"passport-pickup"|"certificate-issuance"|"family-relation-certificate"|"resident-registration"',
-      contractVersion: "2026-04-stage-6",
+      contractVersion: "2026-04-stage-7",
     });
 
     const invalidJsonResponse = await fetch(`${baseUrl}/api/recommend`, {
@@ -142,7 +141,7 @@ async function main() {
     assert.deepEqual(await invalidJsonResponse.json(), {
       error: "INVALID_JSON",
       details: "JSON 본문을 읽을 수 없습니다.",
-      contractVersion: "2026-04-stage-6",
+      contractVersion: "2026-04-stage-7",
     });
   } finally {
     await new Promise<void>((resolve, reject) => {

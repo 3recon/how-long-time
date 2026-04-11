@@ -75,7 +75,8 @@ export interface SupportedTaskMatch {
 }
 
 export interface WaitingSnapshot {
-  count: number;
+  count: number | null;
+  estimatedMinutes: number;
   updatedAt: string | null;
 }
 
@@ -119,10 +120,8 @@ export type MobilityLookupResult =
   | MobilityLookupFallback;
 
 export interface RecommendationBreakdown {
-  score: number;
   rank: number;
-  waitingPenalty: number;
-  travelPenalty: number;
+  totalMinutes: number;
   reason: string;
 }
 

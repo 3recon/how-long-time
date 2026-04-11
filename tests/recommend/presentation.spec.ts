@@ -17,8 +17,15 @@ async function main() {
   const defaultSummary = getSelectedOfficeSummary(response.recommendations, null);
   assert.ok(defaultSummary);
   assert.equal(defaultSummary?.id, response.recommendations[0]?.id);
+  assert.equal(
+    defaultSummary?.totalMinutes,
+    response.recommendations[0]?.recommendation.totalMinutes,
+  );
+  assert.equal(
+    defaultSummary?.estimatedWaitingMinutes,
+    response.recommendations[0]?.waiting.estimatedMinutes,
+  );
   assert.equal(defaultSummary?.travelMinutes, response.recommendations[0]?.travel.minutes);
-  assert.equal(defaultSummary?.waitingCount, response.recommendations[0]?.waiting.count);
 
   const selectedId = response.recommendations[1]?.id ?? null;
   const selectedSummary = getSelectedOfficeSummary(
@@ -28,6 +35,10 @@ async function main() {
   assert.ok(selectedSummary);
   assert.equal(selectedSummary?.id, selectedId);
   assert.equal(selectedSummary?.rank, response.recommendations[1]?.recommendation.rank);
+  assert.equal(
+    selectedSummary?.totalMinutes,
+    response.recommendations[1]?.recommendation.totalMinutes,
+  );
   assert.equal(
     selectedSummary?.taskSummary,
     response.recommendations[1]?.supportedTaskMatches.map((task) => task.taskName).join(", "),

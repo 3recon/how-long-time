@@ -1,34 +1,26 @@
 import assert from "node:assert/strict";
 
 import {
-  calculateRecommendationScore,
-  calculateTravelPenalty,
-  calculateWaitingPenalty,
+  calculateTotalLeadTime,
+  estimateWaitingMinutes,
   rankRecommendationCandidates,
 } from "../../lib/recommend/scoring.ts";
 
-assert.equal(calculateWaitingPenalty(0), 0);
-assert.equal(calculateWaitingPenalty(4), 2);
-assert.equal(calculateWaitingPenalty(8), 5);
-assert.equal(calculateWaitingPenalty(17), 14);
-assert.equal(calculateWaitingPenalty(null), 18);
-
-assert.equal(calculateTravelPenalty(9), 0);
-assert.equal(calculateTravelPenalty(18), 4);
-assert.equal(calculateTravelPenalty(29), 9);
-assert.equal(calculateTravelPenalty(51), 22);
-assert.equal(calculateTravelPenalty(75), 30);
+assert.equal(estimateWaitingMinutes(0), 0);
+assert.equal(estimateWaitingMinutes(4), 12);
+assert.equal(estimateWaitingMinutes(8), 24);
+assert.equal(estimateWaitingMinutes(17), 51);
+assert.equal(estimateWaitingMinutes(null), 10);
 
 assert.deepEqual(
-  calculateRecommendationScore({
+  calculateTotalLeadTime({
     waitingCount: 8,
     travelMinutes: 19,
   }),
   {
-    score: 91,
-    waitingPenalty: 5,
-    travelPenalty: 4,
-    reason: "대기 인원과 이동 시간이 모두 부담이 적은 편입니다.",
+    estimatedWaitingMinutes: 24,
+    totalMinutes: 43,
+    reason: "대기시간 비중이 커 총 소요시간을 먼저 확인하는 편이 좋습니다.",
   },
 );
 
@@ -55,23 +47,23 @@ assert.deepEqual(
   ]).map((candidate) => ({
     id: candidate.id,
     rank: candidate.rank,
-    score: candidate.score,
+    totalMinutes: candidate.totalMinutes,
   })),
   [
     {
-      id: "jongno",
+      id: "seongdong",
       rank: 1,
-      score: 91,
+      totalMinutes: 39,
+    },
+    {
+      id: "jongno",
+      rank: 2,
+      totalMinutes: 43,
     },
     {
       id: "jung-gu",
-      rank: 2,
-      score: 87,
-    },
-    {
-      id: "seongdong",
       rank: 3,
-      score: 83,
+      totalMinutes: 49,
     },
   ],
 );

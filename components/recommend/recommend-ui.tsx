@@ -29,6 +29,21 @@ export function formatUpdatedAt(value: string | null): string {
   }).format(date);
 }
 
+export function formatWaitingCount(value: number | null): string {
+  if (value === null) {
+    return "확인 중";
+  }
+
+  return `${value}명`;
+}
+
+export function formatEstimatedWaiting(value: {
+  estimatedMinutes: number;
+  waitingCount: number | null;
+}): string {
+  return `${value.estimatedMinutes}분 ${formatWaitingCount(value.waitingCount)}`;
+}
+
 export function getRequestErrorMessage(error: string | null | undefined): string {
   switch (error) {
     case "INVALID_REQUEST":
@@ -144,10 +159,10 @@ export function RecommendationCard(props: {
 
         <div className="rounded-2xl border border-[rgba(17,17,17,0.08)] bg-white px-3 py-2 text-right shadow-[0_12px_24px_rgba(17,17,17,0.06)]">
           <p className="text-xs uppercase tracking-[0.2em] text-[var(--muted)]">
-            score
+            total
           </p>
           <p className="mt-1 text-xl font-semibold tabular-nums">
-            {props.office.recommendation.score}
+            {props.office.recommendation.totalMinutes}분
           </p>
         </div>
       </div>
@@ -158,12 +173,15 @@ export function RecommendationCard(props: {
 
       <div className="mt-5 grid gap-3 sm:grid-cols-3">
         <StatChip
-          label="이동시간"
+          label="이동 시간"
           value={`${props.office.travel.minutes}분`}
         />
         <StatChip
-          label="대기 인원"
-          value={`${props.office.waiting.count}명`}
+          label="예상 대기(예상 인원)"
+          value={formatEstimatedWaiting({
+            estimatedMinutes: props.office.waiting.estimatedMinutes,
+            waitingCount: props.office.waiting.count,
+          })}
         />
         <StatChip
           label="처리 업무"

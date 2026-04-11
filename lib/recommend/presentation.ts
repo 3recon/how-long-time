@@ -10,9 +10,10 @@ export interface SelectedOfficeSummary {
   address: string;
   reason: string;
   rank: number;
-  score: number;
+  totalMinutes: number;
   travelMinutes: number;
-  waitingCount: number;
+  estimatedWaitingMinutes: number;
+  waitingCount: number | null;
   updatedAt: string | null;
   taskSummary: string;
 }
@@ -57,8 +58,9 @@ export function getSelectedOfficeSummary(
     address: selectedOffice.address,
     reason: selectedOffice.recommendation.reason,
     rank: selectedOffice.recommendation.rank,
-    score: selectedOffice.recommendation.score,
+    totalMinutes: selectedOffice.recommendation.totalMinutes,
     travelMinutes: selectedOffice.travel.minutes,
+    estimatedWaitingMinutes: selectedOffice.waiting.estimatedMinutes,
     waitingCount: selectedOffice.waiting.count,
     updatedAt: selectedOffice.waiting.updatedAt,
     taskSummary:

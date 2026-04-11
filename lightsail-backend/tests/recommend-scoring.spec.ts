@@ -1,52 +1,42 @@
 import assert from "node:assert/strict";
 
 import {
-  calculateRecommendationScore,
-  calculateTravelPenalty,
-  calculateWaitingPenalty,
+  calculateTotalLeadTime,
+  estimateWaitingMinutes,
   rankRecommendationCandidates,
 } from "../src/recommend/scoring.js";
 
 function main() {
-  assert.equal(calculateWaitingPenalty(0), 0);
-  assert.equal(calculateWaitingPenalty(1), 0);
-  assert.equal(calculateWaitingPenalty(4), 2);
-  assert.equal(calculateWaitingPenalty(8), 5);
-  assert.equal(calculateWaitingPenalty(12), 9);
-  assert.equal(calculateWaitingPenalty(20), 14);
-  assert.equal(calculateWaitingPenalty(21), 20);
-  assert.equal(calculateWaitingPenalty(null), 18);
-
-  assert.equal(calculateTravelPenalty(10), 0);
-  assert.equal(calculateTravelPenalty(20), 4);
-  assert.equal(calculateTravelPenalty(30), 9);
-  assert.equal(calculateTravelPenalty(45), 15);
-  assert.equal(calculateTravelPenalty(60), 22);
-  assert.equal(calculateTravelPenalty(61), 30);
+  assert.equal(estimateWaitingMinutes(0), 0);
+  assert.equal(estimateWaitingMinutes(1), 3);
+  assert.equal(estimateWaitingMinutes(4), 12);
+  assert.equal(estimateWaitingMinutes(8), 24);
+  assert.equal(estimateWaitingMinutes(12), 36);
+  assert.equal(estimateWaitingMinutes(20), 60);
+  assert.equal(estimateWaitingMinutes(21), 63);
+  assert.equal(estimateWaitingMinutes(null), 10);
 
   assert.deepEqual(
-    calculateRecommendationScore({
+    calculateTotalLeadTime({
       waitingCount: null,
       travelMinutes: 12,
     }),
     {
-      score: 78,
-      waitingPenalty: 18,
-      travelPenalty: 4,
-      reason: "이동 시간은 짧지만 대기 인원이 조금 더 있습니다.",
+      estimatedWaitingMinutes: 10,
+      totalMinutes: 22,
+      reason: "이동시간 비중이 크지만 총 소요시간은 안정적인 편입니다.",
     },
   );
 
   assert.deepEqual(
-    calculateRecommendationScore({
+    calculateTotalLeadTime({
       waitingCount: 12,
       travelMinutes: 30,
     }),
     {
-      score: 82,
-      waitingPenalty: 9,
-      travelPenalty: 9,
-      reason: "대기 인원과 이동 시간을 함께 고려했을 때 균형이 괜찮습니다.",
+      estimatedWaitingMinutes: 36,
+      totalMinutes: 66,
+      reason: "대기시간 비중이 커 총 소요시간을 먼저 확인하는 편이 좋습니다.",
     },
   );
 
@@ -73,31 +63,27 @@ function main() {
     ]).map((candidate) => ({
       id: candidate.id,
       rank: candidate.rank,
-      score: candidate.score,
-      waitingPenalty: candidate.waitingPenalty,
-      travelPenalty: candidate.travelPenalty,
+      totalMinutes: candidate.totalMinutes,
+      estimatedWaitingMinutes: candidate.estimatedWaitingMinutes,
     })),
     [
       {
         id: "short-and-light",
         rank: 1,
-        score: 98,
-        waitingPenalty: 2,
-        travelPenalty: 0,
+        totalMinutes: 15,
+        estimatedWaitingMinutes: 6,
       },
       {
         id: "long-but-empty",
         rank: 2,
-        score: 85,
-        waitingPenalty: 0,
-        travelPenalty: 15,
+        totalMinutes: 33,
+        estimatedWaitingMinutes: 0,
       },
       {
         id: "near-but-busy",
         rank: 3,
-        score: 82,
-        waitingPenalty: 14,
-        travelPenalty: 4,
+        totalMinutes: 63,
+        estimatedWaitingMinutes: 51,
       },
     ],
   );
@@ -111,7 +97,7 @@ function main() {
     },
     {
       id: "name-second",
-      name: "노원구청",
+      name: "용인구청",
       waitingCount: null,
       travelMinutes: 20,
     },
@@ -127,58 +113,23 @@ function main() {
     tiedCandidates.map((candidate) => ({
       id: candidate.id,
       rank: candidate.rank,
-      score: candidate.score,
+      totalMinutes: candidate.totalMinutes,
     })),
     [
       {
         id: "travel-first",
         rank: 1,
-        score: 78,
+        totalMinutes: 29,
       },
       {
         id: "name-first",
         rank: 2,
-        score: 78,
+        totalMinutes: 30,
       },
       {
         id: "name-second",
         rank: 3,
-        score: 78,
-      },
-    ],
-  );
-
-  const sameScoreCandidates = rankRecommendationCandidates([
-    {
-      id: "less-waiting",
-      name: "송파구청",
-      waitingCount: 2,
-      travelMinutes: 20,
-    },
-    {
-      id: "more-waiting",
-      name: "양천구청",
-      waitingCount: 4,
-      travelMinutes: 20,
-    },
-  ]);
-
-  assert.deepEqual(
-    sameScoreCandidates.map((candidate) => ({
-      id: candidate.id,
-      rank: candidate.rank,
-      score: candidate.score,
-    })),
-    [
-      {
-        id: "less-waiting",
-        rank: 1,
-        score: 94,
-      },
-      {
-        id: "more-waiting",
-        rank: 2,
-        score: 94,
+        totalMinutes: 30,
       },
     ],
   );

@@ -15,7 +15,7 @@ async function main() {
 
       return new Response(
         JSON.stringify({
-          meta: { contractVersion: "2026-04-stage-6" },
+          meta: { contractVersion: "2026-04-stage-7" },
           recommendations: [{ id: "jongno-passport-office" }],
         }),
         {
@@ -43,7 +43,7 @@ async function main() {
 
   const getBody = await getResponse.json();
 
-  assert.equal(getBody.meta.contractVersion, "2026-04-stage-6");
+  assert.equal(getBody.meta.contractVersion, "2026-04-stage-7");
   assert.equal(getBody.recommendations[0].id, "jongno-passport-office");
 
   const localDemoHandlers = createRecommendRouteHandlers({
@@ -148,7 +148,7 @@ async function main() {
         JSON.stringify({
           error: "NO_RECOMMENDATION",
           details: "No offices support the selected purpose.",
-          contractVersion: "2026-04-stage-6",
+          contractVersion: "2026-04-stage-7",
         }),
         {
           status: 404,
@@ -169,7 +169,7 @@ async function main() {
   assert.deepEqual(await noRecommendationResponse.json(), {
     error: "NO_RECOMMENDATION",
     details: "No offices support the selected purpose.",
-    contractVersion: "2026-04-stage-6",
+    contractVersion: "2026-04-stage-7",
   });
 
   const configErrorHandlers = createRecommendRouteHandlers({
