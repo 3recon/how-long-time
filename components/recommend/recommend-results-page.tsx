@@ -90,6 +90,13 @@ export function RecommendResultsPage(props: {
       setIsLoading(true);
       setRequestError(null);
 
+      if (currentRequest.mode === "demo") {
+        setResult(createClientDemoRecommendResponse(currentRequest));
+        setRequestNotice("demo 모드 샘플 결과를 바로 불러왔습니다.");
+        setIsLoading(false);
+        return;
+      }
+
       try {
         const response = await fetch(`/api/recommend?${requestQueryString}`, {
           method: "GET",

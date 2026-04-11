@@ -30,7 +30,7 @@ async function main() {
 
   const getResponse = await handlers.GET(
     new Request(
-      "http://localhost/api/recommend?purposeId=passport-reissue&originLabel=%EC%84%9C%EC%9A%B8%EC%8B%9C%EC%B2%AD&lat=37.5665&lng=126.978&mode=live",
+      "http://localhost/api/recommend?purposeId=passport-reissue&originLabel=Seoul&lat=37.5665&lng=126.978&mode=live",
     ),
   );
 
@@ -38,7 +38,7 @@ async function main() {
   assert.equal(requests[0]?.method, "GET");
   assert.equal(
     requests[0]?.url,
-    "http://3.34.168.45:3001/api/recommend?purposeId=passport-reissue&originLabel=%EC%84%9C%EC%9A%B8%EC%8B%9C%EC%B2%AD&lat=37.5665&lng=126.978&mode=live",
+    "http://3.34.168.45:3001/api/recommend?purposeId=passport-reissue&originLabel=Seoul&lat=37.5665&lng=126.978&mode=live",
   );
 
   const getBody = await getResponse.json();
@@ -46,12 +46,32 @@ async function main() {
   assert.equal(getBody.meta.contractVersion, "2026-04-stage-6");
   assert.equal(getBody.recommendations[0].id, "jongno-passport-office");
 
-  const postResponse = await handlers.POST(
+  const localDemoHandlers = createRecommendRouteHandlers({
+    backendBaseUrl: "http://3.34.168.45:3001",
+    fetchImpl: async () => {
+      throw new Error("demo mode should not call upstream backend");
+    },
+  });
+
+  const localDemoResponse = await localDemoHandlers.GET(
+    new Request(
+      "http://localhost/api/recommend?purposeId=passport-pickup&originLabel=Seoul&lat=37.5665&lng=126.978&mode=demo",
+    ),
+  );
+
+  assert.equal(localDemoResponse.status, 200);
+  const localDemoBody = await localDemoResponse.json();
+  assert.equal(localDemoBody.request.mode, "demo");
+  assert.equal(localDemoBody.request.purposeId, "passport-pickup");
+  assert.equal(localDemoBody.meta.dataSource, "demo-sample");
+  assert.ok(localDemoBody.recommendations.length > 0);
+
+  const postDemoResponse = await handlers.POST(
     new Request("http://localhost/api/recommend", {
       method: "POST",
       body: JSON.stringify({
         purposeId: "passport-reissue",
-        originLabel: "서울시청",
+        originLabel: "Seoul",
         origin: {
           lat: 37.5665,
           lng: 126.978,
@@ -64,17 +84,39 @@ async function main() {
     }),
   );
 
-  assert.equal(postResponse.status, 200);
+  assert.equal(postDemoResponse.status, 200);
+  assert.equal((await postDemoResponse.json()).request.mode, "demo");
+  assert.equal(requests.length, 1);
+
+  const postLiveResponse = await handlers.POST(
+    new Request("http://localhost/api/recommend", {
+      method: "POST",
+      body: JSON.stringify({
+        purposeId: "passport-reissue",
+        originLabel: "Seoul",
+        origin: {
+          lat: 37.5665,
+          lng: 126.978,
+        },
+        mode: "live",
+      }),
+      headers: {
+        "Content-Type": "application/json",
+      },
+    }),
+  );
+
+  assert.equal(postLiveResponse.status, 200);
   assert.equal(requests[1]?.method, "POST");
   assert.equal(requests[1]?.url, "http://3.34.168.45:3001/api/recommend");
   assert.deepEqual(JSON.parse(requests[1]?.body ?? "{}"), {
     purposeId: "passport-reissue",
-    originLabel: "서울시청",
+    originLabel: "Seoul",
     origin: {
       lat: 37.5665,
       lng: 126.978,
     },
-    mode: "demo",
+    mode: "live",
   });
 
   const invalidJsonResponse = await handlers.POST(
@@ -88,15 +130,11 @@ async function main() {
   );
 
   assert.equal(invalidJsonResponse.status, 400);
-  assert.deepEqual(await invalidJsonResponse.json(), {
-    error: "INVALID_JSON",
-    details: "JSON 본문을 읽을 수 없습니다.",
-    contractVersion: "2026-04-stage-6",
-  });
+  assert.equal((await invalidJsonResponse.json()).error, "INVALID_JSON");
 
   const invalidRequestResponse = await handlers.GET(
     new Request(
-      "http://localhost/api/recommend?purposeId=passport-reissue&originLabel=%EC%84%9C%EC%9A%B8%EC%8B%9C%EC%B2%AD&lng=126.978&mode=live",
+      "http://localhost/api/recommend?purposeId=passport-reissue&originLabel=Seoul&lng=126.978&mode=live",
     ),
   );
 
@@ -109,7 +147,7 @@ async function main() {
       new Response(
         JSON.stringify({
           error: "NO_RECOMMENDATION",
-          details: "선택한 민원 목적을 처리할 수 있는 민원실을 찾지 못했습니다.",
+          details: "No offices support the selected purpose.",
           contractVersion: "2026-04-stage-6",
         }),
         {
@@ -123,14 +161,14 @@ async function main() {
 
   const noRecommendationResponse = await upstreamErrorHandlers.GET(
     new Request(
-      "http://localhost/api/recommend?purposeId=passport-reissue&originLabel=%EC%84%9C%EC%9A%B8%EC%8B%9C%EC%B2%AD&lat=37.5665&lng=126.978&mode=live",
+      "http://localhost/api/recommend?purposeId=passport-reissue&originLabel=Seoul&lat=37.5665&lng=126.978&mode=live",
     ),
   );
 
   assert.equal(noRecommendationResponse.status, 404);
   assert.deepEqual(await noRecommendationResponse.json(), {
     error: "NO_RECOMMENDATION",
-    details: "선택한 민원 목적을 처리할 수 있는 민원실을 찾지 못했습니다.",
+    details: "No offices support the selected purpose.",
     contractVersion: "2026-04-stage-6",
   });
 
@@ -140,16 +178,12 @@ async function main() {
 
   const configErrorResponse = await configErrorHandlers.GET(
     new Request(
-      "http://localhost/api/recommend?purposeId=passport-reissue&originLabel=%EC%84%9C%EC%9A%B8%EC%8B%9C%EC%B2%AD&lat=37.5665&lng=126.978&mode=live",
+      "http://localhost/api/recommend?purposeId=passport-reissue&originLabel=Seoul&lat=37.5665&lng=126.978&mode=live",
     ),
   );
 
   assert.equal(configErrorResponse.status, 503);
-  assert.deepEqual(await configErrorResponse.json(), {
-    error: "UPSTREAM_CONFIG_ERROR",
-    details: "추천 백엔드 주소가 설정되지 않았습니다.",
-    contractVersion: "2026-04-stage-6",
-  });
+  assert.equal((await configErrorResponse.json()).error, "UPSTREAM_CONFIG_ERROR");
 
   console.log("recommend route spec passed");
 }

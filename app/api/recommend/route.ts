@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 
+import { createClientDemoRecommendResponse } from "@/lib/recommend/client-demo";
 import { recommendContractVersion } from "@/lib/recommend/constants";
 import { parseRecommendRequest } from "@/lib/recommend/request";
 import { getServerRuntimeConfig } from "@/lib/server/env";
@@ -148,6 +149,10 @@ export function createRecommendRouteHandlers(
       return errorResponse(parsed.status, parsed.error, parsed.details);
     }
 
+    if (parsed.value.mode === "demo") {
+      return NextResponse.json(createClientDemoRecommendResponse(parsed.value));
+    }
+
     return forwardRecommendRequest(parsed.value, {
       backendBaseUrl,
       fetchImpl,
@@ -168,6 +173,10 @@ export function createRecommendRouteHandlers(
 
     if (!parsed.ok) {
       return errorResponse(parsed.status, parsed.error, parsed.details);
+    }
+
+    if (parsed.value.mode === "demo") {
+      return NextResponse.json(createClientDemoRecommendResponse(parsed.value));
     }
 
     return forwardRecommendRequest(parsed.value, {
