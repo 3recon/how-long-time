@@ -6,6 +6,7 @@ import { KakaoMapPanel } from "@/components/recommend/kakao-map-panel";
 import {
   RecommendationCard,
 } from "@/components/recommend/recommend-ui";
+import { getPurposeLabel } from "@/data/recommend/purpose-options";
 import { getInitialSelectedOfficeId } from "@/lib/recommend/presentation";
 import type { LocationPoint, RecommendResponse } from "@/types/recommend";
 
@@ -25,17 +26,21 @@ export function RecommendResultsLayout(props: {
   const origin = props.result?.request.origin ?? props.fallbackOrigin;
   const originLabel =
     props.result?.request.originLabel || props.fallbackOriginLabel;
+  const selectedPurposeLabel = props.result?.request.purposeId
+    ? getPurposeLabel(props.result.request.purposeId)
+    : null;
 
   return (
-    <div className="grid min-w-0 gap-4 lg:h-[calc(100dvh-7.5rem)] lg:min-h-[760px] lg:grid-cols-[minmax(0,1fr)_minmax(360px,0.9fr)] lg:overflow-hidden xl:grid-cols-[minmax(0,0.95fr)_minmax(420px,1.05fr)]">
+    <div className="grid min-w-0 gap-4 lg:h-[calc(100dvh-7.5rem)] lg:min-h-[760px] lg:grid-cols-[minmax(0,1.08fr)_minmax(360px,1fr)] lg:overflow-hidden xl:grid-cols-[minmax(0,1.08fr)_minmax(420px,1fr)]">
       <div className="min-w-0 lg:flex lg:h-full lg:min-h-0 lg:flex-col">
         <section className="soft-card min-w-0 rounded-[28px] border-[rgba(17,17,17,0.08)] p-5 sm:p-6 lg:flex lg:h-full lg:min-h-0 lg:flex-col lg:overflow-hidden lg:p-5">
           {recommendations.length > 0 ? (
-            <div className="space-y-4 lg:min-h-0 lg:flex-1 lg:overflow-auto lg:pr-1">
+            <div className="space-y-4 lg:min-h-0 lg:flex-1 lg:overflow-auto lg:pr-1 lg:[scrollbar-gutter:stable]">
               {recommendations.map((office) => (
                 <RecommendationCard
                   key={office.id}
                   office={office}
+                  selectedPurposeLabel={selectedPurposeLabel}
                   selected={selectedId === office.id}
                   onSelect={() => props.onSelectOffice(office.id)}
                   expanded={expandedOfficeId === office.id}

@@ -1,5 +1,7 @@
 "use client";
 
+import { useEffect, useMemo, useRef, useState } from "react";
+
 export interface RouteTimeSegmentBarProps {
   travelMinutes: number;
   waitingMinutes: number;
@@ -27,6 +29,9 @@ interface TimeSegment extends RouteTimeSegmentInput {
   iconClassName: string;
 }
 
+const MIN_WIDTH_WITH_ICON_PX = 52;
+const MIN_WIDTH_TEXT_ONLY_PX = 30;
+
 function toSafeMinutes(value: number): number {
   if (!Number.isFinite(value) || value <= 0) {
     return 0;
@@ -36,6 +41,8 @@ function toSafeMinutes(value: number): number {
 }
 
 export function RouteTimeSegmentBar(props: RouteTimeSegmentBarProps) {
+  const containerRef = useRef<HTMLDivElement | null>(null);
+  const [containerWidth, setContainerWidth] = useState(0);
   const travelMinutes = toSafeMinutes(props.travelMinutes);
   const waitingMinutes = toSafeMinutes(props.waitingMinutes);
   const inputSegments = props.segments ?? [
@@ -52,6 +59,7 @@ export function RouteTimeSegmentBar(props: RouteTimeSegmentBarProps) {
       kind: "waiting" as const,
     },
   ];
+
   const segments: TimeSegment[] = inputSegments
     .map((segment) => ({
       ...segment,
@@ -59,10 +67,12 @@ export function RouteTimeSegmentBar(props: RouteTimeSegmentBarProps) {
       ...getSegmentStyle(segment.kind),
     }))
     .filter((segment) => segment.minutes > 0);
+
   const totalMinutes = segments.reduce(
     (sum, segment) => sum + segment.minutes,
     0,
   );
+
   const labelText =
     segments.length > 0
       ? segments
@@ -70,35 +80,115 @@ export function RouteTimeSegmentBar(props: RouteTimeSegmentBarProps) {
           .join(", ")
       : "이동 0분";
 
+  useEffect(() => {
+    const element = containerRef.current;
+
+    if (!element || typeof ResizeObserver === "undefined") {
+      return;
+    }
+
+    const observer = new ResizeObserver((entries) => {
+      const nextWidth = entries[0]?.contentRect.width ?? 0;
+      setContainerWidth(nextWidth);
+    });
+
+    observer.observe(element);
+    setContainerWidth(element.getBoundingClientRect().width);
+
+    return () => {
+      observer.disconnect();
+    };
+  }, []);
+
+  const segmentWidths = useMemo(() => {
+    if (segments.length === 0 || totalMinutes <= 0 || containerWidth <= 0) {
+      return segments.map((segment) => ({
+        key: segment.key,
+        widthPercent: totalMinutes > 0 ? (segment.minutes / totalMinutes) * 100 : 0,
+      }));
+    }
+
+    const minWidths = segments.map((segment) =>
+      segment.kind === "transfer" ? MIN_WIDTH_TEXT_ONLY_PX : MIN_WIDTH_WITH_ICON_PX,
+    );
+
+    const widths = new Array<number>(segments.length).fill(0);
+    const unresolved = new Set(segments.map((_, index) => index));
+    let remainingWidth = containerWidth;
+    let remainingMinutes = totalMinutes;
+
+    while (unresolved.size > 0 && remainingMinutes > 0 && remainingWidth > 0) {
+      let clampedAny = false;
+
+      for (const index of Array.from(unresolved)) {
+        const tentativeWidth =
+          (remainingWidth * segments[index].minutes) / remainingMinutes;
+
+        if (tentativeWidth < minWidths[index]) {
+          widths[index] = minWidths[index];
+          remainingWidth -= minWidths[index];
+          remainingMinutes -= segments[index].minutes;
+          unresolved.delete(index);
+          clampedAny = true;
+        }
+      }
+
+      if (!clampedAny) {
+        break;
+      }
+    }
+
+    if (unresolved.size > 0 && remainingMinutes > 0 && remainingWidth > 0) {
+      for (const index of unresolved) {
+        widths[index] =
+          (remainingWidth * segments[index].minutes) / remainingMinutes;
+      }
+    }
+
+    const totalWidth = widths.reduce((sum, width) => sum + width, 0) || containerWidth;
+
+    return segments.map((segment, index) => ({
+      key: segment.key,
+      widthPercent: (widths[index] / totalWidth) * 100,
+    }));
+  }, [containerWidth, segments, totalMinutes]);
+
   return (
     <div
+      ref={containerRef}
       className="flex h-7 overflow-hidden rounded-full bg-[rgba(17,17,17,0.08)] text-[10px] font-semibold shadow-inner ring-1 ring-[rgba(255,255,255,0.75)]"
       aria-label={labelText}
     >
       {totalMinutes > 0 ? (
-        segments.map((segment) => (
-          <div
-            key={segment.key}
-            className={`${segment.className} ${segment.textClassName} flex min-w-0 items-center justify-center gap-1 px-1.5 tabular-nums transition-[width] duration-300 ease-out sm:gap-1.5 sm:px-2.5`}
-            style={{
-              width: `${(segment.minutes / totalMinutes) * 100}%`,
-            }}
-            title={`${segment.label} ${segment.minutes}분`}
-          >
-            {segment.kind !== "transfer" ? (
-              <span
-                className="flex h-4.5 w-4.5 shrink-0 items-center justify-center rounded-full border border-current/20 bg-white/14"
-                aria-hidden="true"
-              >
-                <SegmentIcon
-                  type={segment.kind}
-                  className={`${segment.iconClassName} h-3 w-3 shrink-0`}
-                />
+        segments.map((segment) => {
+          const width =
+            segmentWidths.find((item) => item.key === segment.key)?.widthPercent ??
+            (segment.minutes / totalMinutes) * 100;
+
+          return (
+            <div
+              key={segment.key}
+              className={`${segment.className} ${segment.textClassName} flex min-w-0 items-center justify-center gap-1 px-1.5 tabular-nums transition-[width] duration-300 ease-out sm:gap-1.5 sm:px-2.5`}
+              style={{ width: `${width}%` }}
+              title={`${segment.label} ${segment.minutes}분`}
+            >
+              {segment.kind !== "transfer" ? (
+                <span
+                  className="flex h-4.5 w-4.5 shrink-0 items-center justify-center rounded-full border border-current/20 bg-white/14"
+                  aria-hidden="true"
+                >
+                  <SegmentIcon
+                    type={segment.kind}
+                    className={`${segment.iconClassName} h-3 w-3 shrink-0`}
+                  />
+                </span>
+              ) : null}
+              <span className="shrink-0 whitespace-nowrap">
+                {segment.minutes}분
               </span>
-            ) : null}
-            <span className="truncate">{segment.minutes}분</span>
-          </div>
-        ))
+            </div>
+          );
+        })
       ) : (
         <div className="flex w-full items-center justify-center text-[var(--muted)]">
           0분
@@ -112,8 +202,7 @@ function getSegmentStyle(kind: RouteTimeSegmentKind) {
   switch (kind) {
     case "waiting":
       return {
-        className:
-          "bg-[linear-gradient(135deg,rgba(211,166,63,0.96)_0%,rgba(232,194,102,0.98)_100%)]",
+        className: "bg-[#e2b63b]",
         textClassName: "text-[var(--foreground)]",
         iconClassName: "text-[var(--foreground)]/85",
       };
@@ -132,8 +221,7 @@ function getSegmentStyle(kind: RouteTimeSegmentKind) {
     case "transit":
     case "travel":
       return {
-        className:
-          "bg-[linear-gradient(135deg,rgba(31,58,95,0.92)_0%,rgba(56,87,130,0.92)_100%)]",
+        className: "bg-[#3f6fe0]",
         textClassName: "text-white",
         iconClassName: "text-white/85",
       };

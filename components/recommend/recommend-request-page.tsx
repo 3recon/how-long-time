@@ -222,13 +222,12 @@ export function RecommendRequestPage(props: {
 
   return (
     <main className="relative min-h-dvh overflow-hidden">
-      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(211,166,63,0.24),transparent_36%),radial-gradient(circle_at_bottom_right,rgba(31,58,95,0.08),transparent_28%)]" />
       <div className="relative mx-auto flex min-h-dvh w-full max-w-[1040px] flex-col justify-center px-4 py-6 sm:px-6 lg:px-8">
-        <h1 className="mb-6 text-center text-5xl font-semibold leading-[0.94] tracking-[-0.08em] text-balance sm:text-[4.4rem]">
+        <h1 className="-mt-[30px] mb-6 text-center text-[3.5rem] font-semibold leading-[0.92] tracking-[-0.08em] text-balance sm:text-[5rem]">
           민원, <span className="text-[#245c9a]">어디가?</span>
         </h1>
 
-        <section className="soft-card min-h-[460px] w-full rounded-[36px] border-[rgba(17,17,17,0.08)] p-6 sm:p-8 lg:p-10">
+        <section className="soft-card min-h-[460px] w-full rounded-[36px] border-[rgba(17,17,17,0.14)] p-6 sm:p-8 lg:p-10">
           <form className="space-y-6" onSubmit={handleSubmit}>
             <section className="space-y-3">
               <div className="flex items-center gap-3">
@@ -240,7 +239,7 @@ export function RecommendRequestPage(props: {
                 </label>
               </div>
 
-              <div className="rounded-[28px] border border-[rgba(17,17,17,0.08)] bg-[rgba(255,255,255,0.92)] p-4 shadow-[0_20px_44px_rgba(17,17,17,0.06)] sm:p-5">
+              <div className="rounded-[28px] border border-[rgba(17,17,17,0.14)] bg-[rgba(255,255,255,0.92)] p-4 shadow-[0_20px_44px_rgba(17,17,17,0.06)] sm:p-5">
                 <div className="flex flex-col gap-3 sm:flex-row sm:items-end">
                   <input
                     id="originLabel"
@@ -255,14 +254,14 @@ export function RecommendRequestPage(props: {
                       }
                     }}
                     placeholder="예)서울시청, 홍대입구역, 잠실역, 건대입구역, 강남역, 성수역"
-                    className="min-h-12 w-full flex-1 border-b border-[rgba(17,17,17,0.12)] bg-transparent px-0 pb-3 text-base outline-none placeholder:text-[var(--muted)] focus:border-[var(--accent-blue)]"
+                    className="min-h-12 w-full flex-1 border-b border-[rgba(17,17,17,0.18)] bg-transparent px-0 pb-3 text-base outline-none placeholder:text-[var(--muted)] focus:border-[var(--accent-blue)]"
                     aria-invalid={Boolean(fieldErrors.originLabel)}
                     aria-describedby="origin-help"
                   />
                   <button
                     type="button"
                     onClick={handleConfirmOriginSelection}
-                    className="min-h-12 rounded-2xl border border-[rgba(17,17,17,0.12)] bg-white px-4 text-sm font-semibold whitespace-nowrap text-[var(--foreground)] shadow-[0_10px_24px_rgba(17,17,17,0.06)]"
+                    className="min-h-12 rounded-2xl border border-[rgba(17,17,17,0.16)] bg-white px-4 text-sm font-semibold whitespace-nowrap text-[var(--foreground)] shadow-[0_10px_24px_rgba(17,17,17,0.06)]"
                   >
                     선택
                   </button>
@@ -270,7 +269,7 @@ export function RecommendRequestPage(props: {
                     type="button"
                     onClick={handleUseCurrentLocation}
                     disabled={isLocating || isSubmitting}
-                    className="min-h-12 rounded-2xl border border-[rgba(17,17,17,0.12)] bg-[var(--accent)] px-4 text-sm font-semibold whitespace-nowrap text-[var(--foreground)] shadow-[0_14px_28px_rgba(211,166,63,0.22)] hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:translate-y-0"
+                    className="min-h-12 rounded-2xl border border-[#245c9a] bg-[#245c9a] px-4 text-sm font-semibold whitespace-nowrap text-white shadow-[0_14px_28px_rgba(36,92,154,0.24)] hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:translate-y-0"
                   >
                     {isLocating ? "위치 확인 중..." : "현재 위치"}
                   </button>
@@ -305,7 +304,7 @@ export function RecommendRequestPage(props: {
                 className={`w-full rounded-[28px] border px-4 py-5 text-left shadow-[0_20px_42px_rgba(17,17,17,0.06)] transition-all duration-200 hover:-translate-y-0.5 ${
                   selectedPurpose
                     ? "border-[rgba(211,166,63,0.55)] bg-[linear-gradient(180deg,rgba(244,238,223,0.98)_0%,rgba(255,253,248,1)_100%)]"
-                    : "border-[rgba(17,17,17,0.08)] bg-white"
+                    : "border-[rgba(17,17,17,0.14)] bg-white"
                 }`}
                 aria-haspopup="dialog"
                 aria-expanded={isPurposePickerOpen}
@@ -321,7 +320,7 @@ export function RecommendRequestPage(props: {
                         ""}
                     </p>
                   </div>
-                  <div className="flex h-12 w-12 flex-none items-center justify-center rounded-2xl border border-[rgba(17,17,17,0.08)] bg-white text-lg shadow-[0_12px_24px_rgba(17,17,17,0.06)]">
+                  <div className="flex h-12 w-12 flex-none items-center justify-center rounded-2xl border border-[rgba(17,17,17,0.14)] bg-white text-lg shadow-[0_12px_24px_rgba(17,17,17,0.06)]">
                     →
                   </div>
                 </div>
@@ -343,7 +342,7 @@ export function RecommendRequestPage(props: {
             <button
               type="submit"
               disabled={isLocating || isSubmitting}
-              className="min-h-14 w-full rounded-[22px] border border-[var(--foreground)] bg-[var(--foreground)] px-5 text-base font-semibold text-white shadow-[0_20px_44px_rgba(17,17,17,0.16)] hover:-translate-y-0.5 hover:border-[var(--accent-blue)] hover:bg-[var(--accent-blue)] disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:translate-y-0"
+              className="min-h-14 w-full rounded-[22px] border border-[#245c9a] bg-[#245c9a] px-5 text-base font-semibold text-white shadow-[0_20px_44px_rgba(36,92,154,0.22)] hover:-translate-y-0.5 hover:border-[#245c9a] hover:bg-[#245c9a] disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:translate-y-0"
             >
               추천 요청
             </button>
@@ -361,10 +360,10 @@ export function RecommendRequestPage(props: {
             role="dialog"
             aria-modal="true"
             aria-label="민원 목적 선택"
-            className="w-full max-w-3xl overflow-hidden rounded-[32px] border border-[rgba(255,255,255,0.22)] bg-[linear-gradient(180deg,rgba(255,251,237,0.98)_0%,rgba(255,255,255,1)_100%)] shadow-[0_30px_80px_rgba(17,17,17,0.26)]"
+            className="w-full max-w-3xl overflow-hidden rounded-[32px] border border-[rgba(17,17,17,0.14)] bg-[linear-gradient(180deg,rgba(255,251,237,0.98)_0%,rgba(255,255,255,1)_100%)] shadow-[0_30px_80px_rgba(17,17,17,0.26)]"
             onClick={(event) => event.stopPropagation()}
           >
-            <div className="border-b border-[rgba(17,17,17,0.08)] px-5 py-4 sm:px-6">
+            <div className="border-b border-[rgba(17,17,17,0.14)] px-5 py-4 sm:px-6">
               <div className="flex items-start justify-between gap-4">
                 <div>
                   <h2 className="mt-2 text-2xl font-semibold tracking-[-0.04em]">
@@ -374,7 +373,7 @@ export function RecommendRequestPage(props: {
                 <button
                   type="button"
                   onClick={() => setIsPurposePickerOpen(false)}
-                  className="flex h-11 w-11 flex-none items-center justify-center rounded-2xl border border-[rgba(17,17,17,0.08)] bg-white text-lg shadow-[0_12px_24px_rgba(17,17,17,0.08)]"
+                  className="flex h-11 w-11 flex-none items-center justify-center rounded-2xl border border-[rgba(17,17,17,0.14)] bg-white text-lg shadow-[0_12px_24px_rgba(17,17,17,0.08)]"
                   aria-label="민원 목적 선택 닫기"
                 >
                   ×
@@ -395,7 +394,7 @@ export function RecommendRequestPage(props: {
                 ))}
               </div>
 
-              <div className="mt-5 flex flex-col-reverse gap-3 border-t border-[rgba(17,17,17,0.08)] pt-5 sm:flex-row sm:items-center sm:justify-between">
+              <div className="mt-5 flex flex-col-reverse gap-3 border-t border-[rgba(17,17,17,0.14)] pt-5 sm:flex-row sm:items-center sm:justify-between">
                 <p className="text-sm text-[var(--muted)]">
                   {draftPurpose
                     ? `선택 예정: ${draftPurpose.label}`
@@ -420,7 +419,7 @@ export function RecommendRequestPage(props: {
                       setIsPurposePickerOpen(false);
                     }}
                     disabled={!draftPurposeId}
-                    className="min-h-11 rounded-2xl border border-[var(--foreground)] bg-[var(--foreground)] px-5 text-sm font-semibold text-white shadow-[0_16px_32px_rgba(17,17,17,0.14)] disabled:cursor-not-allowed disabled:opacity-50"
+                    className="min-h-11 rounded-2xl border border-[#245c9a] bg-[#245c9a] px-5 text-sm font-semibold text-white shadow-[0_16px_32px_rgba(36,92,154,0.22)] disabled:cursor-not-allowed disabled:opacity-50"
                   >
                     확인
                   </button>

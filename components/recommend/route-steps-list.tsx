@@ -218,21 +218,7 @@ export function RouteStepsList(props: { steps: RouteStepItem[] }) {
 
   return (
     <div className="rounded-[24px] border border-[rgba(17,17,17,0.08)] bg-white p-4 shadow-[0_16px_32px_rgba(17,17,17,0.05)]">
-      <div className="flex items-center justify-between gap-3">
-        <div>
-          <p className="text-xs font-semibold uppercase tracking-[0.22em] text-[var(--muted)]">
-            Route details
-          </p>
-          <h4 className="mt-1 text-base font-semibold tracking-[-0.03em]">
-            단계별 이동 경로
-          </h4>
-        </div>
-        <span className="rounded-full bg-[rgba(211,166,63,0.16)] px-3 py-1 text-xs font-semibold text-[var(--foreground)]">
-          {props.steps.length}단계
-        </span>
-      </div>
-
-      <ol className="mt-4 space-y-3">
+      <ol className="space-y-3">
         {props.steps.map((step, index) => (
           <li
             key={step.id ?? `${step.kind}-${index}`}

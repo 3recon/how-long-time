@@ -259,12 +259,13 @@ export function RecommendResultsPage(props: {
 
   return (
     <main className="relative min-h-dvh overflow-hidden">
-      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(211,166,63,0.24),transparent_36%),radial-gradient(circle_at_bottom_right,rgba(31,58,95,0.08),transparent_28%)]" />
       <div className="relative mx-auto flex w-full max-w-[1680px] flex-col gap-4 px-4 py-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between gap-4">
-          <h2 className="text-2xl font-semibold tracking-[-0.04em]">
-            총 소요시간 비교
-          </h2>
+          <div className="justify-self-start rounded-full border border-[rgba(17,17,17,0.1)] bg-white/78 px-4 py-2 shadow-[0_10px_24px_rgba(17,17,17,0.05)] backdrop-blur-sm">
+            <h2 className="text-xl font-semibold tracking-[-0.04em]">
+              소요 시간 비교
+            </h2>
+          </div>
           <Link
             href="/"
             className="inline-flex min-h-10 items-center justify-center rounded-[18px] border border-[var(--foreground)] bg-[var(--foreground)] px-3.5 text-[13px] font-semibold text-white shadow-[0_14px_28px_rgba(17,17,17,0.14)]"

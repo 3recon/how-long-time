@@ -156,16 +156,27 @@ function getMarkerImageForOffice(
   );
 }
 
-function MapLegend(props: { originLabel: string }) {
+function MapLegend(props: { originLabel: string; compact?: boolean }) {
   return (
-    <div className="pointer-events-none absolute left-4 top-4 z-20 max-w-[calc(100%-2rem)] rounded-[22px] border border-[rgba(17,17,17,0.08)] bg-white/92 px-4 py-3 shadow-[0_18px_34px_rgba(17,17,17,0.08)] backdrop-blur-sm">
-      <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--accent-strong)]">
-        지도 범례
-      </p>
-      <p className="mt-1 text-sm font-semibold text-[var(--foreground)]">
-        출발지: {props.originLabel}
-      </p>
-      <div className="mt-3 flex flex-wrap gap-2.5">
+    <div
+      className={
+        props.compact
+          ? "flex flex-wrap items-center justify-center gap-2.5"
+          : "pointer-events-none absolute left-4 top-4 z-20 max-w-[calc(100%-2rem)] rounded-[22px] border border-[rgba(17,17,17,0.08)] bg-white/92 px-4 py-3 shadow-[0_18px_34px_rgba(17,17,17,0.08)] backdrop-blur-sm"
+      }
+    >
+      <div className="flex items-center gap-2 rounded-full border border-[rgba(17,17,17,0.08)] bg-[rgba(255,255,255,0.85)] px-2.5 py-1.5">
+        <span className="text-xs font-semibold text-[var(--foreground)]">
+          출발지: {props.originLabel}
+        </span>
+      </div>
+      <div
+        className={
+          props.compact
+            ? "flex flex-wrap items-center justify-center gap-2.5"
+            : "mt-3 flex flex-wrap gap-2.5"
+        }
+      >
         {getMapLegendItems().map((item) => (
           <div
             key={item.id}
@@ -203,9 +214,7 @@ function LegendSwatch(props: {
     return (
       <span className="relative inline-flex h-5 w-5 items-center justify-center">
         <span className="absolute h-5 w-5 rounded-full bg-[rgba(245,158,11,0.28)]" />
-        <span className="relative inline-flex h-4 w-4 items-center justify-center rounded-full border-2 border-white bg-[#d97706] text-[9px] font-bold text-white">
-          1
-        </span>
+        <span className="relative inline-flex h-4 w-4 items-center justify-center rounded-full border-2 border-white bg-[#d97706]" />
       </span>
     );
   }
@@ -213,9 +222,7 @@ function LegendSwatch(props: {
   return (
     <span className="relative inline-flex h-5 w-5 items-center justify-center">
       <span className="absolute h-4 w-4 rounded-full bg-[rgba(245,225,164,0.3)]" />
-      <span className="relative inline-flex h-3.5 w-3.5 items-center justify-center rounded-full border-2 border-white bg-[#2f2413] text-[8px] font-bold text-white">
-        2
-      </span>
+      <span className="relative inline-flex h-3.5 w-3.5 items-center justify-center rounded-full border-2 border-white bg-[#2f2413]" />
     </span>
   );
 }
@@ -548,7 +555,7 @@ export function KakaoMapPanel(props: {
 
       infoWindowRef.current?.close();
       infoWindowRef.current = new kakao.maps.InfoWindow({
-        content: `<div style="padding:10px 12px;min-width:156px;"><div style="font-size:11px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:#b45309;">현재 비교 중</div><div style="margin-top:4px;font-size:13px;font-weight:700;color:#111;">#${selectedOffice.recommendation.rank} ${selectedOffice.name}</div></div>`,
+        content: `<div style="padding:10px 12px;min-width:156px;"><div style="font-size:13px;font-weight:700;color:#111;">${selectedOffice.recommendation.rank}순위 - ${selectedOffice.name}</div></div>`,
       });
 
       if (selectedMarker) {
@@ -567,29 +574,14 @@ export function KakaoMapPanel(props: {
 
   return (
     <section className="soft-card overflow-hidden rounded-[28px] border-[rgba(17,17,17,0.08)] lg:flex lg:h-full lg:min-h-0 lg:flex-col">
-      <div className="flex flex-wrap items-center justify-between gap-3 border-b border-[var(--line)] px-5 py-4 sm:px-6">
-        <div>
-          <p className="text-xs font-semibold uppercase tracking-[0.28em] text-[var(--accent-strong)]">
-            Kakao Map
-          </p>
-          <h3 className="mt-1 text-lg font-semibold tracking-[-0.03em]">
-            위치 비교 보기
-          </h3>
-        </div>
-        {selectedOffice ? (
-          <div className="rounded-full border border-[rgba(17,17,17,0.12)] bg-[rgba(211,166,63,0.14)] px-3 py-1.5 text-sm font-medium text-[var(--foreground)]">
-            현재 포커스: {selectedOffice.name}
-          </div>
-        ) : null}
+      <div className="border-b border-[var(--line)] px-5 py-4 sm:px-6">
+        <MapLegend originLabel={originLabel} compact />
       </div>
-
       <div className="relative lg:flex-1">
         <div
           ref={mapContainerRef}
           className={`${mapViewportClassName} bg-[linear-gradient(180deg,#fffdf8_0%,#ebe3cf_100%)]`}
         />
-        <MapLegend originLabel={originLabel} />
-
         {sdkStatus !== "ready" ? (
           <div className="absolute inset-0">
             <FallbackMap

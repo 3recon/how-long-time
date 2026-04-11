@@ -50,7 +50,7 @@ export function formatEstimatedWaiting(value: {
   estimatedMinutes: number;
   waitingCount: number | null;
 }): string {
-  return `${value.estimatedMinutes}분 ${formatWaitingCount(value.waitingCount)}`;
+  return `${value.estimatedMinutes}분`;
 }
 
 function getRouteStepItems(office: RecommendedOffice) {
@@ -170,8 +170,8 @@ export function Eyebrow(props: { children: ReactNode }) {
 
 export function StatChip(props: { label: string; value: string }) {
   return (
-    <div className="rounded-2xl border border-[rgba(17,17,17,0.08)] bg-white px-4 py-3 shadow-[0_16px_34px_rgba(17,17,17,0.06)]">
-      <p className="text-xs uppercase tracking-[0.22em] text-[var(--muted)]">
+    <div className="rounded-2xl border border-[rgba(17,17,17,0.14)] bg-white px-4 py-3 shadow-[0_16px_34px_rgba(17,17,17,0.06)]">
+      <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[rgba(17,17,17,0.72)]">
         {props.label}
       </p>
       <p className="mt-1 text-lg font-semibold tracking-[-0.03em]">
@@ -224,24 +224,22 @@ export function PurposeOptionCard(props: {
 
 export function RecommendationCard(props: {
   office: RecommendedOffice;
+  selectedPurposeLabel?: string | null;
   selected: boolean;
   onSelect: () => void;
   expanded: boolean;
   onToggleDetails: () => void;
 }) {
   const detailsId = `recommendation-details-${props.office.id}`;
-  const taskSummary =
-    props.office.supportedTaskMatches.map((task) => task.taskName).join(", ") ||
-    "안내 가능한 업무 없음";
   const routeSteps = getRouteStepItems(props.office);
   const routeTimeSegments = getRouteTimeSegments(props.office);
 
   return (
     <article
-      className={`w-full rounded-[24px] border px-5 py-4 text-left transition-all duration-200 ${
+      className={`w-full rounded-[24px] border px-5 py-2 text-left transition-all duration-200 ${
         props.selected
-          ? "border-[var(--accent-blue)] bg-[linear-gradient(180deg,rgba(244,238,223,0.95)_0%,rgba(255,253,248,1)_100%)] shadow-[0_24px_48px_rgba(31,58,95,0.12)]"
-          : "border-[rgba(17,17,17,0.08)] bg-white hover:-translate-y-0.5 hover:border-[rgba(17,17,17,0.16)] hover:shadow-[0_20px_40px_rgba(17,17,17,0.08)]"
+          ? "border-[rgba(31,58,95,0.45)] bg-[linear-gradient(180deg,rgba(244,238,223,0.95)_0%,rgba(255,253,248,1)_100%)] shadow-[0_24px_48px_rgba(31,58,95,0.12)]"
+          : "border-[rgba(17,17,17,0.14)] bg-white hover:-translate-y-0.5 hover:border-[rgba(17,17,17,0.22)] hover:shadow-[0_20px_40px_rgba(17,17,17,0.08)]"
       }`}
     >
       <div className="flex flex-wrap items-start justify-between gap-3">
@@ -252,7 +250,7 @@ export function RecommendationCard(props: {
           aria-pressed={props.selected}
         >
           <div className="flex flex-wrap items-center gap-2">
-            <span className="rounded-full border border-[rgba(17,17,17,0.08)] bg-[rgba(211,166,63,0.18)] px-2.5 py-1 text-xs font-semibold uppercase tracking-[0.18em] text-[var(--foreground)]">
+            <span className="rounded-full border border-[rgba(17,17,17,0.14)] bg-[rgba(211,166,63,0.18)] px-2.5 py-1 text-xs font-semibold uppercase tracking-[0.18em] text-[var(--foreground)]">
               #{props.office.recommendation.rank}
             </span>
             {props.selected ? (
@@ -271,7 +269,7 @@ export function RecommendationCard(props: {
           </div>
         </button>
 
-        <div className="rounded-2xl border border-[rgba(17,17,17,0.08)] bg-white px-3 py-2 text-right shadow-[0_12px_24px_rgba(17,17,17,0.06)]">
+        <div className="rounded-2xl border border-[rgba(17,17,17,0.14)] bg-white px-3 py-2 text-right shadow-[0_12px_24px_rgba(17,17,17,0.06)]">
           <p className="text-xl font-semibold tabular-nums">
             {props.office.recommendation.totalMinutes}분
           </p>
@@ -280,17 +278,20 @@ export function RecommendationCard(props: {
 
       <div className="mt-5 grid gap-3 sm:grid-cols-3">
         <StatChip
+          label="소요 시간"
+          value={`${props.office.recommendation.totalMinutes}분`}
+        />
+        <StatChip
           label="이동 시간"
           value={`${props.office.travel.minutes}분`}
         />
         <StatChip
-          label="예상 대기(예상 인원)"
+          label="대기 시간"
           value={formatEstimatedWaiting({
             estimatedMinutes: props.office.waiting.estimatedMinutes,
             waitingCount: props.office.waiting.count,
           })}
         />
-        <StatChip label="처리 업무" value={taskSummary} />
       </div>
 
       <div className="mt-5 flex justify-end">
@@ -308,7 +309,7 @@ export function RecommendationCard(props: {
       {props.expanded ? (
         <div
           id={detailsId}
-          className="mt-4 rounded-[24px] border border-[rgba(17,17,17,0.08)] bg-[rgba(255,253,248,0.88)] p-4"
+          className="mt-4 rounded-[24px] border border-[rgba(17,17,17,0.14)] bg-[rgba(255,253,248,0.88)] p-4"
         >
           <RouteTimeSegmentBar
             travelMinutes={props.office.travel.minutes}
@@ -330,7 +331,7 @@ export function RecommendationCard(props: {
               value={`${props.office.waiting.estimatedMinutes}분`}
             />
             <StatChip
-              label="예상 인원"
+              label="대기 인원"
               value={formatWaitingCount(props.office.waiting.count)}
             />
           </div>
