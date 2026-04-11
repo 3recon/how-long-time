@@ -4,9 +4,7 @@ import { type FormEvent, useEffect, useId, useState } from "react";
 import { useRouter } from "next/navigation";
 
 import {
-  Eyebrow,
   PurposeOptionCard,
-  formatCoordinates,
 } from "@/components/recommend/recommend-ui";
 import { appConfig } from "@/lib/env";
 import {
@@ -16,7 +14,6 @@ import {
 import { buildRecommendResultsHref } from "@/lib/recommend/route-state";
 import type {
   LocationPoint,
-  RecommendMode,
   RecommendPurposeId,
 } from "@/types/recommend";
 import { purposeOptions } from "@/data/recommend/purpose-options";
@@ -56,15 +53,12 @@ export function RecommendRequestPage(props: {
   const [coordinates, setCoordinates] = useState<LocationPoint | null>(
     parseInitialCoordinates(props.searchParams) ?? appConfig.defaultCenter,
   );
-  const [requestMode, setRequestMode] = useState<RecommendMode>("demo");
   const [fieldErrors, setFieldErrors] = useState<{
     originLabel?: string;
     purposeId?: string;
   }>({});
   const [requestError, setRequestError] = useState<string | null>(null);
-  const [locationStatus, setLocationStatus] = useState(
-    getModeLocationStatus("demo"),
-  );
+  const [locationStatus, setLocationStatus] = useState("");
   const [isLocating, setIsLocating] = useState(false);
   const [preferCurrentCoordinates, setPreferCurrentCoordinates] =
     useState(false);
@@ -104,10 +98,10 @@ export function RecommendRequestPage(props: {
     setIsPurposePickerOpen(true);
   }
 
-  function handleRequestModeChange(nextMode: RecommendMode) {
-    setRequestMode(nextMode);
-    setLocationStatus(getModeLocationStatus(nextMode));
+  function handleConfirmOriginSelection() {
+    setLocationStatus("입력한 위치를 선택합니다");
   }
+
 
   async function handleUseCurrentLocation() {
     if (!("geolocation" in navigator)) {
@@ -120,19 +114,12 @@ export function RecommendRequestPage(props: {
     setLocationStatus("현재 위치를 확인하고 있습니다.");
 
     navigator.geolocation.getCurrentPosition(
-      (position) => {
-        const nextCoordinates = {
-          lat: position.coords.latitude,
-          lng: position.coords.longitude,
-        };
-
-        setCoordinates(nextCoordinates);
-        setPreferCurrentCoordinates(true);
-        setOriginLabel((current) => current.trim() || "현재 위치");
+      () => {
+        setCoordinates(appConfig.defaultCenter);
+        setPreferCurrentCoordinates(false);
+        setOriginLabel("서울시청");
         setFieldErrors((current) => ({ ...current, originLabel: undefined }));
-        setLocationStatus(
-          "현재 위치를 반영했습니다. 추천 요청을 누르면 같은 탭에서 결과 화면으로 이동합니다.",
-        );
+        setLocationStatus("");
         setIsLocating(false);
       },
       () => {
@@ -215,7 +202,7 @@ export function RecommendRequestPage(props: {
         purposeId: purposeId as RecommendPurposeId,
         coordinates,
         fallbackOrigin: appConfig.defaultCenter,
-        mode: requestMode,
+        mode: "demo",
         preferCurrentCoordinates,
         geocodeOrigin,
       });
@@ -236,86 +223,70 @@ export function RecommendRequestPage(props: {
   return (
     <main className="relative min-h-dvh overflow-hidden">
       <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(211,166,63,0.24),transparent_36%),radial-gradient(circle_at_bottom_right,rgba(31,58,95,0.08),transparent_28%)]" />
-      <RequestModeToggle
-        mode={requestMode}
-        onChange={handleRequestModeChange}
-      />
       <div className="relative mx-auto flex min-h-dvh w-full max-w-[900px] items-center px-4 py-6 sm:px-6 lg:px-8">
         <section className="soft-card w-full rounded-[36px] border-[rgba(17,17,17,0.08)] p-5 sm:p-7">
           <div className="border-b border-[var(--line)] pb-6">
-            <div className="flex flex-wrap items-center gap-3">
-              <Eyebrow>Minwon Now</Eyebrow>
-              <span className="rounded-full border border-[rgba(17,17,17,0.08)] bg-white px-3 py-1 text-xs font-medium text-[var(--muted)]">
-                1단계 입력 화면
-              </span>
-            </div>
-
-            <h1 className="mt-5 text-5xl font-semibold leading-[0.94] tracking-[-0.08em] text-balance sm:text-[4.4rem]">
-              위치와 민원 목적만 고르면
-              <span className="block text-[var(--accent-strong)]">
-                다음 화면에서 비교합니다.
-              </span>
+            <h1 className="text-center text-5xl font-semibold leading-[0.94] tracking-[-0.08em] text-balance sm:text-[4.4rem]">
+              민원, <span className="text-[#245c9a]">어디가?</span>
             </h1>
-            <p className="mt-4 max-w-2xl text-sm leading-7 text-[var(--muted)] sm:text-base">
-              첫 화면에서는 입력만 간결하게 끝내고, 결과 화면에서 위치 비교
-              보기와 경로, 추천 결과 비교를 한 번에 확인합니다.
-            </p>
           </div>
 
           <form className="space-y-6 pt-6" onSubmit={handleSubmit}>
             <section className="space-y-3">
-              <div className="flex items-center justify-between gap-3">
+              <div className="flex items-center gap-3">
                 <label
                   htmlFor="originLabel"
                   className="text-sm font-semibold text-[var(--foreground)]"
                 >
                   출발지
                 </label>
-                <span className="text-xs uppercase tracking-[0.22em] text-[var(--muted)]">
-                  origin
-                </span>
               </div>
 
               <div className="rounded-[28px] border border-[rgba(17,17,17,0.08)] bg-[rgba(255,255,255,0.92)] p-4 shadow-[0_20px_44px_rgba(17,17,17,0.06)] sm:p-5">
-                <input
-                  id="originLabel"
-                  value={originLabel}
-                  onChange={(event) => {
-                    setOriginLabel(event.target.value);
-                    if (fieldErrors.originLabel) {
-                      setFieldErrors((current) => ({
-                        ...current,
-                        originLabel: undefined,
-                      }));
-                    }
-                  }}
-                  placeholder="예) 서울시청, 집, 회사"
-                  className="min-h-12 w-full border-b border-[rgba(17,17,17,0.12)] bg-transparent px-0 pb-3 text-base outline-none placeholder:text-[var(--muted)] focus:border-[var(--accent-blue)]"
-                  aria-invalid={Boolean(fieldErrors.originLabel)}
-                  aria-describedby="origin-help"
-                />
-
-                <div className="mt-4 flex flex-col gap-3 sm:flex-row">
+                <div className="flex flex-col gap-3 sm:flex-row sm:items-end">
+                  <input
+                    id="originLabel"
+                    value={originLabel}
+                    onChange={(event) => {
+                      setOriginLabel(event.target.value);
+                      if (fieldErrors.originLabel) {
+                        setFieldErrors((current) => ({
+                          ...current,
+                          originLabel: undefined,
+                        }));
+                      }
+                    }}
+                    placeholder="예)서울시청, 홍대입구역, 잠실역, 건대입구역, 강남역, 성수역"
+                    className="min-h-12 w-full flex-1 border-b border-[rgba(17,17,17,0.12)] bg-transparent px-0 pb-3 text-base outline-none placeholder:text-[var(--muted)] focus:border-[var(--accent-blue)]"
+                    aria-invalid={Boolean(fieldErrors.originLabel)}
+                    aria-describedby="origin-help"
+                  />
+                  <button
+                    type="button"
+                    onClick={handleConfirmOriginSelection}
+                    className="min-h-12 rounded-2xl border border-[rgba(17,17,17,0.12)] bg-white px-4 text-sm font-semibold whitespace-nowrap text-[var(--foreground)] shadow-[0_10px_24px_rgba(17,17,17,0.06)]"
+                  >
+                    선택
+                  </button>
                   <button
                     type="button"
                     onClick={handleUseCurrentLocation}
                     disabled={isLocating || isSubmitting}
-                    className="min-h-12 rounded-2xl border border-[rgba(17,17,17,0.12)] bg-[var(--accent)] px-4 text-sm font-semibold text-[var(--foreground)] shadow-[0_14px_28px_rgba(211,166,63,0.22)] hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:translate-y-0"
+                    className="min-h-12 rounded-2xl border border-[rgba(17,17,17,0.12)] bg-[var(--accent)] px-4 text-sm font-semibold whitespace-nowrap text-[var(--foreground)] shadow-[0_14px_28px_rgba(211,166,63,0.22)] hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:translate-y-0"
                   >
-                    {isLocating ? "위치 확인 중..." : "현재 위치 사용"}
+                    {isLocating ? "위치 확인 중..." : "현재 위치"}
                   </button>
-                  <div className="flex-1 rounded-2xl border border-dashed border-[rgba(17,17,17,0.12)] px-4 py-3 text-sm text-[var(--muted)]">
-                    기준 좌표: {formatCoordinates(coordinates)}
-                  </div>
                 </div>
               </div>
 
-              <p
-                id="origin-help"
-                className="text-sm leading-6 text-[var(--muted)]"
-              >
-                {locationStatus}
-              </p>
+              {locationStatus ? (
+                <p
+                  id="origin-help"
+                  className="text-sm leading-6 text-[var(--muted)]"
+                >
+                  {locationStatus}
+                </p>
+              ) : null}
               {fieldErrors.originLabel ? (
                 <p className="text-sm font-medium text-[var(--accent-red)]">
                   {fieldErrors.originLabel}
@@ -324,13 +295,10 @@ export function RecommendRequestPage(props: {
             </section>
 
             <section className="space-y-3">
-              <div className="flex items-center justify-between gap-3">
+              <div className="flex items-center gap-3">
                 <label className="text-sm font-semibold text-[var(--foreground)]">
                   민원 목적
                 </label>
-                <span className="text-xs uppercase tracking-[0.22em] text-[var(--muted)]">
-                  purpose
-                </span>
               </div>
 
               <button
@@ -347,15 +315,12 @@ export function RecommendRequestPage(props: {
               >
                 <div className="flex items-center justify-between gap-4">
                   <div className="min-w-0">
-                    <p className="text-xs font-semibold uppercase tracking-[0.24em] text-[var(--accent-strong)]">
-                      Purpose Picker
-                    </p>
                     <p className="mt-2 text-lg font-semibold tracking-[-0.03em]">
                       {selectedPurpose?.label ?? "민원 목적을 선택해 주세요"}
                     </p>
                     <p className="mt-1 text-sm leading-6 text-[var(--muted)]">
                       {selectedPurpose?.description ??
-                        "목적을 먼저 고르면 결과 화면에서 비교 이유가 더 선명해집니다."}
+                        ""}
                     </p>
                   </div>
                   <div className="flex h-12 w-12 flex-none items-center justify-center rounded-2xl border border-[rgba(17,17,17,0.08)] bg-white text-lg shadow-[0_12px_24px_rgba(17,17,17,0.06)]">
@@ -404,15 +369,9 @@ export function RecommendRequestPage(props: {
             <div className="border-b border-[rgba(17,17,17,0.08)] px-5 py-4 sm:px-6">
               <div className="flex items-start justify-between gap-4">
                 <div>
-                  <p className="text-xs font-semibold uppercase tracking-[0.28em] text-[var(--accent-strong)]">
-                    Purpose Picker
-                  </p>
                   <h2 className="mt-2 text-2xl font-semibold tracking-[-0.04em]">
-                    민원 목적을 빠르게 선택해 주세요
+                    민원 목적을 선택해 주세요
                   </h2>
-                  <p className="mt-2 text-sm leading-6 text-[var(--muted)]">
-                    목적을 고르면 결과 화면에서도 같은 기준으로 비교합니다.
-                  </p>
                 </div>
                 <button
                   type="button"
@@ -442,7 +401,7 @@ export function RecommendRequestPage(props: {
                 <p className="text-sm text-[var(--muted)]">
                   {draftPurpose
                     ? `선택 예정: ${draftPurpose.label}`
-                    : "목적을 하나 고르면 확인 버튼이 활성화됩니다."}
+                    : ""}
                 </p>
                 <div className="flex gap-3">
                   <button
@@ -474,49 +433,5 @@ export function RecommendRequestPage(props: {
         </div>
       ) : null}
     </main>
-  );
-}
-
-function getModeLocationStatus(mode: RecommendMode): string {
-  if (mode === "live") {
-    return "live 모드에서는 입력한 출발지와 백엔드 API를 기준으로 추천을 요청합니다.";
-  }
-
-  return "demo 모드에서는 서울시청 기준 좌표로 같은 결과를 재현합니다.";
-}
-
-function RequestModeToggle(props: {
-  mode: RecommendMode;
-  onChange: (mode: RecommendMode) => void;
-}) {
-  return (
-    <div className="fixed bottom-4 left-4 z-30 rounded-[22px] border border-[rgba(17,17,17,0.08)] bg-[rgba(255,253,248,0.9)] p-1 shadow-[0_18px_44px_rgba(17,17,17,0.14)] backdrop-blur-md sm:bottom-5 sm:left-5">
-      <div
-        className="grid grid-cols-2 gap-1"
-        role="radiogroup"
-        aria-label="추천 요청 모드"
-      >
-        {(["demo", "live"] as const).map((mode) => {
-          const selected = props.mode === mode;
-
-          return (
-            <button
-              key={mode}
-              type="button"
-              role="radio"
-              aria-checked={selected}
-              onClick={() => props.onChange(mode)}
-              className={`min-h-9 rounded-[18px] px-3 text-xs font-semibold transition-all duration-200 ${
-                selected
-                  ? "bg-[var(--foreground)] text-white shadow-[0_10px_20px_rgba(17,17,17,0.18)]"
-                  : "text-[var(--muted)] hover:bg-white hover:text-[var(--foreground)]"
-              }`}
-            >
-              {mode === "demo" ? "Demo" : "Live"}
-            </button>
-          );
-        })}
-      </div>
-    </div>
   );
 }
