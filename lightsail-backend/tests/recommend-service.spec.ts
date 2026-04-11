@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 
-import { demoRecommendationSample } from "../src/data/demo/recommendation-sample.js";
+import { demoRecommendationDataset } from "../src/data/demo/recommendation-sample.js";
 import { createRecommendService, RecommendServiceError } from "../src/recommend/service.js";
 
 async function main() {
@@ -128,11 +128,39 @@ async function main() {
 
   assert.equal(demoResponse.meta.mode, "demo");
   assert.equal(demoResponse.meta.dataSource, "demo-sample");
-  assert.equal(demoResponse.meta.scenarioId, "demo-seoul-cityhall-passport");
+  assert.equal(
+    demoResponse.meta.scenarioId,
+    "demo-seoul-seongsu-passport-pickup",
+  );
+  assert.equal(demoResponse.recommendations.length, 3);
   assert.match(
     demoResponse.recommendations[0]?.waiting.updatedAt ?? "",
     /\+09:00$/,
   );
+
+  const jamsilDemoResponse = await createRecommendService().recommend({
+    purposeId: "passport-reissue",
+    originLabel: "잠실새내",
+    origin: {
+      lat: 37.5114,
+      lng: 127.0869,
+    },
+    mode: "demo",
+  });
+
+  assert.equal(
+    jamsilDemoResponse.meta.scenarioId,
+    "demo-seoul-jamsil-passport",
+  );
+  assert.deepEqual(jamsilDemoResponse, await createRecommendService().recommend({
+    purposeId: "passport-reissue",
+    originLabel: "잠실새내",
+    origin: {
+      lat: 37.5114,
+      lng: 127.0869,
+    },
+    mode: "demo",
+  }));
 
   const demoSampleJson = JSON.parse(
     readFileSync(
@@ -141,7 +169,8 @@ async function main() {
     ),
   );
 
-  assert.deepEqual(demoSampleJson, demoRecommendationSample);
+  assert.equal(demoRecommendationDataset.scenarios.length, 6);
+  assert.deepEqual(demoSampleJson, demoRecommendationDataset);
 
   const emptyService = createRecommendService({
     fetchWaitingItems: async () => ({
