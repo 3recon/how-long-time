@@ -87,6 +87,44 @@ async function main() {
     steps: [],
   });
 
+  assert.deepEqual(
+    parseODsaySearchResponse({
+      result: {
+        path: [
+          {
+            info: {
+              totalTime: 42,
+              totalDistance: 12345,
+            },
+            subPath: [],
+          },
+        ],
+      },
+    }).steps,
+    [],
+  );
+
+  assert.deepEqual(
+    parseODsaySearchResponse({
+      result: {
+        path: [
+          {
+            info: {
+              totalTime: 42,
+              totalDistance: 12345,
+            },
+            subPath: [
+              {
+                trafficType: 2,
+              },
+            ],
+          },
+        ],
+      },
+    }).steps,
+    [],
+  );
+
   const odsayDetailedPayload = {
     result: {
       path: [
@@ -218,8 +256,7 @@ async function main() {
           }),
       }),
     (error: unknown) =>
-      error instanceof ODsayApiError &&
-      error.code === "ODSAY_API_ERROR",
+      error instanceof ODsayApiError && error.code === "ODSAY_API_ERROR",
   );
 
   console.log("mobility spec passed");

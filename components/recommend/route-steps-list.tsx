@@ -48,6 +48,25 @@ function toOptionalString(value: unknown): string | undefined {
     : undefined;
 }
 
+function formatRouteEndpoints(fromValue: unknown, toValue: unknown) {
+  const from = toOptionalString(fromValue);
+  const to = toOptionalString(toValue);
+
+  if (from && to) {
+    return `${from} -> ${to}`;
+  }
+
+  if (from) {
+    return `${from} 출발`;
+  }
+
+  if (to) {
+    return `${to} 도착`;
+  }
+
+  return undefined;
+}
+
 function toOptionalNumber(value: unknown): number | null {
   return typeof value === "number" && Number.isFinite(value)
     ? Math.max(0, Math.round(value))
@@ -92,9 +111,11 @@ export function normalizeRouteStepItems(value: unknown): RouteStepItem[] {
         description:
           toOptionalString(item.description) ??
           toOptionalString(item.detail) ??
-          toOptionalString(item.stationName),
+          toOptionalString(item.stationName) ??
+          formatRouteEndpoints(item.from, item.to),
         minutes: toOptionalNumber(item.minutes),
-        lineName: toOptionalString(item.lineName),
+        lineName:
+          toOptionalString(item.lineName) ?? toOptionalString(item.routeName),
         stopCount: toOptionalNumber(item.stopCount),
         badges: toBadges(item.badges),
       },

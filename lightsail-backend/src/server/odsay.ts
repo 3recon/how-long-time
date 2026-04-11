@@ -17,8 +17,7 @@ export interface BuildODsayPublicTransitUrlOptions {
   baseUrl?: string;
 }
 
-export interface GetPublicTransitTravelTimeOptions
-  extends BuildODsayPublicTransitUrlOptions {
+export interface GetPublicTransitTravelTimeOptions extends BuildODsayPublicTransitUrlOptions {
   fetchImpl?: typeof fetch;
   signal?: AbortSignal;
 }
@@ -181,6 +180,13 @@ function createRouteDetails(
     .filter(isRecord)
     .map(createRouteStep)
     .filter((step): step is TravelRouteStep => step !== null);
+
+  if (steps.length === 0) {
+    return {
+      breakdown: createEmptyBreakdown(totalMinutes),
+      steps: [],
+    };
+  }
 
   const walkMinutes = steps
     .filter((step) => step.type === "walk")
