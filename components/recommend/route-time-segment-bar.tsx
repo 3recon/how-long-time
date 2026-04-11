@@ -168,7 +168,7 @@ export function RouteTimeSegmentBar(props: RouteTimeSegmentBarProps) {
           return (
             <div
               key={segment.key}
-              className={`${segment.className} ${segment.textClassName} flex min-w-0 items-center justify-center gap-1 px-1.5 tabular-nums transition-[width] duration-300 ease-out sm:gap-1.5 sm:px-2.5`}
+              className={`${segment.className} ${segment.textClassName} flex min-w-0 items-center justify-center gap-1 px-1.5 tabular-nums transition-[width] duration-300 ease-out sm:gap-1.5 sm:px-2`}
               style={{ width: `${width}%` }}
               title={`${segment.label} ${segment.minutes}분`}
             >

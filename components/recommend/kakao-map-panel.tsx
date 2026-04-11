@@ -161,11 +161,11 @@ function MapLegend(props: { originLabel: string; compact?: boolean }) {
     <div
       className={
         props.compact
-          ? "flex flex-wrap items-center justify-center gap-2.5"
+          ? "flex items-center justify-center gap-2 overflow-x-auto pb-1 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
           : "pointer-events-none absolute left-4 top-4 z-20 max-w-[calc(100%-2rem)] rounded-[22px] border border-[rgba(17,17,17,0.08)] bg-white/92 px-4 py-3 shadow-[0_18px_34px_rgba(17,17,17,0.08)] backdrop-blur-sm"
       }
     >
-      <div className="flex items-center gap-2 rounded-full border border-[rgba(17,17,17,0.08)] bg-[rgba(255,255,255,0.85)] px-2.5 py-1.5">
+      <div className="flex flex-none items-center gap-2 rounded-full border border-[rgba(17,17,17,0.1)] bg-[rgba(255,255,255,0.92)] px-2.5 py-1.5">
         <span className="text-xs font-semibold text-[var(--foreground)]">
           출발지: {props.originLabel}
         </span>
@@ -173,14 +173,14 @@ function MapLegend(props: { originLabel: string; compact?: boolean }) {
       <div
         className={
           props.compact
-            ? "flex flex-wrap items-center justify-center gap-2.5"
+            ? "flex flex-none items-center gap-2"
             : "mt-3 flex flex-wrap gap-2.5"
         }
       >
         {getMapLegendItems().map((item) => (
           <div
             key={item.id}
-            className="flex items-center gap-2 rounded-full border border-[rgba(17,17,17,0.08)] bg-[rgba(255,255,255,0.85)] px-2.5 py-1.5"
+            className="flex flex-none items-center gap-2 rounded-full border border-[rgba(17,17,17,0.1)] bg-[rgba(255,255,255,0.92)] px-2.5 py-1.5"
           >
             <LegendSwatch itemId={item.id} />
             <div className="leading-none">
@@ -573,7 +573,7 @@ export function KakaoMapPanel(props: {
     null;
 
   return (
-    <section className="soft-card overflow-hidden rounded-[28px] border-[rgba(17,17,17,0.08)] lg:flex lg:h-full lg:min-h-0 lg:flex-col">
+    <section className="soft-card overflow-hidden rounded-[28px] border-[rgba(17,17,17,0.12)] lg:flex lg:h-full lg:min-h-0 lg:flex-col">
       <div className="border-b border-[var(--line)] px-5 py-4 sm:px-6">
         <MapLegend originLabel={originLabel} compact />
       </div>

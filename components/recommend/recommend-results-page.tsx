@@ -261,14 +261,14 @@ export function RecommendResultsPage(props: {
     <main className="relative min-h-dvh overflow-hidden">
       <div className="relative mx-auto flex w-full max-w-[1680px] flex-col gap-4 px-4 py-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between gap-4">
-          <div className="justify-self-start rounded-full border border-[rgba(17,17,17,0.1)] bg-white/78 px-4 py-2 shadow-[0_10px_24px_rgba(17,17,17,0.05)] backdrop-blur-sm">
+          <div className="justify-self-start rounded-full border border-[rgba(17,17,17,0.14)] bg-white px-4 py-2 shadow-[0_10px_24px_rgba(17,17,17,0.05)]">
             <h2 className="text-xl font-semibold tracking-[-0.04em]">
               소요 시간 비교
             </h2>
           </div>
           <Link
             href="/"
-            className="inline-flex min-h-10 items-center justify-center rounded-[18px] border border-[var(--foreground)] bg-[var(--foreground)] px-3.5 text-[13px] font-semibold text-white shadow-[0_14px_28px_rgba(17,17,17,0.14)]"
+            className="inline-flex min-h-10 items-center justify-center rounded-[18px] border border-[var(--foreground)] bg-[var(--foreground)] px-3.5 text-[13px] font-semibold text-white shadow-[0_14px_28px_rgba(17,17,17,0.14)] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[rgba(36,92,154,0.14)]"
           >
             {RESTART_LABEL}
           </Link>
