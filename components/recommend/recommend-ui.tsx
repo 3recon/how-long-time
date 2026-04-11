@@ -69,30 +69,11 @@ function getRouteTimeSegments(office: RecommendedOffice) {
         kind,
       };
     })
-    .filter((segment) => segment.minutes > 0);
+    .filter((segment) => segment.minutes > 0 && segment.kind !== "transfer");
 
   if (stepSegments && stepSegments.length > 0) {
-    const stepMinutes = stepSegments.reduce(
-      (sum, segment) => sum + segment.minutes,
-      0,
-    );
-    const remainingTravelMinutes = Math.max(
-      0,
-      Math.round(office.travel.minutes - stepMinutes),
-    );
-
     return [
       ...stepSegments,
-      ...(remainingTravelMinutes > 0
-        ? [
-            {
-              key: "travel-remainder",
-              label: "기타",
-              minutes: remainingTravelMinutes,
-              kind: "transfer" as const,
-            },
-          ]
-        : []),
       {
         key: "waiting",
         label: "대기",
@@ -117,15 +98,9 @@ function getRouteTimeSegments(office: RecommendedOffice) {
     },
     {
       key: "transit",
-      label: "탑승",
+      label: "대중교통",
       minutes: breakdown.transitRideMinutes,
       kind: "transit" as const,
-    },
-    {
-      key: "transfer",
-      label: "환승/기타",
-      minutes: breakdown.transferEtcMinutes,
-      kind: "transfer" as const,
     },
     {
       key: "waiting",
@@ -160,7 +135,7 @@ function getRouteTimeSegmentLabel(
       return "도보";
     case "bus":
     case "subway":
-      return step.routeName ?? "탑승";
+      return step.routeName ?? "대중교통";
     case "transfer-etc":
       return "환승/기타";
     default:
@@ -173,13 +148,13 @@ export function getRequestErrorMessage(
 ): string {
   switch (error) {
     case "INVALID_REQUEST":
-      return "입력값을 다시 확인해 주세요.";
+      return "입력한 주소를 좌표로 변환하지 못했습니다. (서울시청, 홍대입구역, 잠실역, 건대입구역, 강남역, 성수역)중 하나를 입력해주세요.";
     case "INVALID_JSON":
       return "요청 형식이 올바르지 않습니다.";
     case "UPSTREAM_CONFIG_ERROR":
       return "추천 서버 설정을 확인해 주세요.";
     case "UPSTREAM_API_ERROR":
-      return "추천 서버에 연결하지 못했습니다.";
+      return "추천 서버와 연결하지 못했습니다.";
     default:
       return "추천 정보를 불러오지 못했습니다. 잠시 후 다시 시도해 주세요.";
   }
@@ -331,7 +306,7 @@ export function RecommendationCard(props: {
           aria-expanded={props.expanded}
           aria-controls={detailsId}
         >
-          {props.expanded ? "상세 경로 접기" : "상세 경로"}
+          {props.expanded ? "상세 경로 닫기" : "상세 경로"}
         </button>
       </div>
 
