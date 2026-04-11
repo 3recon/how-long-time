@@ -41,15 +41,34 @@ async function main() {
 
   assert.equal(backendResponse.meta.contractVersion, recommendContractVersion);
   assert.equal(backendResponse.meta.dataSource, "demo-sample");
-  assert.equal(backendResponse.meta.purposeMappingVersion, purposeMappingVersion);
+  assert.equal(
+    backendResponse.meta.purposeMappingVersion,
+    purposeMappingVersion,
+  );
   assert.equal(backendResponse.meta.scenarioId, expectedScenarioId);
 
   assert.equal(clientResponse.meta.contractVersion, recommendContractVersion);
   assert.equal(clientResponse.meta.dataSource, "demo-sample");
-  assert.equal(clientResponse.meta.purposeMappingVersion, purposeMappingVersion);
+  assert.equal(
+    clientResponse.meta.purposeMappingVersion,
+    purposeMappingVersion,
+  );
   assert.equal(clientResponse.meta.scenarioId, expectedScenarioId);
   assert.deepEqual(clientResponse.summary, backendResponse.summary);
-  assert.deepEqual(clientResponse.recommendations, backendResponse.recommendations);
+  assert.deepEqual(
+    clientResponse.recommendations,
+    backendResponse.recommendations,
+  );
+  assert.deepEqual(clientResponse.recommendations[0]?.travel.breakdown, {
+    walkMinutes: 4,
+    transitRideMinutes: 12,
+    transferEtcMinutes: 3,
+  });
+  assert.equal(clientResponse.recommendations[0]?.travel.steps?.length, 3);
+  assert.equal(
+    clientResponse.recommendations[0]?.travel.steps?.[1]?.routeName,
+    "종로09",
+  );
 
   assert.deepEqual(rootDemoSample, demoRecommendationSample);
 

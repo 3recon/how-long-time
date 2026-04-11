@@ -50,6 +50,38 @@ export const demoRecommendationSample: RecommendResponse = {
       travel: {
         minutes: 19,
         distanceKm: 3.2,
+        breakdown: {
+          walkMinutes: 4,
+          transitRideMinutes: 12,
+          transferEtcMinutes: 3,
+        },
+        steps: [
+          {
+            type: "walk",
+            title: "도보 이동",
+            minutes: 3,
+            distanceKm: 0.3,
+            from: "서울시청",
+            to: "시청역",
+          },
+          {
+            type: "bus",
+            title: "버스 탑승",
+            minutes: 12,
+            routeName: "종로09",
+            from: "시청역1호선",
+            to: "종로구청",
+            stopCount: 4,
+          },
+          {
+            type: "walk",
+            title: "민원실까지 도보",
+            minutes: 1,
+            distanceKm: 0.1,
+            from: "종로구청 정류장",
+            to: "종로구청 여권 민원실",
+          },
+        ],
       },
       recommendation: {
         rank: 1,
@@ -88,6 +120,45 @@ export const demoRecommendationSample: RecommendResponse = {
       travel: {
         minutes: 16,
         distanceKm: 2.6,
+        breakdown: {
+          walkMinutes: 4,
+          transitRideMinutes: 9,
+          transferEtcMinutes: 3,
+        },
+        steps: [
+          {
+            type: "walk",
+            title: "도보 이동",
+            minutes: 2,
+            distanceKm: 0.2,
+            from: "서울시청",
+            to: "시청역",
+          },
+          {
+            type: "subway",
+            title: "지하철 탑승",
+            minutes: 9,
+            routeName: "1호선",
+            from: "시청역",
+            to: "종로5가역",
+            stopCount: 2,
+          },
+          {
+            type: "transfer-etc",
+            title: "환승/기타",
+            minutes: 3,
+            from: "종로5가역",
+            to: "중구청 방향",
+          },
+          {
+            type: "walk",
+            title: "민원실까지 도보",
+            minutes: 2,
+            distanceKm: 0.2,
+            from: "중구청 인근",
+            to: "중구청 민원여권과",
+          },
+        ],
       },
       recommendation: {
         rank: 2,
