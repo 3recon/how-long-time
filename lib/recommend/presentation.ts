@@ -4,6 +4,19 @@ import type {
   RecommendedOffice,
 } from "@/types/recommend";
 
+export interface SelectedOfficeSummary {
+  id: string;
+  name: string;
+  address: string;
+  reason: string;
+  rank: number;
+  score: number;
+  travelMinutes: number;
+  waitingCount: number;
+  updatedAt: string | null;
+  taskSummary: string;
+}
+
 export function getInitialSelectedOfficeId(
   response: RecommendResponse | null,
 ): string | null {
@@ -26,6 +39,33 @@ export function resolveSelectedOffice(
     recommendations.find((office) => office.id === selectedOfficeId) ??
     recommendations[0]
   );
+}
+
+export function getSelectedOfficeSummary(
+  recommendations: RecommendedOffice[],
+  selectedOfficeId: string | null,
+): SelectedOfficeSummary | null {
+  const selectedOffice = resolveSelectedOffice(recommendations, selectedOfficeId);
+
+  if (!selectedOffice) {
+    return null;
+  }
+
+  return {
+    id: selectedOffice.id,
+    name: selectedOffice.name,
+    address: selectedOffice.address,
+    reason: selectedOffice.recommendation.reason,
+    rank: selectedOffice.recommendation.rank,
+    score: selectedOffice.recommendation.score,
+    travelMinutes: selectedOffice.travel.minutes,
+    waitingCount: selectedOffice.waiting.count,
+    updatedAt: selectedOffice.waiting.updatedAt,
+    taskSummary:
+      selectedOffice.supportedTaskMatches
+        .map((task) => task.taskName)
+        .join(", ") || "안내 가능한 민원 없음",
+  };
 }
 
 export function getMapFocusPoint(options: {

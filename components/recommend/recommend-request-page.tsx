@@ -1,17 +1,13 @@
 "use client";
 
 import { type FormEvent, useEffect, useId, useState } from "react";
+import { useRouter } from "next/navigation";
 
 import {
   Eyebrow,
   PurposeOptionCard,
-  StatChip,
   formatCoordinates,
 } from "@/components/recommend/recommend-ui";
-import {
-  getPurposeLabel,
-  purposeOptions,
-} from "@/data/recommend/purpose-options";
 import { appConfig } from "@/lib/env";
 import {
   buildDemoRecommendRequest,
@@ -19,6 +15,7 @@ import {
 } from "@/lib/recommend/form";
 import { buildRecommendResultsHref } from "@/lib/recommend/route-state";
 import type { LocationPoint, RecommendPurposeId } from "@/types/recommend";
+import { purposeOptions } from "@/data/recommend/purpose-options";
 
 function readValue(
   input: Record<string, string | string[] | undefined>,
@@ -44,6 +41,7 @@ function parseInitialCoordinates(
 export function RecommendRequestPage(props: {
   searchParams: Record<string, string | string[] | undefined>;
 }) {
+  const router = useRouter();
   const purposeDialogId = useId();
   const [originLabel, setOriginLabel] = useState(
     readValue(props.searchParams, "originLabel") ?? "",
@@ -60,7 +58,7 @@ export function RecommendRequestPage(props: {
   }>({});
   const [requestError, setRequestError] = useState<string | null>(null);
   const [locationStatus, setLocationStatus] = useState(
-    "demo 모드에서는 서울시청 기본 좌표로 같은 결과를 재현합니다.",
+    "demo 모드에서는 서울시청 기준 좌표로 같은 결과를 재현합니다.",
   );
   const [isLocating, setIsLocating] = useState(false);
   const [isPurposePickerOpen, setIsPurposePickerOpen] = useState(false);
@@ -100,7 +98,7 @@ export function RecommendRequestPage(props: {
 
   async function handleUseCurrentLocation() {
     if (!("geolocation" in navigator)) {
-      setRequestError("이 브라우저에서는 현재 위치 기능을 사용할 수 없습니다.");
+      setRequestError("브라우저에서 현재 위치 기능을 지원하지 않습니다.");
       return;
     }
 
@@ -119,7 +117,7 @@ export function RecommendRequestPage(props: {
         setOriginLabel((current) => current.trim() || "현재 위치");
         setFieldErrors((current) => ({ ...current, originLabel: undefined }));
         setLocationStatus(
-          "현재 위치를 반영했습니다. 추천 요청을 누르면 결과 화면으로 이동합니다.",
+          "현재 위치를 반영했습니다. 추천 요청을 누르면 같은 탭에서 결과 화면으로 이동합니다.",
         );
         setIsLocating(false);
       },
@@ -128,7 +126,7 @@ export function RecommendRequestPage(props: {
           "현재 위치를 가져오지 못했습니다. 출발지를 직접 입력해 주세요.",
         );
         setLocationStatus(
-          "위치 권한이 없어도 서울시청 기준 demo 결과를 확인할 수 있습니다.",
+          "위치 권한이 없으면 서울시청 기준 demo 결과를 확인할 수 있습니다.",
         );
         setIsLocating(false);
       },
@@ -162,15 +160,15 @@ export function RecommendRequestPage(props: {
       fallbackOrigin: appConfig.defaultCenter,
     });
 
-    window.location.assign(buildRecommendResultsHref(requestPayload));
+    router.push(buildRecommendResultsHref(requestPayload));
   }
 
   return (
     <main className="relative min-h-dvh overflow-hidden">
-      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(211,166,63,0.24),transparent_36%),radial-gradient(circle_at_bottom_right,rgba(31,58,95,0.08),transparent_26%)]" />
-      <div className="relative mx-auto flex min-h-dvh w-full max-w-[1480px] flex-col gap-5 px-4 py-4 sm:px-6 lg:grid lg:grid-cols-[minmax(0,430px)_minmax(0,1fr)] lg:items-stretch lg:gap-6 lg:px-6 lg:py-6">
-        <section className="soft-card rounded-[32px] border-[rgba(17,17,17,0.08)] p-5 sm:p-6 lg:flex lg:min-h-[calc(100dvh-3rem)] lg:flex-col lg:p-6">
-          <div className="space-y-3 border-b border-[var(--line)] pb-5">
+      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(211,166,63,0.24),transparent_36%),radial-gradient(circle_at_bottom_right,rgba(31,58,95,0.08),transparent_28%)]" />
+      <div className="relative mx-auto flex min-h-dvh w-full max-w-[900px] items-center px-4 py-6 sm:px-6 lg:px-8">
+        <section className="soft-card w-full rounded-[36px] border-[rgba(17,17,17,0.08)] p-5 sm:p-7">
+          <div className="border-b border-[var(--line)] pb-6">
             <div className="flex flex-wrap items-center gap-3">
               <Eyebrow>Minwon Now</Eyebrow>
               <span className="rounded-full border border-[rgba(17,17,17,0.08)] bg-white px-3 py-1 text-xs font-medium text-[var(--muted)]">
@@ -178,24 +176,19 @@ export function RecommendRequestPage(props: {
               </span>
             </div>
 
-            <div className="space-y-2">
-              <h1 className="text-4xl font-semibold leading-[0.96] tracking-[-0.06em] text-balance sm:text-[3.15rem]">
-                위치와 민원 목적을 먼저 정하고
-                <span className="block text-[var(--accent-strong)]">
-                  다음 화면에서 비교합니다.
-                </span>
-              </h1>
-              <p className="max-w-xl text-sm leading-6 text-[var(--muted)] sm:text-[0.95rem]">
-                첫 화면에서는 입력만 간결하게 끝내고, 결과 화면에서 지도와 추천
-                비교를 한 번에 확인합니다.
-              </p>
-            </div>
+            <h1 className="mt-5 text-5xl font-semibold leading-[0.94] tracking-[-0.08em] text-balance sm:text-[4.4rem]">
+              위치와 민원 목적만 고르면
+              <span className="block text-[var(--accent-strong)]">
+                다음 화면에서 비교합니다.
+              </span>
+            </h1>
+            <p className="mt-4 max-w-2xl text-sm leading-7 text-[var(--muted)] sm:text-base">
+              첫 화면에서는 입력만 간결하게 끝내고, 결과 화면에서 위치 비교 보기와
+              경로, 추천 결과 비교를 한 번에 확인합니다.
+            </p>
           </div>
 
-          <form
-            className="space-y-4 pt-5 lg:flex lg:min-h-0 lg:flex-1 lg:flex-col"
-            onSubmit={handleSubmit}
-          >
+          <form className="space-y-6 pt-6" onSubmit={handleSubmit}>
             <section className="space-y-3">
               <div className="flex items-center justify-between gap-3">
                 <label
@@ -209,7 +202,7 @@ export function RecommendRequestPage(props: {
                 </span>
               </div>
 
-              <div className="rounded-[24px] border border-[rgba(17,17,17,0.08)] bg-[rgba(255,255,255,0.88)] p-4 shadow-[0_18px_40px_rgba(17,17,17,0.06)]">
+              <div className="rounded-[28px] border border-[rgba(17,17,17,0.08)] bg-[rgba(255,255,255,0.92)] p-4 shadow-[0_20px_44px_rgba(17,17,17,0.06)] sm:p-5">
                 <input
                   id="originLabel"
                   value={originLabel}
@@ -228,7 +221,7 @@ export function RecommendRequestPage(props: {
                   aria-describedby="origin-help"
                 />
 
-                <div className="mt-3 flex flex-col gap-3 sm:flex-row">
+                <div className="mt-4 flex flex-col gap-3 sm:flex-row">
                   <button
                     type="button"
                     onClick={handleUseCurrentLocation}
@@ -259,14 +252,14 @@ export function RecommendRequestPage(props: {
                   민원 목적
                 </label>
                 <span className="text-xs uppercase tracking-[0.22em] text-[var(--muted)]">
-                  quick picker
+                  purpose
                 </span>
               </div>
 
               <button
                 type="button"
                 onClick={openPurposePicker}
-                className={`w-full rounded-[26px] border px-4 py-4 text-left shadow-[0_18px_38px_rgba(17,17,17,0.06)] transition-all duration-200 hover:-translate-y-0.5 ${
+                className={`w-full rounded-[28px] border px-4 py-5 text-left shadow-[0_20px_42px_rgba(17,17,17,0.06)] transition-all duration-200 hover:-translate-y-0.5 ${
                   selectedPurpose
                     ? "border-[rgba(211,166,63,0.55)] bg-[linear-gradient(180deg,rgba(244,238,223,0.98)_0%,rgba(255,253,248,1)_100%)]"
                     : "border-[rgba(17,17,17,0.08)] bg-white"
@@ -280,7 +273,7 @@ export function RecommendRequestPage(props: {
                     <p className="text-xs font-semibold uppercase tracking-[0.24em] text-[var(--accent-strong)]">
                       Purpose Picker
                     </p>
-                    <p className="mt-2 text-base font-semibold tracking-[-0.03em]">
+                    <p className="mt-2 text-lg font-semibold tracking-[-0.03em]">
                       {selectedPurpose?.label ?? "민원 목적을 선택해 주세요"}
                     </p>
                     <p className="mt-1 text-sm leading-6 text-[var(--muted)]">
@@ -301,25 +294,6 @@ export function RecommendRequestPage(props: {
               ) : null}
             </section>
 
-            <div className="grid gap-3 sm:grid-cols-2">
-              <div className="rounded-[22px] border border-[rgba(17,17,17,0.08)] bg-white px-4 py-4">
-                <p className="text-xs uppercase tracking-[0.22em] text-[var(--muted)]">
-                  API 경로
-                </p>
-                <p className="mt-2 break-all text-sm font-semibold leading-6">
-                  /api/recommend
-                </p>
-              </div>
-              <div className="rounded-[22px] border border-[rgba(17,17,17,0.08)] bg-white px-4 py-4">
-                <p className="text-xs uppercase tracking-[0.22em] text-[var(--muted)]">
-                  백엔드 후보
-                </p>
-                <p className="mt-2 break-all text-sm font-semibold leading-6">
-                  {appConfig.apiBaseUrl}
-                </p>
-              </div>
-            </div>
-
             {requestError ? (
               <div className="rounded-[20px] border border-[rgba(220,38,38,0.18)] bg-[rgba(220,38,38,0.06)] px-4 py-3 text-sm font-medium text-[var(--foreground)]">
                 {requestError}
@@ -329,107 +303,11 @@ export function RecommendRequestPage(props: {
             <button
               type="submit"
               disabled={isLocating}
-              className="min-h-13 w-full rounded-[22px] border border-[var(--foreground)] bg-[var(--foreground)] px-5 text-base font-semibold text-white shadow-[0_20px_44px_rgba(17,17,17,0.16)] hover:-translate-y-0.5 hover:border-[var(--accent-blue)] hover:bg-[var(--accent-blue)] disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:translate-y-0 lg:mt-auto"
+              className="min-h-14 w-full rounded-[22px] border border-[var(--foreground)] bg-[var(--foreground)] px-5 text-base font-semibold text-white shadow-[0_20px_44px_rgba(17,17,17,0.16)] hover:-translate-y-0.5 hover:border-[var(--accent-blue)] hover:bg-[var(--accent-blue)] disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:translate-y-0"
             >
-              추천 결과 비교하러 가기
+              추천 요청
             </button>
           </form>
-        </section>
-
-        <section className="flex min-w-0 flex-col gap-5 lg:min-h-[calc(100dvh-3rem)]">
-          <article className="soft-card rounded-[32px] border-[rgba(17,17,17,0.08)] p-5 sm:p-6">
-            <p className="text-xs font-semibold uppercase tracking-[0.28em] text-[var(--accent-strong)]">
-              Two Step Flow
-            </p>
-            <div className="mt-4 grid gap-4 md:grid-cols-2">
-              <div className="rounded-[28px] border border-[rgba(17,17,17,0.08)] bg-[linear-gradient(180deg,rgba(255,253,248,1)_0%,rgba(244,238,223,0.9)_100%)] p-5 shadow-[0_18px_36px_rgba(17,17,17,0.06)]">
-                <p className="text-sm font-semibold text-[var(--accent-strong)]">
-                  1단계
-                </p>
-                <h2 className="mt-2 text-2xl font-semibold tracking-[-0.04em]">
-                  입력만 빠르게
-                </h2>
-                <p className="mt-3 text-sm leading-6 text-[var(--muted)]">
-                  위치와 목적을 정리하고, 결과 비교는 다음 화면으로 넘겨 한 번에
-                  보는 정보 밀도를 줄였습니다.
-                </p>
-              </div>
-              <div className="rounded-[28px] border border-[rgba(17,17,17,0.08)] bg-[var(--foreground)] p-5 text-white shadow-[0_20px_44px_rgba(17,17,17,0.16)]">
-                <p className="text-sm font-semibold text-[rgba(255,255,255,0.72)]">
-                  2단계
-                </p>
-                <h2 className="mt-2 text-2xl font-semibold tracking-[-0.04em]">
-                  지도와 결과를 집중 비교
-                </h2>
-                <p className="mt-3 text-sm leading-6 text-[rgba(255,255,255,0.78)]">
-                  결과 전용 route에서 추천을 다시 불러와 새로고침에도 demo
-                  흐름을 재현합니다.
-                </p>
-              </div>
-            </div>
-          </article>
-
-          <article className="soft-card flex-1 rounded-[32px] border-[rgba(17,17,17,0.08)] p-5 sm:p-6">
-            <div className="flex flex-wrap items-start justify-between gap-4 border-b border-[var(--line)] pb-4">
-              <div>
-                <p className="text-xs font-semibold uppercase tracking-[0.28em] text-[var(--accent-strong)]">
-                  Current Request
-                </p>
-                <h2 className="mt-2 text-2xl font-semibold tracking-[-0.04em]">
-                  지금 보내는 추천 조건
-                </h2>
-              </div>
-              <span className="rounded-full border border-[rgba(17,17,17,0.08)] bg-white px-3 py-1 text-xs font-medium text-[var(--muted)]">
-                demo request
-              </span>
-            </div>
-
-            <div className="mt-5 grid gap-3 sm:grid-cols-3">
-              <StatChip
-                label="출발지"
-                value={originLabel.trim() || "입력 대기"}
-              />
-              <StatChip
-                label="민원 목적"
-                value={purposeId ? getPurposeLabel(purposeId) : "선택 대기"}
-              />
-              <StatChip
-                label="모드"
-                value={coordinates ? "demo (좌표 포함)" : "demo"}
-              />
-            </div>
-
-            <div className="mt-5 rounded-[28px] border border-[rgba(17,17,17,0.08)] bg-[linear-gradient(180deg,rgba(244,238,223,0.92)_0%,rgba(255,253,248,1)_100%)] p-5">
-              <div className="grid gap-4 md:grid-cols-[minmax(0,1fr)_220px]">
-                <div>
-                  <p className="text-xs font-semibold uppercase tracking-[0.22em] text-[var(--accent-strong)]">
-                    Result Route Preview
-                  </p>
-                  <p className="mt-3 text-sm leading-6 text-[var(--muted)]">
-                    버튼을 누르면 아래 정보가 query string으로 이동하고, 결과
-                    화면에서 같은 조건으로 추천 결과를 다시 불러옵니다.
-                  </p>
-                  <div className="mt-4 rounded-[22px] border border-[rgba(17,17,17,0.08)] bg-white px-4 py-4 text-sm leading-6 text-[var(--foreground)]">
-                    <p className="font-semibold">/results</p>
-                    <p className="mt-2 break-all text-[var(--muted)]">
-                      originLabel={originLabel.trim() || "..."}&purposeId=
-                      {purposeId || "..."}&lat={coordinates?.lat.toFixed(4)}
-                      &lng={coordinates?.lng.toFixed(4)}&mode=demo
-                    </p>
-                  </div>
-                </div>
-
-                <div className="rounded-[24px] border border-dashed border-[rgba(17,17,17,0.16)] px-4 py-4 text-sm leading-6 text-[var(--muted)]">
-                  <p className="font-semibold text-[var(--foreground)]">
-                    다음 화면에서 보는 내용
-                  </p>
-                  <p className="mt-2">지도 기반 위치 비교</p>
-                  <p>추천 민원실 카드 비교</p>
-                  <p>선택 민원실 상세 요약</p>
-                </div>
-              </div>
-            </div>
-          </article>
         </section>
       </div>
 
@@ -456,7 +334,7 @@ export function RecommendRequestPage(props: {
                     민원 목적을 빠르게 선택해 주세요
                   </h2>
                   <p className="mt-2 text-sm leading-6 text-[var(--muted)]">
-                    목적을 고르면 결과 화면도 같은 기준으로 비교합니다.
+                    목적을 고르면 결과 화면에서도 같은 기준으로 비교합니다.
                   </p>
                 </div>
                 <button
