@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
 
+import { RouteTimeSegmentBar } from "@/components/recommend/route-time-segment-bar";
 import type { RecommendedOffice } from "@/types/recommend";
 
 export function formatCoordinates(
@@ -125,21 +126,30 @@ export function RecommendationCard(props: {
   office: RecommendedOffice;
   selected: boolean;
   onSelect: () => void;
+  expanded: boolean;
+  onToggleDetails: () => void;
 }) {
+  const detailsId = `recommendation-details-${props.office.id}`;
+  const taskSummary =
+    props.office.supportedTaskMatches.map((task) => task.taskName).join(", ") ||
+    "안내 가능한 업무 없음";
+
   return (
-    <button
-      type="button"
-      onClick={props.onSelect}
+    <article
       className={`w-full rounded-[24px] border px-5 py-4 text-left transition-all duration-200 ${
         props.selected
           ? "border-[var(--accent-blue)] bg-[linear-gradient(180deg,rgba(244,238,223,0.95)_0%,rgba(255,253,248,1)_100%)] shadow-[0_24px_48px_rgba(31,58,95,0.12)]"
           : "border-[rgba(17,17,17,0.08)] bg-white hover:-translate-y-0.5 hover:border-[rgba(17,17,17,0.16)] hover:shadow-[0_20px_40px_rgba(17,17,17,0.08)]"
       }`}
-      aria-pressed={props.selected}
     >
       <div className="flex flex-wrap items-start justify-between gap-3">
-        <div>
-          <div className="flex items-center gap-2">
+        <button
+          type="button"
+          onClick={props.onSelect}
+          className="min-w-0 flex-1 text-left"
+          aria-pressed={props.selected}
+        >
+          <div className="flex flex-wrap items-center gap-2">
             <span className="rounded-full border border-[rgba(17,17,17,0.08)] bg-[rgba(211,166,63,0.18)] px-2.5 py-1 text-xs font-semibold uppercase tracking-[0.18em] text-[var(--foreground)]">
               #{props.office.recommendation.rank}
             </span>
@@ -155,7 +165,7 @@ export function RecommendationCard(props: {
           <p className="mt-1 text-sm leading-6 text-[var(--muted)]">
             {props.office.address}
           </p>
-        </div>
+        </button>
 
         <div className="rounded-2xl border border-[rgba(17,17,17,0.08)] bg-white px-3 py-2 text-right shadow-[0_12px_24px_rgba(17,17,17,0.06)]">
           <p className="text-xs uppercase tracking-[0.2em] text-[var(--muted)]">
@@ -185,11 +195,52 @@ export function RecommendationCard(props: {
         />
         <StatChip
           label="처리 업무"
-          value={props.office.supportedTaskMatches
-            .map((task) => task.taskName)
-            .join(", ")}
+          value={taskSummary}
         />
       </div>
-    </button>
+
+      <div className="mt-5 flex justify-end">
+        <button
+          type="button"
+          onClick={props.onToggleDetails}
+          className="inline-flex min-h-11 items-center justify-center rounded-2xl border border-[rgba(31,58,95,0.22)] bg-white px-4 text-sm font-semibold text-[var(--accent-strong)] shadow-[0_12px_24px_rgba(17,17,17,0.06)] transition hover:-translate-y-0.5 hover:border-[var(--accent-blue)] hover:shadow-[0_16px_30px_rgba(31,58,95,0.12)]"
+          aria-expanded={props.expanded}
+          aria-controls={detailsId}
+        >
+          {props.expanded ? "상세 경로 접기" : "상세 경로"}
+        </button>
+      </div>
+
+      {props.expanded ? (
+        <div
+          id={detailsId}
+          className="mt-4 rounded-[24px] border border-[rgba(17,17,17,0.08)] bg-[rgba(255,253,248,0.88)] p-4"
+        >
+          <RouteTimeSegmentBar
+            travelMinutes={props.office.travel.minutes}
+            waitingMinutes={props.office.waiting.estimatedMinutes}
+          />
+
+          <div className="mt-4 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+            <StatChip
+              label="총 소요시간"
+              value={`${props.office.recommendation.totalMinutes}분`}
+            />
+            <StatChip
+              label="총 이동시간"
+              value={`${props.office.travel.minutes}분`}
+            />
+            <StatChip
+              label="예상 대기시간"
+              value={`${props.office.waiting.estimatedMinutes}분`}
+            />
+            <StatChip
+              label="예상 인원"
+              value={formatWaitingCount(props.office.waiting.count)}
+            />
+          </div>
+        </div>
+      ) : null}
+    </article>
   );
 }
