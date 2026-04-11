@@ -3,6 +3,7 @@ export type RouteStepKind =
   | "bus"
   | "subway"
   | "transfer"
+  | "transfer-etc"
   | "waiting"
   | "arrival"
   | "other";
@@ -23,6 +24,7 @@ const routeStepKinds = new Set<RouteStepKind>([
   "bus",
   "subway",
   "transfer",
+  "transfer-etc",
   "waiting",
   "arrival",
   "other",
@@ -194,7 +196,9 @@ function StepIcon(props: { kind: RouteStepKind }) {
       {props.kind === "subway" ? <SubwayIcon /> : null}
       {props.kind === "walk" ? <WalkIcon /> : null}
       {props.kind === "waiting" ? <ClockIcon /> : null}
-      {props.kind === "transfer" ? <TransferIcon /> : null}
+      {props.kind === "transfer" || props.kind === "transfer-etc" ? (
+        <TransferIcon />
+      ) : null}
       {props.kind === "arrival" ? <ArrivalIcon /> : null}
       {props.kind === "other" ? <DotIcon /> : null}
     </span>
@@ -210,6 +214,7 @@ function getStepIconClassName(kind: RouteStepKind): string {
       return "bg-[rgba(211,166,63,0.95)] text-[var(--foreground)] ring-[rgba(211,166,63,0.18)]";
     case "walk":
     case "transfer":
+    case "transfer-etc":
       return "bg-[rgba(17,17,17,0.08)] text-[var(--muted)] ring-[rgba(17,17,17,0.08)]";
     case "arrival":
       return "bg-[rgba(79,122,74,0.14)] text-[rgb(79,122,74)] ring-[rgba(79,122,74,0.16)]";

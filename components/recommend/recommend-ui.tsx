@@ -50,11 +50,42 @@ export function formatEstimatedWaiting(value: {
 }
 
 function getRouteStepItems(office: RecommendedOffice) {
-  const travel = office.travel as RecommendedOffice["travel"] & {
-    steps?: unknown;
-  };
+  return normalizeRouteStepItems(office.travel.steps);
+}
 
-  return normalizeRouteStepItems(travel.steps);
+function getRouteTimeSegments(office: RecommendedOffice) {
+  const breakdown = office.travel.breakdown;
+
+  if (!breakdown) {
+    return undefined;
+  }
+
+  return [
+    {
+      key: "walk",
+      label: "도보",
+      minutes: breakdown.walkMinutes,
+      kind: "walk" as const,
+    },
+    {
+      key: "transit",
+      label: "탑승",
+      minutes: breakdown.transitRideMinutes,
+      kind: "transit" as const,
+    },
+    {
+      key: "transfer",
+      label: "환승/기타",
+      minutes: breakdown.transferEtcMinutes,
+      kind: "transfer" as const,
+    },
+    {
+      key: "waiting",
+      label: "대기",
+      minutes: office.waiting.estimatedMinutes,
+      kind: "waiting" as const,
+    },
+  ];
 }
 
 export function getRequestErrorMessage(
@@ -148,6 +179,7 @@ export function RecommendationCard(props: {
     props.office.supportedTaskMatches.map((task) => task.taskName).join(", ") ||
     "안내 가능한 업무 없음";
   const routeSteps = getRouteStepItems(props.office);
+  const routeTimeSegments = getRouteTimeSegments(props.office);
 
   return (
     <article
@@ -231,6 +263,7 @@ export function RecommendationCard(props: {
           <RouteTimeSegmentBar
             travelMinutes={props.office.travel.minutes}
             waitingMinutes={props.office.waiting.estimatedMinutes}
+            segments={routeTimeSegments}
           />
 
           <div className="mt-4 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
