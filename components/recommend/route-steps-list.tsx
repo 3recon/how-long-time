@@ -19,6 +19,11 @@ export interface RouteStepItem {
   badges?: string[];
 }
 
+interface RouteStepItemDraft extends RouteStepItem {
+  id: string;
+  badges: string[];
+}
+
 const routeStepKinds = new Set<RouteStepKind>([
   "walk",
   "bus",
@@ -89,7 +94,7 @@ export function normalizeRouteStepItems(value: unknown): RouteStepItem[] {
     return [];
   }
 
-  return value.flatMap((item, index): RouteStepItem[] => {
+  const normalizedSteps = value.flatMap((item, index): RouteStepItemDraft[] => {
     if (!isRecord(item)) {
       return [];
     }
@@ -106,7 +111,7 @@ export function normalizeRouteStepItems(value: unknown): RouteStepItem[] {
     return [
       {
         id: toOptionalString(item.id) ?? `${index}`,
-        kind: toRouteStepKind(item.kind ?? item.type),
+        kind: normalizeWalkLikeKind(toRouteStepKind(item.kind ?? item.type)),
         title,
         description:
           toOptionalString(item.description) ??
@@ -121,6 +126,89 @@ export function normalizeRouteStepItems(value: unknown): RouteStepItem[] {
       },
     ];
   });
+
+  return mergeConsecutiveWalkSteps(normalizedSteps);
+}
+
+function normalizeWalkLikeKind(kind: RouteStepKind): RouteStepKind {
+  if (kind === "transfer" || kind === "transfer-etc") {
+    return "walk";
+  }
+
+  return kind;
+}
+
+function mergeConsecutiveWalkSteps(steps: RouteStepItemDraft[]): RouteStepItem[] {
+  return steps.reduce<RouteStepItemDraft[]>((mergedSteps, step) => {
+    const previousStep = mergedSteps.at(-1);
+
+    if (step.kind !== "walk" || previousStep?.kind !== "walk") {
+      mergedSteps.push(step);
+      return mergedSteps;
+    }
+
+    previousStep.title = mergeWalkTitles(previousStep.title, step.title);
+    previousStep.description = mergeOptionalText(
+      previousStep.description,
+      step.description,
+    );
+    previousStep.minutes = mergeMinutes(previousStep.minutes, step.minutes);
+    previousStep.badges = dedupeBadges([
+      ...previousStep.badges,
+      ...step.badges,
+    ]);
+
+    return mergedSteps;
+  }, []);
+}
+
+function mergeWalkTitles(left: string, right: string): string {
+  if (left === right) {
+    return left;
+  }
+
+  const leftBase = left.replace(/\s*도보$/, "");
+  const rightBase = right.replace(/\s*도보$/, "");
+
+  if (leftBase === rightBase) {
+    return `${leftBase} 도보`;
+  }
+
+  return `${leftBase} 후 ${rightBase}`;
+}
+
+function mergeOptionalText(
+  left: string | undefined,
+  right: string | undefined,
+): string | undefined {
+  if (left && right) {
+    if (left === right) {
+      return left;
+    }
+
+    return `${left} / ${right}`;
+  }
+
+  return left ?? right;
+}
+
+function mergeMinutes(
+  left: number | null | undefined,
+  right: number | null | undefined,
+): number | null | undefined {
+  const safeLeft = left ?? 0;
+  const safeRight = right ?? 0;
+  const total = safeLeft + safeRight;
+
+  if (total === 0) {
+    return left ?? right;
+  }
+
+  return total;
+}
+
+function dedupeBadges(badges: string[]): string[] {
+  return [...new Set(badges)];
 }
 
 export function RouteStepsList(props: { steps: RouteStepItem[] }) {

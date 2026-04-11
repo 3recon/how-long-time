@@ -71,34 +71,32 @@ export function RouteTimeSegmentBar(props: RouteTimeSegmentBarProps) {
       : "이동 0분";
 
   return (
-    <div className="rounded-[24px] border border-[rgba(17,17,17,0.08)] bg-[linear-gradient(180deg,rgba(255,253,248,0.96)_0%,rgba(250,245,232,0.98)_100%)] p-4 shadow-[0_18px_34px_rgba(17,17,17,0.06)]">
-      <div
-        className="flex h-8 overflow-hidden rounded-full bg-[rgba(17,17,17,0.08)] text-xs font-semibold shadow-inner ring-1 ring-[rgba(255,255,255,0.75)]"
-        aria-label={labelText}
-      >
-        {totalMinutes > 0 ? (
-          segments.map((segment) => (
-            <div
-              key={segment.key}
-              className={`${segment.className} ${segment.textClassName} flex min-w-0 items-center justify-center gap-1.5 px-2 tabular-nums transition-[width] duration-300 ease-out sm:gap-2 sm:px-3`}
-              style={{
-                width: `${(segment.minutes / totalMinutes) * 100}%`,
-              }}
-              title={`${segment.label} ${segment.minutes}분`}
-            >
-              <SegmentIcon
-                type={segment.kind}
-                className={segment.iconClassName}
-              />
-              <span className="truncate">{segment.minutes}분</span>
-            </div>
-          ))
-        ) : (
-          <div className="flex w-full items-center justify-center text-[var(--muted)]">
-            0분
+    <div
+      className="flex h-8 overflow-hidden rounded-full bg-[rgba(17,17,17,0.08)] text-xs font-semibold shadow-inner ring-1 ring-[rgba(255,255,255,0.75)]"
+      aria-label={labelText}
+    >
+      {totalMinutes > 0 ? (
+        segments.map((segment) => (
+          <div
+            key={segment.key}
+            className={`${segment.className} ${segment.textClassName} flex min-w-0 items-center justify-center gap-1.5 px-2 tabular-nums transition-[width] duration-300 ease-out sm:gap-2 sm:px-3`}
+            style={{
+              width: `${(segment.minutes / totalMinutes) * 100}%`,
+            }}
+            title={`${segment.label} ${segment.minutes}분`}
+          >
+            <SegmentIcon
+              type={segment.kind}
+              className={segment.iconClassName}
+            />
+            <span className="truncate">{segment.minutes}분</span>
           </div>
-        )}
-      </div>
+        ))
+      ) : (
+        <div className="flex w-full items-center justify-center text-[var(--muted)]">
+          0분
+        </div>
+      )}
     </div>
   );
 }
