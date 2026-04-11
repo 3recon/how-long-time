@@ -10,7 +10,7 @@ import {
 } from "@/components/recommend/recommend-ui";
 import { appConfig } from "@/lib/env";
 import {
-  buildRecommendRequest,
+  resolveRecommendRequest,
   validateRecommendForm,
 } from "@/lib/recommend/form";
 import { buildRecommendResultsHref } from "@/lib/recommend/route-state";
@@ -66,6 +66,9 @@ export function RecommendRequestPage(props: {
     getModeLocationStatus("demo"),
   );
   const [isLocating, setIsLocating] = useState(false);
+  const [preferCurrentCoordinates, setPreferCurrentCoordinates] =
+    useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [isPurposePickerOpen, setIsPurposePickerOpen] = useState(false);
   const [draftPurposeId, setDraftPurposeId] = useState("");
 
@@ -124,6 +127,7 @@ export function RecommendRequestPage(props: {
         };
 
         setCoordinates(nextCoordinates);
+        setPreferCurrentCoordinates(true);
         setOriginLabel((current) => current.trim() || "현재 위치");
         setFieldErrors((current) => ({ ...current, originLabel: undefined }));
         setLocationStatus(
@@ -148,7 +152,47 @@ export function RecommendRequestPage(props: {
     );
   }
 
-  function handleSubmit(event: FormEvent<HTMLFormElement>) {
+  async function geocodeOrigin(originLabelToResolve: string) {
+    const response = await fetch(
+      `/api/geocode?originLabel=${encodeURIComponent(originLabelToResolve)}`,
+      {
+        method: "GET",
+        cache: "no-store",
+      },
+    );
+
+    const body = (await response.json()) as
+      | {
+          originLabel: string;
+          resolvedAddress: string;
+          coordinates: LocationPoint;
+        }
+      | {
+          error?: string;
+          details?: string;
+        };
+
+    if (!response.ok) {
+      throw new Error(
+        "details" in body && typeof body.details === "string"
+          ? body.details
+          : "출발지 좌표를 확인하지 못했습니다. 다시 시도해 주세요.",
+      );
+    }
+
+    return {
+      originLabel:
+        "resolvedAddress" in body ? body.resolvedAddress : originLabelToResolve,
+      coordinates:
+        "coordinates" in body
+          ? body.coordinates
+          : (() => {
+              throw new Error("출발지 좌표 응답이 올바르지 않습니다.");
+            })(),
+    };
+  }
+
+  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
 
     const nextErrors = validateRecommendForm({
@@ -163,15 +207,30 @@ export function RecommendRequestPage(props: {
       return;
     }
 
-    const requestPayload = buildRecommendRequest({
-      originLabel,
-      purposeId: purposeId as RecommendPurposeId,
-      coordinates,
-      fallbackOrigin: appConfig.defaultCenter,
-      mode: requestMode,
-    });
+    setIsSubmitting(true);
 
-    router.push(buildRecommendResultsHref(requestPayload));
+    try {
+      const requestPayload = await resolveRecommendRequest({
+        originLabel,
+        purposeId: purposeId as RecommendPurposeId,
+        coordinates,
+        fallbackOrigin: appConfig.defaultCenter,
+        mode: requestMode,
+        preferCurrentCoordinates,
+        geocodeOrigin,
+      });
+
+      setCoordinates(requestPayload.origin);
+      router.push(buildRecommendResultsHref(requestPayload));
+    } catch (error) {
+      setRequestError(
+        error instanceof Error
+          ? error.message
+          : "출발지 좌표를 확인하지 못했습니다. 다시 시도해 주세요.",
+      );
+    } finally {
+      setIsSubmitting(false);
+    }
   }
 
   return (
@@ -240,7 +299,7 @@ export function RecommendRequestPage(props: {
                   <button
                     type="button"
                     onClick={handleUseCurrentLocation}
-                    disabled={isLocating}
+                    disabled={isLocating || isSubmitting}
                     className="min-h-12 rounded-2xl border border-[rgba(17,17,17,0.12)] bg-[var(--accent)] px-4 text-sm font-semibold text-[var(--foreground)] shadow-[0_14px_28px_rgba(211,166,63,0.22)] hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:translate-y-0"
                   >
                     {isLocating ? "위치 확인 중..." : "현재 위치 사용"}
@@ -320,7 +379,7 @@ export function RecommendRequestPage(props: {
 
             <button
               type="submit"
-              disabled={isLocating}
+              disabled={isLocating || isSubmitting}
               className="min-h-14 w-full rounded-[22px] border border-[var(--foreground)] bg-[var(--foreground)] px-5 text-base font-semibold text-white shadow-[0_20px_44px_rgba(17,17,17,0.16)] hover:-translate-y-0.5 hover:border-[var(--accent-blue)] hover:bg-[var(--accent-blue)] disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:translate-y-0"
             >
               추천 요청

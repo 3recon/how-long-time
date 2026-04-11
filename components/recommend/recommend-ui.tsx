@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import { formatOfficeDisplayName } from "@/lib/recommend/presentation";
 
 import {
   normalizeRouteStepItems,
@@ -207,7 +208,7 @@ export function RecommendationCard(props: {
             ) : null}
           </div>
           <h3 className="mt-3 text-lg font-semibold tracking-[-0.03em]">
-            {props.office.name}
+            {formatOfficeDisplayName(props.office.name)}
           </h3>
           <p className="mt-1 text-sm leading-6 text-[var(--muted)]">
             {props.office.address}

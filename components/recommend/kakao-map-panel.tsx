@@ -7,6 +7,7 @@ import {
   getMapLegendItems,
   getMapMarkerPresentation,
 } from "@/lib/recommend/map-marker-presentation";
+import { formatOfficeDisplayName } from "@/lib/recommend/presentation";
 import type { LocationPoint, RecommendedOffice } from "@/types/recommend";
 
 declare global {
@@ -448,7 +449,7 @@ export function KakaoMapPanel(props: {
         const marker = new kakao.maps.Marker({
           map,
           position,
-          title: office.name,
+          title: formatOfficeDisplayName(office.name),
           image: getMarkerImageForOffice(
             kakao,
             office,

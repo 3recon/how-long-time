@@ -18,6 +18,14 @@ export interface SelectedOfficeSummary {
   taskSummary: string;
 }
 
+export function formatOfficeDisplayName(name: string): string {
+  return name
+    .replace(/\s*민원여권과.*/, "")
+    .replace(/\s*여권\s*민원실.*/, "")
+    .replace(/\s*민원실.*/, "")
+    .trim();
+}
+
 export function getInitialSelectedOfficeId(
   response: RecommendResponse | null,
 ): string | null {
@@ -54,7 +62,7 @@ export function getSelectedOfficeSummary(
 
   return {
     id: selectedOffice.id,
-    name: selectedOffice.name,
+    name: formatOfficeDisplayName(selectedOffice.name),
     address: selectedOffice.address,
     reason: selectedOffice.recommendation.reason,
     rank: selectedOffice.recommendation.rank,

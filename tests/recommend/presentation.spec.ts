@@ -1,9 +1,17 @@
 import assert from "node:assert/strict";
 
 import { createClientDemoRecommendResponse } from "../../lib/recommend/client-demo.ts";
-import { getSelectedOfficeSummary } from "../../lib/recommend/presentation.ts";
+import {
+  formatOfficeDisplayName,
+  getSelectedOfficeSummary,
+} from "../../lib/recommend/presentation.ts";
 
 async function main() {
+  assert.equal(formatOfficeDisplayName("성동구청 민원여권과"), "성동구청");
+  assert.equal(formatOfficeDisplayName("종로구청 여권 민원실"), "종로구청");
+  assert.equal(formatOfficeDisplayName("중구청 민원실"), "중구청");
+  assert.equal(formatOfficeDisplayName("명동주민센터"), "명동주민센터");
+
   const response = createClientDemoRecommendResponse({
     purposeId: "passport-pickup",
     originLabel: "서울시청",
@@ -17,6 +25,7 @@ async function main() {
   const defaultSummary = getSelectedOfficeSummary(response.recommendations, null);
   assert.ok(defaultSummary);
   assert.equal(defaultSummary?.id, response.recommendations[0]?.id);
+  assert.equal(defaultSummary?.name, formatOfficeDisplayName(response.recommendations[0]?.name ?? ""));
   assert.equal(
     defaultSummary?.totalMinutes,
     response.recommendations[0]?.recommendation.totalMinutes,
@@ -35,6 +44,10 @@ async function main() {
   assert.ok(selectedSummary);
   assert.equal(selectedSummary?.id, selectedId);
   assert.equal(selectedSummary?.rank, response.recommendations[1]?.recommendation.rank);
+  assert.equal(
+    selectedSummary?.name,
+    formatOfficeDisplayName(response.recommendations[1]?.name ?? ""),
+  );
   assert.equal(
     selectedSummary?.totalMinutes,
     response.recommendations[1]?.recommendation.totalMinutes,
