@@ -65,7 +65,7 @@ declare global {
 
 type KakaoSdkStatus = "idle" | "loading" | "ready" | "error" | "missing-key";
 const mapViewportClassName =
-  "h-[380px] w-full sm:h-[420px] lg:h-[56vh] lg:min-h-[420px] lg:max-h-[620px]";
+  "h-[380px] w-full sm:h-[420px] lg:h-full lg:min-h-[700px]";
 
 let kakaoMapSdkPromise: Promise<void> | null = null;
 
@@ -427,7 +427,7 @@ export function KakaoMapPanel(props: {
     null;
 
   return (
-    <section className="soft-card overflow-hidden rounded-[28px] border-[rgba(17,17,17,0.08)]">
+    <section className="soft-card overflow-hidden rounded-[28px] border-[rgba(17,17,17,0.08)] lg:flex lg:h-full lg:min-h-0 lg:flex-col">
       <div className="flex flex-wrap items-center justify-between gap-3 border-b border-[var(--line)] px-5 py-4 sm:px-6">
         <div>
           <p className="text-xs font-semibold uppercase tracking-[0.28em] text-[var(--accent-strong)]">
@@ -444,7 +444,7 @@ export function KakaoMapPanel(props: {
         ) : null}
       </div>
 
-      <div className="relative">
+      <div className="relative lg:flex-1">
         <div
           ref={mapContainerRef}
           className={`${mapViewportClassName} bg-[linear-gradient(180deg,#fffdf8_0%,#ebe3cf_100%)]`}
