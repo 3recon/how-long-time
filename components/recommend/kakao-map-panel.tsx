@@ -567,11 +567,6 @@ export function KakaoMapPanel(props: {
     });
   }, [origin.lat, origin.lng, recommendations, selectedOfficeId, sdkStatus]);
 
-  const selectedOffice =
-    recommendations.find((office) => office.id === selectedOfficeId) ??
-    recommendations[0] ??
-    null;
-
   return (
     <section className="soft-card overflow-hidden rounded-[28px] border-[rgba(17,17,17,0.12)] lg:flex lg:h-full lg:min-h-0 lg:flex-col">
       <div className="border-b border-[var(--line)] px-5 py-4 sm:px-6">

@@ -138,6 +138,7 @@ export function createApp(dependencies: AppDependencies = {}) {
   });
 
   app.use((error: unknown, _request: Request, response: Response, _next: unknown) => {
+    void _next;
     if (error instanceof SyntaxError) {
       return sendError(response, 400, "INVALID_JSON", "JSON 본문을 읽을 수 없습니다.");
     }

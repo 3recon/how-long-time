@@ -1,4 +1,4 @@
-import sample from "./recommendation-sample.json";
+import sample from "./recommendation-sample.json" with { type: "json" };
 
 import type { RecommendResponse } from "../../contracts/recommend.js";
 

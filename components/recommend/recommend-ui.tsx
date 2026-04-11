@@ -170,7 +170,7 @@ export function Eyebrow(props: { children: ReactNode }) {
 
 export function StatChip(props: { label: string; value: string }) {
   return (
-    <div className="rounded-2xl border border-[rgba(17,17,17,0.14)] bg-white px-4 py-3 shadow-[0_16px_34px_rgba(17,17,17,0.06)]">
+    <div className="rounded-2xl border border-[rgba(17,17,17,0.14)] bg-white px-4 py-3 text-center shadow-[0_16px_34px_rgba(17,17,17,0.06)]">
       <p className="text-[13px] font-semibold tracking-[-0.02em] text-[rgba(17,17,17,0.82)]">
         {props.label}
       </p>
