@@ -203,6 +203,18 @@ function createDefaultTravelEstimateResolver() {
   };
 }
 
+function ensureTravelRouteDetails(travel: TravelEstimate): TravelEstimate {
+  return {
+    ...travel,
+    breakdown: travel.breakdown ?? {
+      walkMinutes: 0,
+      transitRideMinutes: 0,
+      transferEtcMinutes: travel.minutes,
+    },
+    steps: travel.steps ?? [],
+  };
+}
+
 async function createLiveRecommendResponse(
   request: RecommendRequest,
   dependencies: RecommendServiceDependencies,
@@ -227,13 +239,17 @@ async function createLiveRecommendResponse(
   }
 
   const recommendationsWithTravel = await Promise.all(
-    officeCandidates.map(async (candidate) => ({
-      ...candidate,
-      travel: await getTravelEstimate({
+    officeCandidates.map(async (candidate) => {
+      const travel = await getTravelEstimate({
         request,
         office: candidate.office,
-      }),
-    })),
+      });
+
+      return {
+        ...candidate,
+        travel: ensureTravelRouteDetails(travel),
+      };
+    }),
   );
 
   const rankedCandidates = rankRecommendationCandidates(

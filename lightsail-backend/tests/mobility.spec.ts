@@ -79,6 +79,116 @@ async function main() {
   assert.deepEqual(parseODsaySearchResponse(odsayPayload), {
     minutes: 42,
     distanceKm: 12.35,
+    breakdown: {
+      walkMinutes: 0,
+      transitRideMinutes: 0,
+      transferEtcMinutes: 42,
+    },
+    steps: [],
+  });
+
+  assert.deepEqual(
+    parseODsaySearchResponse({
+      result: {
+        path: [
+          {
+            info: {
+              totalTime: 42,
+              totalDistance: 12345,
+            },
+            subPath: [],
+          },
+        ],
+      },
+    }).steps,
+    [],
+  );
+
+  assert.deepEqual(
+    parseODsaySearchResponse({
+      result: {
+        path: [
+          {
+            info: {
+              totalTime: 42,
+              totalDistance: 12345,
+            },
+            subPath: [
+              {
+                trafficType: 2,
+              },
+            ],
+          },
+        ],
+      },
+    }).steps,
+    [],
+  );
+
+  const odsayDetailedPayload = {
+    result: {
+      path: [
+        {
+          info: {
+            totalTime: 31,
+            totalDistance: 6300,
+          },
+          subPath: [
+            {
+              trafficType: 3,
+              sectionTime: 4,
+              distance: 350,
+            },
+            {
+              trafficType: 2,
+              sectionTime: 18,
+              distance: 5600,
+              stationCount: 7,
+              startName: "City Hall",
+              endName: "Jongno Office",
+              lane: [
+                {
+                  busNo: "Jongno 09",
+                },
+              ],
+            },
+          ],
+        },
+      ],
+    },
+  };
+
+  assert.deepEqual(parseODsaySearchResponse(odsayDetailedPayload), {
+    minutes: 31,
+    distanceKm: 6.3,
+    breakdown: {
+      walkMinutes: 4,
+      transitRideMinutes: 18,
+      transferEtcMinutes: 9,
+    },
+    steps: [
+      {
+        type: "walk",
+        title: "Walk",
+        minutes: 4,
+        distanceKm: 0.35,
+      },
+      {
+        type: "bus",
+        title: "Jongno 09",
+        minutes: 18,
+        distanceKm: 5.6,
+        from: "City Hall",
+        to: "Jongno Office",
+        routeName: "Jongno 09",
+        stopCount: 7,
+      },
+      {
+        type: "transfer-etc",
+        title: "Transfer/other",
+        minutes: 9,
+      },
+    ],
   });
 
   const timeoutService = createMobilityService({
@@ -146,8 +256,7 @@ async function main() {
           }),
       }),
     (error: unknown) =>
-      error instanceof ODsayApiError &&
-      error.code === "ODSAY_API_ERROR",
+      error instanceof ODsayApiError && error.code === "ODSAY_API_ERROR",
   );
 
   console.log("mobility spec passed");

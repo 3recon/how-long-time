@@ -1,5 +1,9 @@
 import type { ReactNode } from "react";
 
+import {
+  normalizeRouteStepItems,
+  RouteStepsList,
+} from "@/components/recommend/route-steps-list";
 import { RouteTimeSegmentBar } from "@/components/recommend/route-time-segment-bar";
 import type { RecommendedOffice } from "@/types/recommend";
 
@@ -45,7 +49,48 @@ export function formatEstimatedWaiting(value: {
   return `${value.estimatedMinutes}분 ${formatWaitingCount(value.waitingCount)}`;
 }
 
-export function getRequestErrorMessage(error: string | null | undefined): string {
+function getRouteStepItems(office: RecommendedOffice) {
+  return normalizeRouteStepItems(office.travel.steps);
+}
+
+function getRouteTimeSegments(office: RecommendedOffice) {
+  const breakdown = office.travel.breakdown;
+
+  if (!breakdown) {
+    return undefined;
+  }
+
+  return [
+    {
+      key: "walk",
+      label: "도보",
+      minutes: breakdown.walkMinutes,
+      kind: "walk" as const,
+    },
+    {
+      key: "transit",
+      label: "탑승",
+      minutes: breakdown.transitRideMinutes,
+      kind: "transit" as const,
+    },
+    {
+      key: "transfer",
+      label: "환승/기타",
+      minutes: breakdown.transferEtcMinutes,
+      kind: "transfer" as const,
+    },
+    {
+      key: "waiting",
+      label: "대기",
+      minutes: office.waiting.estimatedMinutes,
+      kind: "waiting" as const,
+    },
+  ];
+}
+
+export function getRequestErrorMessage(
+  error: string | null | undefined,
+): string {
   switch (error) {
     case "INVALID_REQUEST":
       return "입력값을 다시 확인해 주세요.";
@@ -133,6 +178,8 @@ export function RecommendationCard(props: {
   const taskSummary =
     props.office.supportedTaskMatches.map((task) => task.taskName).join(", ") ||
     "안내 가능한 업무 없음";
+  const routeSteps = getRouteStepItems(props.office);
+  const routeTimeSegments = getRouteTimeSegments(props.office);
 
   return (
     <article
@@ -193,10 +240,7 @@ export function RecommendationCard(props: {
             waitingCount: props.office.waiting.count,
           })}
         />
-        <StatChip
-          label="처리 업무"
-          value={taskSummary}
-        />
+        <StatChip label="처리 업무" value={taskSummary} />
       </div>
 
       <div className="mt-5 flex justify-end">
@@ -219,6 +263,7 @@ export function RecommendationCard(props: {
           <RouteTimeSegmentBar
             travelMinutes={props.office.travel.minutes}
             waitingMinutes={props.office.waiting.estimatedMinutes}
+            segments={routeTimeSegments}
           />
 
           <div className="mt-4 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
@@ -239,6 +284,12 @@ export function RecommendationCard(props: {
               value={formatWaitingCount(props.office.waiting.count)}
             />
           </div>
+
+          {routeSteps.length > 0 ? (
+            <div className="mt-4">
+              <RouteStepsList steps={routeSteps} />
+            </div>
+          ) : null}
         </div>
       ) : null}
     </article>
