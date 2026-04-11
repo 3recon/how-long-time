@@ -1,4 +1,9 @@
-import type { LocationPoint, TravelEstimate } from "../contracts/recommend.js";
+import type {
+  LocationPoint,
+  TravelBreakdown,
+  TravelEstimate,
+  TravelRouteStep,
+} from "../contracts/recommend.js";
 
 const ODSAY_PUBLIC_TRANSIT_ENDPOINT =
   "https://api.odsay.com/v1/api/searchPubTransPathT";
@@ -38,6 +43,177 @@ function toNumber(value: unknown): number | null {
 
 function roundToTwoDecimals(value: number): number {
   return Math.round(value * 100) / 100;
+}
+
+function toDistanceKm(value: unknown): number | null {
+  const meters = toNumber(value);
+
+  return meters === null ? null : roundToTwoDecimals(meters / 1000);
+}
+
+function toNonNegativeMinutes(value: unknown): number | null {
+  const minutes = toNumber(value);
+
+  if (minutes === null || minutes < 0) {
+    return null;
+  }
+
+  return minutes;
+}
+
+function firstString(...values: unknown[]): string | undefined {
+  for (const value of values) {
+    if (typeof value === "string" && value.trim()) {
+      return value.trim();
+    }
+  }
+
+  return undefined;
+}
+
+function toRouteName(subPath: RecordValue): string | undefined {
+  if (!Array.isArray(subPath.lane)) {
+    return undefined;
+  }
+
+  for (const lane of subPath.lane) {
+    if (!isRecord(lane)) {
+      continue;
+    }
+
+    const routeName = firstString(lane.busNo, lane.name);
+
+    if (routeName) {
+      return routeName;
+    }
+  }
+
+  return undefined;
+}
+
+function toStopCount(value: unknown): number | undefined {
+  const stopCount = toNumber(value);
+
+  return stopCount === null || stopCount < 0 ? undefined : stopCount;
+}
+
+function createRouteStep(subPath: RecordValue): TravelRouteStep | null {
+  const trafficType = toNumber(subPath.trafficType);
+  const minutes = toNonNegativeMinutes(subPath.sectionTime);
+
+  if (trafficType === null || minutes === null) {
+    return null;
+  }
+
+  const distanceKm = toDistanceKm(subPath.distance);
+  const from = firstString(subPath.startName);
+  const to = firstString(subPath.endName);
+  const routeName = toRouteName(subPath);
+  const stopCount = toStopCount(subPath.stationCount);
+
+  if (trafficType === 3) {
+    return {
+      type: "walk",
+      title: "Walk",
+      minutes,
+      ...(distanceKm === null ? {} : { distanceKm }),
+      ...(from ? { from } : {}),
+      ...(to ? { to } : {}),
+    };
+  }
+
+  if (trafficType === 2) {
+    return {
+      type: "bus",
+      title: routeName ?? "Bus",
+      minutes,
+      ...(distanceKm === null ? {} : { distanceKm }),
+      ...(from ? { from } : {}),
+      ...(to ? { to } : {}),
+      ...(routeName ? { routeName } : {}),
+      ...(stopCount === undefined ? {} : { stopCount }),
+    };
+  }
+
+  if (trafficType === 1) {
+    return {
+      type: "subway",
+      title: routeName ?? "Subway",
+      minutes,
+      ...(distanceKm === null ? {} : { distanceKm }),
+      ...(from ? { from } : {}),
+      ...(to ? { to } : {}),
+      ...(routeName ? { routeName } : {}),
+      ...(stopCount === undefined ? {} : { stopCount }),
+    };
+  }
+
+  return {
+    type: "transfer-etc",
+    title: "Transfer/other",
+    minutes,
+    ...(distanceKm === null ? {} : { distanceKm }),
+    ...(from ? { from } : {}),
+    ...(to ? { to } : {}),
+  };
+}
+
+function createEmptyBreakdown(totalMinutes: number): TravelBreakdown {
+  return {
+    walkMinutes: 0,
+    transitRideMinutes: 0,
+    transferEtcMinutes: totalMinutes,
+  };
+}
+
+function createRouteDetails(
+  totalMinutes: number,
+  subPaths: unknown,
+): Pick<TravelEstimate, "breakdown" | "steps"> {
+  if (!Array.isArray(subPaths)) {
+    return {
+      breakdown: createEmptyBreakdown(totalMinutes),
+      steps: [],
+    };
+  }
+
+  const steps = subPaths
+    .filter(isRecord)
+    .map(createRouteStep)
+    .filter((step): step is TravelRouteStep => step !== null);
+
+  const walkMinutes = steps
+    .filter((step) => step.type === "walk")
+    .reduce((sum, step) => sum + step.minutes, 0);
+  const transitRideMinutes = steps
+    .filter((step) => step.type === "bus" || step.type === "subway")
+    .reduce((sum, step) => sum + step.minutes, 0);
+  const explicitTransferEtcMinutes = steps
+    .filter((step) => step.type === "transfer-etc")
+    .reduce((sum, step) => sum + step.minutes, 0);
+  const knownMinutes =
+    walkMinutes + transitRideMinutes + explicitTransferEtcMinutes;
+  const remainderMinutes = Math.max(0, totalMinutes - knownMinutes);
+  const transferEtcMinutes = explicitTransferEtcMinutes + remainderMinutes;
+
+  return {
+    breakdown: {
+      walkMinutes,
+      transitRideMinutes,
+      transferEtcMinutes,
+    },
+    steps:
+      transferEtcMinutes > explicitTransferEtcMinutes
+        ? [
+            ...steps,
+            {
+              type: "transfer-etc",
+              title: "Transfer/other",
+              minutes: remainderMinutes,
+            },
+          ]
+        : steps,
+  };
 }
 
 export class ODsayApiError extends Error {
@@ -111,13 +287,12 @@ export function parseODsaySearchResponse(payload: unknown): TravelEstimate {
       continue;
     }
 
-    const distanceMeters = toNumber(path.info.totalDistance);
+    const distanceKm = toDistanceKm(path.info.totalDistance);
+    const details = createRouteDetails(minutes, path.subPath);
     const estimate: TravelEstimate = {
       minutes,
-      distanceKm:
-        distanceMeters === null
-          ? null
-          : roundToTwoDecimals(distanceMeters / 1000),
+      distanceKm,
+      ...details,
     };
 
     if (!bestPath || estimate.minutes < bestPath.minutes) {
