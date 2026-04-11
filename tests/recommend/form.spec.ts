@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 
 import {
   buildDemoRecommendRequest,
+  buildRecommendRequest,
   validateRecommendForm,
 } from "../../lib/recommend/form.ts";
 
@@ -26,7 +27,7 @@ async function main() {
   );
 
   assert.deepEqual(
-    buildDemoRecommendRequest({
+    buildRecommendRequest({
       originLabel: "  서울시청  ",
       purposeId: "passport-reissue",
       coordinates: null,
@@ -67,6 +68,31 @@ async function main() {
         lng: 127.01,
       },
       mode: "demo",
+    },
+  );
+
+  assert.deepEqual(
+    buildRecommendRequest({
+      originLabel: "광화문",
+      purposeId: "certificate-issuance",
+      coordinates: {
+        lat: 37.571,
+        lng: 126.9769,
+      },
+      fallbackOrigin: {
+        lat: 37.5665,
+        lng: 126.978,
+      },
+      mode: "live",
+    }),
+    {
+      purposeId: "certificate-issuance",
+      originLabel: "광화문",
+      origin: {
+        lat: 37.571,
+        lng: 126.9769,
+      },
+      mode: "live",
     },
   );
 

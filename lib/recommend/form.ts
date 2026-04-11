@@ -1,5 +1,6 @@
 import type {
   LocationPoint,
+  RecommendMode,
   RecommendPurposeId,
   RecommendRequest,
 } from "@/types/recommend";
@@ -14,11 +15,12 @@ export interface RecommendFormErrors {
   purposeId?: string;
 }
 
-interface BuildDemoRecommendRequestInput {
+interface BuildRecommendRequestInput {
   originLabel: string;
   purposeId: RecommendPurposeId;
   coordinates: LocationPoint | null;
   fallbackOrigin: LocationPoint;
+  mode?: RecommendMode;
 }
 
 export function validateRecommendForm(
@@ -37,13 +39,15 @@ export function validateRecommendForm(
   return errors;
 }
 
-export function buildDemoRecommendRequest(
-  input: BuildDemoRecommendRequestInput,
+export function buildRecommendRequest(
+  input: BuildRecommendRequestInput,
 ): RecommendRequest {
   return {
     purposeId: input.purposeId,
     originLabel: input.originLabel.trim(),
     origin: input.coordinates ?? input.fallbackOrigin,
-    mode: "demo",
+    mode: input.mode ?? "demo",
   };
 }
+
+export const buildDemoRecommendRequest = buildRecommendRequest;

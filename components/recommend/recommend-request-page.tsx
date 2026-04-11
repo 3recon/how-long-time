@@ -10,11 +10,15 @@ import {
 } from "@/components/recommend/recommend-ui";
 import { appConfig } from "@/lib/env";
 import {
-  buildDemoRecommendRequest,
+  buildRecommendRequest,
   validateRecommendForm,
 } from "@/lib/recommend/form";
 import { buildRecommendResultsHref } from "@/lib/recommend/route-state";
-import type { LocationPoint, RecommendPurposeId } from "@/types/recommend";
+import type {
+  LocationPoint,
+  RecommendMode,
+  RecommendPurposeId,
+} from "@/types/recommend";
 import { purposeOptions } from "@/data/recommend/purpose-options";
 
 function readValue(
@@ -52,13 +56,14 @@ export function RecommendRequestPage(props: {
   const [coordinates, setCoordinates] = useState<LocationPoint | null>(
     parseInitialCoordinates(props.searchParams) ?? appConfig.defaultCenter,
   );
+  const [requestMode, setRequestMode] = useState<RecommendMode>("demo");
   const [fieldErrors, setFieldErrors] = useState<{
     originLabel?: string;
     purposeId?: string;
   }>({});
   const [requestError, setRequestError] = useState<string | null>(null);
   const [locationStatus, setLocationStatus] = useState(
-    "demo 모드에서는 서울시청 기준 좌표로 같은 결과를 재현합니다.",
+    getModeLocationStatus("demo"),
   );
   const [isLocating, setIsLocating] = useState(false);
   const [isPurposePickerOpen, setIsPurposePickerOpen] = useState(false);
@@ -94,6 +99,11 @@ export function RecommendRequestPage(props: {
   function openPurposePicker() {
     setDraftPurposeId(purposeId);
     setIsPurposePickerOpen(true);
+  }
+
+  function handleRequestModeChange(nextMode: RecommendMode) {
+    setRequestMode(nextMode);
+    setLocationStatus(getModeLocationStatus(nextMode));
   }
 
   async function handleUseCurrentLocation() {
@@ -153,11 +163,12 @@ export function RecommendRequestPage(props: {
       return;
     }
 
-    const requestPayload = buildDemoRecommendRequest({
+    const requestPayload = buildRecommendRequest({
       originLabel,
       purposeId: purposeId as RecommendPurposeId,
       coordinates,
       fallbackOrigin: appConfig.defaultCenter,
+      mode: requestMode,
     });
 
     router.push(buildRecommendResultsHref(requestPayload));
@@ -166,6 +177,10 @@ export function RecommendRequestPage(props: {
   return (
     <main className="relative min-h-dvh overflow-hidden">
       <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(211,166,63,0.24),transparent_36%),radial-gradient(circle_at_bottom_right,rgba(31,58,95,0.08),transparent_28%)]" />
+      <RequestModeToggle
+        mode={requestMode}
+        onChange={handleRequestModeChange}
+      />
       <div className="relative mx-auto flex min-h-dvh w-full max-w-[900px] items-center px-4 py-6 sm:px-6 lg:px-8">
         <section className="soft-card w-full rounded-[36px] border-[rgba(17,17,17,0.08)] p-5 sm:p-7">
           <div className="border-b border-[var(--line)] pb-6">
@@ -183,8 +198,8 @@ export function RecommendRequestPage(props: {
               </span>
             </h1>
             <p className="mt-4 max-w-2xl text-sm leading-7 text-[var(--muted)] sm:text-base">
-              첫 화면에서는 입력만 간결하게 끝내고, 결과 화면에서 위치 비교 보기와
-              경로, 추천 결과 비교를 한 번에 확인합니다.
+              첫 화면에서는 입력만 간결하게 끝내고, 결과 화면에서 위치 비교
+              보기와 경로, 추천 결과 비교를 한 번에 확인합니다.
             </p>
           </div>
 
@@ -236,7 +251,10 @@ export function RecommendRequestPage(props: {
                 </div>
               </div>
 
-              <p id="origin-help" className="text-sm leading-6 text-[var(--muted)]">
+              <p
+                id="origin-help"
+                className="text-sm leading-6 text-[var(--muted)]"
+              >
                 {locationStatus}
               </p>
               {fieldErrors.originLabel ? (
@@ -397,5 +415,49 @@ export function RecommendRequestPage(props: {
         </div>
       ) : null}
     </main>
+  );
+}
+
+function getModeLocationStatus(mode: RecommendMode): string {
+  if (mode === "live") {
+    return "live 모드에서는 입력한 출발지와 백엔드 API를 기준으로 추천을 요청합니다.";
+  }
+
+  return "demo 모드에서는 서울시청 기준 좌표로 같은 결과를 재현합니다.";
+}
+
+function RequestModeToggle(props: {
+  mode: RecommendMode;
+  onChange: (mode: RecommendMode) => void;
+}) {
+  return (
+    <div className="fixed bottom-4 left-4 z-30 rounded-[22px] border border-[rgba(17,17,17,0.08)] bg-[rgba(255,253,248,0.9)] p-1 shadow-[0_18px_44px_rgba(17,17,17,0.14)] backdrop-blur-md sm:bottom-5 sm:left-5">
+      <div
+        className="grid grid-cols-2 gap-1"
+        role="radiogroup"
+        aria-label="추천 요청 모드"
+      >
+        {(["demo", "live"] as const).map((mode) => {
+          const selected = props.mode === mode;
+
+          return (
+            <button
+              key={mode}
+              type="button"
+              role="radio"
+              aria-checked={selected}
+              onClick={() => props.onChange(mode)}
+              className={`min-h-9 rounded-[18px] px-3 text-xs font-semibold transition-all duration-200 ${
+                selected
+                  ? "bg-[var(--foreground)] text-white shadow-[0_10px_20px_rgba(17,17,17,0.18)]"
+                  : "text-[var(--muted)] hover:bg-white hover:text-[var(--foreground)]"
+              }`}
+            >
+              {mode === "demo" ? "Demo" : "Live"}
+            </button>
+          );
+        })}
+      </div>
+    </div>
   );
 }
