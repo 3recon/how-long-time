@@ -5,7 +5,10 @@ import {
   normalizeRouteStepItems,
   RouteStepsList,
 } from "@/components/recommend/route-steps-list";
-import { RouteTimeSegmentBar } from "@/components/recommend/route-time-segment-bar";
+import {
+  RouteTimeSegmentBar,
+  type RouteTimeSegmentInput,
+} from "@/components/recommend/route-time-segment-bar";
 import type { RecommendedOffice } from "@/types/recommend";
 
 export function formatCoordinates(
@@ -55,6 +58,50 @@ function getRouteStepItems(office: RecommendedOffice) {
 }
 
 function getRouteTimeSegments(office: RecommendedOffice) {
+  const stepSegments = office.travel.steps
+    ?.map((step, index): RouteTimeSegmentInput => {
+      const kind = getRouteTimeSegmentKind(step.type);
+
+      return {
+        key: `${index}-${step.type}-${step.routeName ?? step.title}`,
+        label: getRouteTimeSegmentLabel(step),
+        minutes: step.minutes,
+        kind,
+      };
+    })
+    .filter((segment) => segment.minutes > 0);
+
+  if (stepSegments && stepSegments.length > 0) {
+    const stepMinutes = stepSegments.reduce(
+      (sum, segment) => sum + segment.minutes,
+      0,
+    );
+    const remainingTravelMinutes = Math.max(
+      0,
+      Math.round(office.travel.minutes - stepMinutes),
+    );
+
+    return [
+      ...stepSegments,
+      ...(remainingTravelMinutes > 0
+        ? [
+            {
+              key: "travel-remainder",
+              label: "기타",
+              minutes: remainingTravelMinutes,
+              kind: "transfer" as const,
+            },
+          ]
+        : []),
+      {
+        key: "waiting",
+        label: "대기",
+        minutes: office.waiting.estimatedMinutes,
+        kind: "waiting" as const,
+      },
+    ];
+  }
+
   const breakdown = office.travel.breakdown;
 
   if (!breakdown) {
@@ -87,6 +134,38 @@ function getRouteTimeSegments(office: RecommendedOffice) {
       kind: "waiting" as const,
     },
   ];
+}
+
+function getRouteTimeSegmentKind(
+  stepType: NonNullable<RecommendedOffice["travel"]["steps"]>[number]["type"],
+): RouteTimeSegmentInput["kind"] {
+  switch (stepType) {
+    case "walk":
+      return "walk";
+    case "bus":
+    case "subway":
+      return "transit";
+    case "transfer-etc":
+      return "transfer";
+    default:
+      return "other";
+  }
+}
+
+function getRouteTimeSegmentLabel(
+  step: NonNullable<RecommendedOffice["travel"]["steps"]>[number],
+): string {
+  switch (step.type) {
+    case "walk":
+      return "도보";
+    case "bus":
+    case "subway":
+      return step.routeName ?? "탑승";
+    case "transfer-etc":
+      return "환승/기타";
+    default:
+      return "기타";
+  }
 }
 
 export function getRequestErrorMessage(

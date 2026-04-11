@@ -39,21 +39,21 @@
 
 | scenarioId | 목적 | 출발지 | 추천 후보 수 | 1순위 민원실 | 총 소요시간 | 대기 | 이동 |
 | --- | --- | --- | ---: | --- | ---: | ---: | ---: |
-| `demo-seoul-cityhall-passport` | `passport-reissue` | `서울시청` | 2 | `종로구청 여권 민원실` | 40분 | 22분 | 18분 |
-| `demo-seoul-jamsil-passport` | `passport-reissue` | `잠실역` | 2 | `중구청 민원여권과` | 43분 | 15분 | 28분 |
-| `demo-seoul-seongsu-passport-pickup` | `passport-pickup` | `성수역` | 3 | `성동구청 민원여권과` | 18분 | 6분 | 12분 |
-| `demo-seoul-hongdae-certificate` | `certificate-issuance` | `홍대입구역` | 1 | `중구청 민원여권과` | 69분 | 42분 | 27분 |
-| `demo-seoul-gangnam-family` | `family-relation-certificate` | `강남역` | 1 | `성동구청 민원여권과` | 32분 | 3분 | 29분 |
-| `demo-seoul-konkuk-resident` | `resident-registration` | `건대입구역` | 1 | `성동구청 민원여권과` | 42분 | 33분 | 9분 |
+| `demo-seoul-cityhall-passport` | `passport-reissue` | `서울시청` | 3 | `명동주민센터` | 31분 | 10분 | 21분 |
+| `demo-seoul-jamsil-passport` | `passport-reissue` | `잠실역` | 3 | `잠실3동 주민센터` | 12분 | 7분 | 5분 |
+| `demo-seoul-seongsu-passport-pickup` | `passport-pickup` | `성수역` | 2 | `성수2가제1동 주민센터` | 6분 | 0분 | 6분 |
+| `demo-seoul-hongdae-certificate` | `certificate-issuance` | `홍대입구역` | 3 | `서교동 주민센터` | 16분 | 3분 | 13분 |
+| `demo-seoul-gangnam-family` | `family-relation-certificate` | `강남역` | 2 | `강남구청` | 21분 | 1분 | 20분 |
+| `demo-seoul-konkuk-resident` | `resident-registration` | `건대입구역` | 2 | `자양4동 주민센터` | 12분 | 3분 | 9분 |
 
 ## 선택 기준
 `demo` 모드에서는 준비된 6개 시나리오 중 하나를 고른다.
 
-1. `purposeId` exact match를 가장 먼저 본다.
-2. `originLabel` 정규화 exact match를 본다.
-3. `originLabel` 부분 match를 본다.
-4. 그래도 안 갈리면 입력 좌표와 시나리오 좌표의 거리가 가장 가까운 것을 고른다.
-5. 끝까지 같으면 JSON에 들어 있는 데이터 순서를 tie-breaker로 사용한다.
+1. `originLabel` 정규화 exact match를 가장 먼저 본다.
+2. `originLabel` 부분 match를 본다.
+3. 그래도 안 갈리면 입력 좌표와 시나리오 좌표의 거리가 가장 가까운 것을 고른다.
+4. 끝까지 같으면 `purposeId` exact match를 tie-breaker로 본다.
+5. 그래도 같으면 JSON에 들어 있는 데이터 순서를 tie-breaker로 사용한다.
 
 정규화 기준:
 - 공백 제거
@@ -64,16 +64,32 @@
 ## fallback 동작 예시
 - `purposeId = "passport-reissue"`이고 `originLabel = "잠실새내"`이면
   `잠실역` 시나리오와 라벨 부분 match가 걸려 `demo-seoul-jamsil-passport`를 선택한다.
-- `purposeId`는 맞지만 `originLabel`이 exact match가 아니면 좌표가 더 가까운 시나리오가 선택될 수 있다.
+- `originLabel`이 exact match가 아니면 좌표가 더 가까운 시나리오가 선택될 수 있다.
 - exact 입력값에 없는 조합이라도 항상 6개 중 하나로 수렴한다.
 
 ## 입력 가능 값 해석
-- `purposeId`는 추천 요청 계약에 정의된 값만 사용한다.
+- `purposeId`는 추천 요청 계약에 정의된 값만 사용하지만 demo 시나리오 선택의 1차 기준은 아니다.
 - `originLabel`은 자유 입력 문자열이지만, demo에서는 위 표의 출발지명에 가까울수록 의도한 시나리오를 고르기 쉽다.
+- 같은 출발지 입력이면 민원 목적이 달라도 같은 demo 민원실 후보를 반환한다.
 - `origin.lat`, `origin.lng`는 fallback 시나리오 선택에 실제로 사용된다.
 - `mode`가 `demo`가 아니면 이 문서의 시나리오 표는 적용되지 않는다.
 
 ## 운영 메모
 - root와 backend JSON은 같은 내용을 유지해야 한다.
 - 시나리오를 추가하거나 수정할 때는 두 JSON과 두 TS export 파일을 함께 갱신한다.
+- `demo-seoul-cityhall-passport`의 명동주민센터 이동 경로는 사용자 제공 `2026-04-13 13:12` 출발 길찾기 이미지 기준 수동 스냅샷으로 고정했다.
+- `demo-seoul-cityhall-passport`의 중구청 이동 경로는 사용자 제공 `2026-04-13 13:12` 출발 길찾기 이미지 기준 수동 스냅샷으로 고정했다.
+- `demo-seoul-cityhall-passport`의 회현동주민센터 이동 경로는 사용자 제공 `2026-04-13 13:12` 출발 길찾기 이미지 기준 수동 스냅샷으로 고정했다.
+- `demo-seoul-seongsu-passport-pickup`의 성수2가제1동 주민센터 이동 경로는 사용자 제공 `2026-04-13 13:12` 출발 길찾기 이미지 기준 수동 스냅샷으로 고정했다.
+- `demo-seoul-seongsu-passport-pickup`의 성수2가3동 주민센터 이동 경로는 성수역에서 도보 6분으로 수동 고정했다.
+- `demo-seoul-jamsil-passport`의 송파구청 이동 경로는 잠실역 2호선에서 도보 3분으로 수동 고정했다.
+- `demo-seoul-jamsil-passport`의 잠실3동 주민센터 이동 경로는 사용자 제공 `2026-04-13 13:12` 출발 길찾기 이미지 기준 수동 스냅샷으로 고정했다.
+- `demo-seoul-jamsil-passport`의 잠실6동 주민센터 이동 경로는 사용자 제공 `2026-04-13 13:12` 출발 길찾기 이미지 기준 수동 스냅샷으로 고정했다.
+- `demo-seoul-hongdae-certificate`의 서교동 주민센터 이동 경로는 사용자 제공 `2026-04-13 13:12` 출발 길찾기 이미지 기준 수동 스냅샷으로 고정했다.
+- `demo-seoul-hongdae-certificate`의 서강동 주민센터 이동 경로는 사용자 제공 `2026-04-13 13:12` 출발 길찾기 이미지 기준 수동 스냅샷으로 고정했다.
+- `demo-seoul-hongdae-certificate`의 연남동 주민센터 이동 경로는 사용자 제공 `2026-04-13 13:12` 출발 길찾기 이미지 기준 수동 스냅샷으로 고정했다.
+- `demo-seoul-gangnam-family`의 강남구청 이동 경로는 사용자 제공 `2026-04-13 13:12` 출발 길찾기 이미지 기준 수동 스냅샷으로 고정했다.
+- `demo-seoul-gangnam-family`의 서초2동 주민센터 이동 경로는 사용자 제공 `2026-04-13 13:12` 출발 길찾기 이미지 기준 수동 스냅샷으로 고정했다.
+- `demo-seoul-konkuk-resident`의 광진구청 이동 경로는 사용자 제공 `2026-04-13 13:12` 출발 길찾기 이미지 기준 수동 스냅샷으로 고정했다.
+- `demo-seoul-konkuk-resident`의 자양4동 주민센터 이동 경로는 사용자 제공 `2026-04-13 13:12` 출발 길찾기 이미지 기준 수동 스냅샷으로 고정했다.
 - 계약 구조는 [docs/recommend-contracts.md](/C:/dev/how_long_time/docs/recommend-contracts.md)를 기준으로 유지한다.

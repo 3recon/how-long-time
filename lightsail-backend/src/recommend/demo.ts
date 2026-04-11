@@ -46,10 +46,6 @@ function compareDemoScenarioScores(
   left: DemoScenarioScore,
   right: DemoScenarioScore,
 ): number {
-  if (left.purposeMatched !== right.purposeMatched) {
-    return left.purposeMatched - right.purposeMatched;
-  }
-
   if (left.labelExactMatched !== right.labelExactMatched) {
     return left.labelExactMatched - right.labelExactMatched;
   }
@@ -60,6 +56,10 @@ function compareDemoScenarioScores(
 
   if (left.distance !== right.distance) {
     return right.distance - left.distance;
+  }
+
+  if (left.purposeMatched !== right.purposeMatched) {
+    return left.purposeMatched - right.purposeMatched;
   }
 
   return 0;

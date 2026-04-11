@@ -142,9 +142,17 @@ async function main() {
   assert.equal(demoResponse.meta.dataSource, "demo-sample");
   assert.equal(
     demoResponse.meta.scenarioId,
-    "demo-seoul-seongsu-passport-pickup",
+    "demo-seoul-cityhall-passport",
   );
   assert.equal(demoResponse.recommendations.length, 3);
+  assert.deepEqual(
+    demoResponse.recommendations.map((recommendation) => recommendation.id),
+    [
+      "myeongdong-community-service-center",
+      "jung-gu-civil-service",
+      "hoehyeon-dong-community-service-center",
+    ],
+  );
   assert.match(
     demoResponse.recommendations[0]?.waiting.updatedAt ?? "",
     /\+09:00$/,
