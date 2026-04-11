@@ -34,7 +34,24 @@ async function main() {
     getTravelEstimate: async ({ office }) => {
       const travelByOfficeId = {
         "jongno-passport-office": { minutes: 19, distanceKm: 3.2 },
-        "jung-gu-civil-service": { minutes: 16, distanceKm: 2.6 },
+        "jung-gu-civil-service": {
+          minutes: 16,
+          distanceKm: 2.6,
+          breakdown: {
+            walkMinutes: 4,
+            transitRideMinutes: 9,
+            transferEtcMinutes: 3,
+          },
+          steps: [
+            {
+              type: "bus",
+              title: "Blue 101",
+              minutes: 9,
+              routeName: "Blue 101",
+              stopCount: 3,
+            },
+          ],
+        },
         "seongdong-civil-service": { minutes: 33, distanceKm: 8.4 },
       } as const;
 
@@ -70,6 +87,8 @@ async function main() {
       estimatedWaitingMinutes: office.waiting.estimatedMinutes,
       waitingCount: office.waiting.count,
       travelMinutes: office.travel.minutes,
+      travelBreakdown: office.travel.breakdown,
+      travelSteps: office.travel.steps,
     })),
     [
       {
@@ -79,6 +98,20 @@ async function main() {
         estimatedWaitingMinutes: 33,
         waitingCount: 11,
         travelMinutes: 16,
+        travelBreakdown: {
+          walkMinutes: 4,
+          transitRideMinutes: 9,
+          transferEtcMinutes: 3,
+        },
+        travelSteps: [
+          {
+            type: "bus",
+            title: "Blue 101",
+            minutes: 9,
+            routeName: "Blue 101",
+            stopCount: 3,
+          },
+        ],
       },
     ],
   );
@@ -202,6 +235,8 @@ async function main() {
       waitingCount: office.waiting.count,
       estimatedWaitingMinutes: office.waiting.estimatedMinutes,
       distanceKm: office.travel.distanceKm,
+      travelBreakdown: office.travel.breakdown,
+      travelSteps: office.travel.steps,
     })),
     [
       {
@@ -211,6 +246,12 @@ async function main() {
         waitingCount: 4,
         estimatedWaitingMinutes: 12,
         distanceKm: null,
+        travelBreakdown: {
+          walkMinutes: 0,
+          transitRideMinutes: 0,
+          transferEtcMinutes: 55,
+        },
+        travelSteps: [],
       },
     ],
   );

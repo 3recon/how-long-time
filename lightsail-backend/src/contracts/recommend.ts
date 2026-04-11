@@ -80,9 +80,34 @@ export interface WaitingSnapshot {
   updatedAt: string | null;
 }
 
+export type TravelRouteStepType =
+  | "walk"
+  | "bus"
+  | "subway"
+  | "transfer-etc";
+
+export interface TravelBreakdown {
+  walkMinutes: number;
+  transitRideMinutes: number;
+  transferEtcMinutes: number;
+}
+
+export interface TravelRouteStep {
+  type: TravelRouteStepType;
+  title: string;
+  minutes: number;
+  distanceKm?: number | null;
+  from?: string;
+  to?: string;
+  routeName?: string;
+  stopCount?: number;
+}
+
 export interface TravelEstimate {
   minutes: number;
   distanceKm: number | null;
+  breakdown?: TravelBreakdown;
+  steps?: TravelRouteStep[];
 }
 
 export interface ResolvedLocation {
