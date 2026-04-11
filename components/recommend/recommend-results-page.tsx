@@ -18,6 +18,30 @@ import type {
   RecommendResponse,
 } from "@/types/recommend";
 
+const PUBLIC_DATA_API_LABEL = "\uacf5\uacf5\ub370\uc774\ud130 API";
+const PUBLIC_DATA_FALLBACK_NOTICE =
+  "\uacf5\uacf5\ub370\uc774\ud130 API \uc7a5\uc560\ub85c \uc778\ud574 demo fallback \uacb0\uacfc\ub85c \uc804\ud658\ud588\uc2b5\ub2c8\ub2e4.";
+const DEMO_MODE_NOTICE =
+  "demo \ubaa8\ub4dc \uc0d8\ud50c \uacb0\uacfc\ub97c \ubc14\ub85c \ubd88\ub7ec\uc654\uc2b5\ub2c8\ub2e4.";
+const QUERY_DEMO_NOTICE =
+  "query string \uae30\ubc18\uc73c\ub85c \uac19\uc740 demo \ucd94\ucc9c \uacb0\uacfc\ub97c \ub2e4\uc2dc \ubd88\ub7ec\uc654\uc2b5\ub2c8\ub2e4.";
+const NETWORK_DEMO_NOTICE =
+  "\ub124\ud2b8\uc6cc\ud06c \uc624\ub958\uac00 \uc788\uc5b4 demo \uc0d8\ud50c \uacb0\uacfc\ub85c \uae30\ubcf8 \ube44\uad50 \ud654\uba74\uc744 \uc720\uc9c0\ud569\ub2c8\ub2e4.";
+const NETWORK_ERROR_MESSAGE =
+  "\ucd94\ucc9c \uc694\uccad \uc911 \ub124\ud2b8\uc6cc\ud06c \uc624\ub958\uac00 \ubc1c\uc0dd\ud588\uc2b5\ub2c8\ub2e4.";
+const INVALID_TITLE =
+  "\uacb0\uacfc \ud654\uba74\uc744 \ub2e4\uc2dc \uc5f4 \uc218 \uc5c6\uc2b5\ub2c8\ub2e4";
+const INVALID_BODY =
+  "\uc8fc\uc18c\uc5d0 \ud544\uc694\ud55c \ucd94\ucc9c \uc870\uac74\uc774 \ubd80\uc871\ud569\ub2c8\ub2e4. \uccab \ud654\uba74\uc5d0\uc11c \ucd9c\ubc1c\uc9c0\uc640 \ubbfc\uc6d0 \ubaa9\uc801\uc744 \ub2e4\uc2dc \uc785\ub825\ud574 \uc8fc\uc138\uc694.";
+const BACK_TO_FORM_LABEL =
+  "\uc785\ub825 \ud654\uba74\uc73c\ub85c \ub3cc\uc544\uac00\uae30";
+const RESTART_LABEL =
+  "\ucc98\uc74c\ubd80\ud130 \ub2e4\uc2dc \uc2dc\uc791";
+const LOADING_LABEL =
+  "\uacb0\uacfc \ud654\uba74\uc744 \uc900\ube44\ud558\uace0 \uc788\uc2b5\ub2c8\ub2e4.";
+const EMPTY_MESSAGE =
+  "\uc544\uc9c1 \ucd94\ucc9c \uacb0\uacfc\uac00 \uc5c6\uc2b5\ub2c8\ub2e4. \uccab \ud654\uba74\uc5d0\uc11c \uc870\uac74\uc744 \ub2e4\uc2dc \uc785\ub825\ud574 \uc8fc\uc138\uc694.";
+
 function readValue(
   input: Record<string, string | string[] | undefined>,
   key: string,
@@ -39,6 +63,19 @@ function buildRequestQuery(request: {
     lng: String(request.origin.lng),
     mode: request.mode,
   });
+}
+
+export function getPublicDataDemoFallbackNotice(
+  errorBody: RecommendErrorResponse | null,
+): string | null {
+  if (
+    errorBody?.error === "UPSTREAM_API_ERROR" &&
+    errorBody.details?.includes(PUBLIC_DATA_API_LABEL)
+  ) {
+    return PUBLIC_DATA_FALLBACK_NOTICE;
+  }
+
+  return null;
 }
 
 export function RecommendResultsPage(props: {
@@ -87,7 +124,7 @@ export function RecommendResultsPage(props: {
 
       if (currentRequest.mode === "demo") {
         setResult(createClientDemoRecommendResponse(currentRequest));
-        setRequestNotice("demo 모드 샘플 결과를 바로 불러왔습니다.");
+        setRequestNotice(DEMO_MODE_NOTICE);
         setIsLoading(false);
         return;
       }
@@ -105,13 +142,13 @@ export function RecommendResultsPage(props: {
           const errorBody = (await response.json().catch(() => null)) as
             | RecommendErrorResponse
             | null;
+          const fallbackNotice = getPublicDataDemoFallbackNotice(errorBody);
 
-          if (requestMode === "demo") {
+          if (fallbackNotice) {
             if (!cancelled) {
               setResult(createClientDemoRecommendResponse(currentRequest));
-              setRequestNotice(
-                "추천 백엔드 연결이 불안정해 로컬 demo 샘플 결과로 이어서 비교합니다.",
-              );
+              setRequestError(null);
+              setRequestNotice(fallbackNotice);
             }
             return;
           }
@@ -128,18 +165,14 @@ export function RecommendResultsPage(props: {
         if (!cancelled) {
           setResult(responseBody);
           setRequestNotice(
-            responseBody.meta.mode === "demo"
-              ? "query string 기반으로 같은 demo 추천 결과를 다시 불러왔습니다."
-              : null,
+            responseBody.meta.mode === "demo" ? QUERY_DEMO_NOTICE : null,
           );
         }
       } catch {
         if (requestMode === "demo") {
           if (!cancelled) {
             setResult(createClientDemoRecommendResponse(currentRequest));
-            setRequestNotice(
-              "네트워크 오류가 있어도 demo 샘플 결과로 기본 비교 흐름을 유지합니다.",
-            );
+            setRequestNotice(NETWORK_DEMO_NOTICE);
           }
           return;
         }
@@ -147,7 +180,7 @@ export function RecommendResultsPage(props: {
         if (!cancelled) {
           setResult(null);
           setRequestNotice(null);
-          setRequestError("추천 요청 중 네트워크 오류가 발생했습니다.");
+          setRequestError(NETWORK_ERROR_MESSAGE);
         }
       } finally {
         if (!cancelled) {
@@ -171,7 +204,9 @@ export function RecommendResultsPage(props: {
 
     setSelectedOfficeId((current) => {
       if (current) {
-        return resolveSelectedOffice(result.recommendations, current)?.id ?? current;
+        return (
+          resolveSelectedOffice(result.recommendations, current)?.id ?? current
+        );
       }
 
       return (
@@ -205,11 +240,10 @@ export function RecommendResultsPage(props: {
             Invalid Result State
           </p>
           <h1 className="mt-3 text-3xl font-semibold tracking-[-0.05em]">
-            결과 화면을 다시 열 수 없습니다
+            {INVALID_TITLE}
           </h1>
           <p className="mt-3 text-sm leading-6 text-[var(--muted)]">
-            주소에 필요한 추천 조건이 부족합니다. 첫 화면에서 출발지와 민원
-            목적을 다시 입력해 주세요.
+            {INVALID_BODY}
           </p>
           <p className="mt-4 rounded-2xl border border-[rgba(220,38,38,0.16)] bg-[rgba(220,38,38,0.06)] px-4 py-3 text-sm text-[var(--foreground)]">
             {requestError}
@@ -218,7 +252,7 @@ export function RecommendResultsPage(props: {
             href="/"
             className="mt-6 inline-flex min-h-12 items-center rounded-2xl border border-[var(--foreground)] bg-[var(--foreground)] px-5 text-sm font-semibold text-white shadow-[0_16px_32px_rgba(17,17,17,0.16)]"
           >
-            입력 화면으로 돌아가기
+            {BACK_TO_FORM_LABEL}
           </Link>
         </section>
       </main>
@@ -234,7 +268,7 @@ export function RecommendResultsPage(props: {
             href="/"
             className="inline-flex min-h-12 items-center justify-center rounded-[20px] border border-[var(--foreground)] bg-[var(--foreground)] px-4 text-sm font-semibold text-white shadow-[0_16px_32px_rgba(17,17,17,0.14)]"
           >
-            처음부터 다시 시작
+            {RESTART_LABEL}
           </Link>
         </div>
 
@@ -244,9 +278,15 @@ export function RecommendResultsPage(props: {
           </div>
         ) : null}
 
+        {requestNotice ? (
+          <div className="rounded-[20px] border border-[rgba(211,166,63,0.24)] bg-[rgba(211,166,63,0.12)] px-4 py-3 text-sm font-medium text-[var(--foreground)]">
+            {requestNotice}
+          </div>
+        ) : null}
+
         {isLoading ? (
           <section className="soft-card flex min-h-[420px] items-center justify-center rounded-[28px] border-[rgba(17,17,17,0.08)] px-6 text-center text-sm leading-6 text-[var(--muted)]">
-            결과 화면을 준비하고 있습니다.
+            {LOADING_LABEL}
           </section>
         ) : (
           <RecommendResultsLayout
@@ -256,7 +296,7 @@ export function RecommendResultsPage(props: {
             onSelectOffice={setSelectedOfficeId}
             fallbackOrigin={requestValue.origin}
             fallbackOriginLabel={requestValue.originLabel}
-            emptyMessage="아직 추천 결과가 없습니다. 첫 화면에서 조건을 다시 입력해 주세요."
+            emptyMessage={EMPTY_MESSAGE}
           />
         )}
       </div>
