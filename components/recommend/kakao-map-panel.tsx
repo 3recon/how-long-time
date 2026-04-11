@@ -22,6 +22,7 @@ declare global {
           ) => void;
           panTo: (position: unknown) => void;
           setLevel: (level: number) => void;
+          relayout: () => void;
         };
         LatLng: new (lat: number, lng: number) => unknown;
         LatLngBounds: new () => {
@@ -63,6 +64,8 @@ declare global {
 }
 
 type KakaoSdkStatus = "idle" | "loading" | "ready" | "error" | "missing-key";
+const mapViewportClassName =
+  "h-[380px] w-full sm:h-[420px] lg:h-[56vh] lg:min-h-[420px] lg:max-h-[620px]";
 
 let kakaoMapSdkPromise: Promise<void> | null = null;
 
@@ -124,7 +127,9 @@ function FallbackMap(props: {
   const lngRange = lngMax - lngMin || 0.01;
 
   return (
-    <div className="relative h-[380px] overflow-hidden bg-[linear-gradient(180deg,rgba(244,238,223,0.98)_0%,rgba(235,227,207,0.98)_100%)] sm:h-[420px] lg:h-full">
+    <div
+      className={`relative overflow-hidden bg-[linear-gradient(180deg,rgba(244,238,223,0.98)_0%,rgba(235,227,207,0.98)_100%)] ${mapViewportClassName}`}
+    >
       <div className="absolute inset-0 opacity-50 [background-image:linear-gradient(rgba(17,17,17,0.06)_1px,transparent_1px),linear-gradient(90deg,rgba(17,17,17,0.06)_1px,transparent_1px)] [background-size:28px_28px]" />
       <div className="absolute left-4 top-4 right-4 rounded-[20px] border border-[rgba(17,17,17,0.08)] bg-white/88 px-4 py-3 text-sm shadow-[0_18px_34px_rgba(17,17,17,0.08)] backdrop-blur-sm">
         <p className="font-semibold">지도 fallback 보기</p>
@@ -216,6 +221,7 @@ export function KakaoMapPanel(props: {
     ) => void;
     panTo: (position: unknown) => void;
     setLevel: (level: number) => void;
+    relayout: () => void;
   } | null>(null);
   const infoWindowRef = useRef<{
     open: (map: unknown, marker: unknown) => void;
@@ -289,6 +295,7 @@ export function KakaoMapPanel(props: {
       }
 
       const map = mapRef.current;
+      map.relayout();
       const bounds = new kakao.maps.LatLngBounds();
 
       markersRef.current.forEach(({ marker }) => marker.setMap(null));
@@ -367,6 +374,7 @@ export function KakaoMapPanel(props: {
 
       const kakao = window.kakao;
       const map = mapRef.current;
+      map.relayout();
       const selectedPosition = new kakao.maps.LatLng(
         selectedOffice.coordinates.lat,
         selectedOffice.coordinates.lng,
@@ -437,12 +445,13 @@ export function KakaoMapPanel(props: {
       </div>
 
       <div className="relative">
-        {sdkStatus === "ready" ? (
-          <div
-            ref={mapContainerRef}
-          className="h-[380px] w-full bg-[linear-gradient(180deg,#fffdf8_0%,#ebe3cf_100%)] sm:h-[420px] lg:h-full"
-          />
-        ) : (
+        <div
+          ref={mapContainerRef}
+          className={`${mapViewportClassName} bg-[linear-gradient(180deg,#fffdf8_0%,#ebe3cf_100%)]`}
+        />
+
+        {sdkStatus !== "ready" ? (
+          <div className="absolute inset-0">
           <FallbackMap
             origin={origin}
             originLabel={originLabel}
@@ -457,7 +466,8 @@ export function KakaoMapPanel(props: {
                   : "지도를 준비하는 동안 fallback 지도를 먼저 보여줍니다."
             }
           />
-        )}
+          </div>
+        ) : null}
 
         {recommendations.length === 0 ? (
           <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 bg-[rgba(255,255,255,0.72)] px-6 text-center backdrop-blur-sm">
