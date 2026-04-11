@@ -1,168 +1,892 @@
 {
-  "request": {
-    "purposeId": "passport-reissue",
-    "originLabel": "서울시청",
-    "origin": {
-      "lat": 37.5665,
-      "lng": 126.978
-    },
-    "mode": "demo"
-  },
-  "meta": {
-    "contractVersion": "2026-04-stage-7",
-    "requestedAt": "2026-04-10T09:00:00.000Z",
-    "mode": "demo",
-    "dataSource": "demo-sample",
-    "scenarioId": "demo-seoul-cityhall-passport",
-    "purposeMappingVersion": "2026-04-stage-4"
-  },
-  "summary": {
-    "totalCandidateCount": 2,
-    "returnedRecommendationCount": 2
-  },
-  "recommendations": [
+  "scenarios": [
     {
-      "id": "jongno-passport-office",
-      "name": "종로구청 여권 민원실",
-      "address": "서울 종로구 삼봉로 43",
-      "coordinates": {
-        "lat": 37.5721,
-        "lng": 126.9794
-      },
-      "supportedPurposeIds": ["passport-reissue", "passport-pickup"],
-      "supportedTaskMatches": [
-        {
-          "taskName": "여권 재발급",
-          "ruleType": "keyword"
+      "request": {
+        "purposeId": "passport-reissue",
+        "originLabel": "서울시청",
+        "origin": {
+          "lat": 37.5665,
+          "lng": 126.978
         },
-        {
-          "taskName": "여권 수령",
-          "ruleType": "keyword"
-        }
-      ],
-      "waiting": {
-        "count": 8,
-        "estimatedMinutes": 24,
-        "updatedAt": "2026-04-10T08:55:00.000+09:00"
+        "mode": "demo"
       },
-      "travel": {
-        "minutes": 19,
-        "distanceKm": 3.2,
-        "breakdown": {
-          "walkMinutes": 4,
-          "transitRideMinutes": 12,
-          "transferEtcMinutes": 3
-        },
-        "steps": [
-          {
-            "type": "walk",
-            "title": "도보 이동",
-            "minutes": 3,
-            "distanceKm": 0.3,
-            "from": "서울시청",
-            "to": "시청역"
+      "meta": {
+        "contractVersion": "2026-04-stage-7",
+        "requestedAt": "2026-04-10T09:00:00.000Z",
+        "mode": "demo",
+        "dataSource": "demo-sample",
+        "scenarioId": "demo-seoul-cityhall-passport",
+        "purposeMappingVersion": "2026-04-stage-4"
+      },
+      "summary": {
+        "totalCandidateCount": 2,
+        "returnedRecommendationCount": 2
+      },
+      "recommendations": [
+        {
+          "id": "jongno-passport-office",
+          "name": "종로구청 여권 민원실",
+          "address": "서울 종로구 삼봉로 43",
+          "coordinates": {
+            "lat": 37.5721,
+            "lng": 126.9794
           },
-          {
-            "type": "bus",
-            "title": "버스 탑승",
+          "supportedPurposeIds": ["passport-reissue", "passport-pickup"],
+          "supportedTaskMatches": [
+            {
+              "taskName": "여권 재발급",
+              "ruleType": "keyword"
+            },
+            {
+              "taskName": "여권 신청",
+              "ruleType": "keyword"
+            }
+          ],
+          "waiting": {
+            "count": 7,
+            "estimatedMinutes": 22,
+            "updatedAt": "2026-04-10T08:55:00.000+09:00"
+          },
+          "travel": {
+            "minutes": 18,
+            "distanceKm": 2.9,
+            "breakdown": {
+              "walkMinutes": 4,
+              "transitRideMinutes": 11,
+              "transferEtcMinutes": 3
+            },
+            "steps": [
+              {
+                "type": "walk",
+                "title": "시청역까지 도보",
+                "minutes": 4,
+                "distanceKm": 0.35,
+                "from": "서울시청",
+                "to": "시청역 정류장"
+              },
+              {
+                "type": "bus",
+                "title": "간선버스 탑승",
+                "minutes": 11,
+                "routeName": "172",
+                "from": "시청역 정류장",
+                "to": "종로구청 정류장",
+                "stopCount": 5
+              },
+              {
+                "type": "transfer-etc",
+                "title": "청사 출입 및 이동",
+                "minutes": 2,
+                "from": "종로구청 정류장",
+                "to": "구청 민원동"
+              },
+              {
+                "type": "walk",
+                "title": "민원실까지 도보",
+                "minutes": 1,
+                "distanceKm": 0.08,
+                "from": "구청 민원동",
+                "to": "종로구청 여권 민원실"
+              }
+            ]
+          },
+          "recommendation": {
+            "rank": 1,
+            "totalMinutes": 40,
+            "reason": "시청권에서는 버스 한 번으로 연결돼 이동과 대기의 균형이 가장 좋습니다."
+          }
+        },
+        {
+          "id": "jung-gu-civil-service",
+          "name": "중구청 민원여권과",
+          "address": "서울 중구 창경궁로 17",
+          "coordinates": {
+            "lat": 37.5641,
+            "lng": 126.9979
+          },
+          "supportedPurposeIds": [
+            "passport-reissue",
+            "passport-pickup",
+            "certificate-issuance"
+          ],
+          "supportedTaskMatches": [
+            {
+              "taskName": "여권 재발급",
+              "ruleType": "keyword"
+            }
+          ],
+          "waiting": {
+            "count": 9,
+            "estimatedMinutes": 27,
+            "updatedAt": "2026-04-10T08:56:00.000+09:00"
+          },
+          "travel": {
+            "minutes": 16,
+            "distanceKm": 2.6,
+            "breakdown": {
+              "walkMinutes": 3,
+              "transitRideMinutes": 9,
+              "transferEtcMinutes": 4
+            },
+            "steps": [
+              {
+                "type": "walk",
+                "title": "시청역까지 도보",
+                "minutes": 2,
+                "distanceKm": 0.2,
+                "from": "서울시청",
+                "to": "시청역"
+              },
+              {
+                "type": "subway",
+                "title": "지하철 1호선 탑승",
+                "minutes": 9,
+                "routeName": "1호선",
+                "from": "시청역",
+                "to": "종로5가역",
+                "stopCount": 2
+              },
+              {
+                "type": "transfer-etc",
+                "title": "출구 이동",
+                "minutes": 3,
+                "from": "종로5가역",
+                "to": "중구청 방향"
+              },
+              {
+                "type": "walk",
+                "title": "민원실까지 도보",
+                "minutes": 2,
+                "distanceKm": 0.2,
+                "from": "중구청 방향",
+                "to": "중구청 민원여권과"
+              }
+            ]
+          },
+          "recommendation": {
+            "rank": 2,
+            "totalMinutes": 43,
+            "reason": "도착은 빠르지만 창구 대기가 더 길어 두 번째 후보입니다."
+          }
+        }
+      ]
+    },
+    {
+      "request": {
+        "purposeId": "passport-reissue",
+        "originLabel": "잠실역",
+        "origin": {
+          "lat": 37.5133,
+          "lng": 127.1001
+        },
+        "mode": "demo"
+      },
+      "meta": {
+        "contractVersion": "2026-04-stage-7",
+        "requestedAt": "2026-04-10T09:05:00.000Z",
+        "mode": "demo",
+        "dataSource": "demo-sample",
+        "scenarioId": "demo-seoul-jamsil-passport",
+        "purposeMappingVersion": "2026-04-stage-4"
+      },
+      "summary": {
+        "totalCandidateCount": 2,
+        "returnedRecommendationCount": 2
+      },
+      "recommendations": [
+        {
+          "id": "jung-gu-civil-service",
+          "name": "중구청 민원여권과",
+          "address": "서울 중구 창경궁로 17",
+          "coordinates": {
+            "lat": 37.5641,
+            "lng": 126.9979
+          },
+          "supportedPurposeIds": [
+            "passport-reissue",
+            "passport-pickup",
+            "certificate-issuance"
+          ],
+          "supportedTaskMatches": [
+            {
+              "taskName": "여권 재발급",
+              "ruleType": "keyword"
+            }
+          ],
+          "waiting": {
+            "count": 5,
+            "estimatedMinutes": 15,
+            "updatedAt": "2026-04-10T09:02:00.000+09:00"
+          },
+          "travel": {
+            "minutes": 28,
+            "distanceKm": 11.7,
+            "breakdown": {
+              "walkMinutes": 5,
+              "transitRideMinutes": 18,
+              "transferEtcMinutes": 5
+            },
+            "steps": [
+              {
+                "type": "walk",
+                "title": "잠실역 환승 이동",
+                "minutes": 3,
+                "distanceKm": 0.2,
+                "from": "잠실역",
+                "to": "8호선 승강장"
+              },
+              {
+                "type": "subway",
+                "title": "8호선 탑승",
+                "minutes": 10,
+                "routeName": "8호선",
+                "from": "잠실역",
+                "to": "을지로4가역",
+                "stopCount": 8
+              },
+              {
+                "type": "transfer-etc",
+                "title": "1호선 연결 이동",
+                "minutes": 4,
+                "from": "을지로4가역",
+                "to": "종로5가역"
+              },
+              {
+                "type": "walk",
+                "title": "민원실까지 도보",
+                "minutes": 11,
+                "distanceKm": 0.8,
+                "from": "종로5가역",
+                "to": "중구청 민원여권과"
+              }
+            ]
+          },
+          "recommendation": {
+            "rank": 1,
+            "totalMinutes": 43,
+            "reason": "대기는 짧지만 환승과 도보가 길어 두 번째 후보로 남깁니다."
+          }
+        },
+        {
+          "id": "jongno-passport-office",
+          "name": "종로구청 여권 민원실",
+          "address": "서울 종로구 삼봉로 43",
+          "coordinates": {
+            "lat": 37.5721,
+            "lng": 126.9794
+          },
+          "supportedPurposeIds": ["passport-reissue", "passport-pickup"],
+          "supportedTaskMatches": [
+            {
+              "taskName": "여권 신청",
+              "ruleType": "keyword"
+            }
+          ],
+          "waiting": {
+            "count": 8,
+            "estimatedMinutes": 24,
+            "updatedAt": "2026-04-10T09:00:00.000+09:00"
+          },
+          "travel": {
+            "minutes": 31,
+            "distanceKm": 12.1,
+            "breakdown": {
+              "walkMinutes": 5,
+              "transitRideMinutes": 21,
+              "transferEtcMinutes": 5
+            },
+            "steps": [
+              {
+                "type": "walk",
+                "title": "잠실역 버스 환승 이동",
+                "minutes": 3,
+                "distanceKm": 0.2,
+                "from": "잠실역",
+                "to": "잠실환승센터"
+              },
+              {
+                "type": "bus",
+                "title": "광역버스 탑승",
+                "minutes": 21,
+                "routeName": "301",
+                "from": "잠실환승센터",
+                "to": "종로1가",
+                "stopCount": 11
+              },
+              {
+                "type": "transfer-etc",
+                "title": "정류장 횡단",
+                "minutes": 3,
+                "from": "종로1가",
+                "to": "종로구청 방향"
+              },
+              {
+                "type": "walk",
+                "title": "민원실까지 도보",
+                "minutes": 4,
+                "distanceKm": 0.35,
+                "from": "종로구청 방향",
+                "to": "종로구청 여권 민원실"
+              }
+            ]
+          },
+          "recommendation": {
+            "rank": 2,
+            "totalMinutes": 55,
+            "reason": "버스는 단순하지만 총 소요시간이 길어 최종 우선순위는 낮습니다."
+          }
+        }
+      ]
+    },
+    {
+      "request": {
+        "purposeId": "passport-pickup",
+        "originLabel": "성수역",
+        "origin": {
+          "lat": 37.5446,
+          "lng": 127.0557
+        },
+        "mode": "demo"
+      },
+      "meta": {
+        "contractVersion": "2026-04-stage-7",
+        "requestedAt": "2026-04-10T09:10:00.000Z",
+        "mode": "demo",
+        "dataSource": "demo-sample",
+        "scenarioId": "demo-seoul-seongsu-passport-pickup",
+        "purposeMappingVersion": "2026-04-stage-4"
+      },
+      "summary": {
+        "totalCandidateCount": 3,
+        "returnedRecommendationCount": 3
+      },
+      "recommendations": [
+        {
+          "id": "seongdong-civil-service",
+          "name": "성동구청 민원여권과",
+          "address": "서울 성동구 고산자로 270",
+          "coordinates": {
+            "lat": 37.5634,
+            "lng": 127.0369
+          },
+          "supportedPurposeIds": [
+            "passport-pickup",
+            "family-relation-certificate",
+            "resident-registration"
+          ],
+          "supportedTaskMatches": [
+            {
+              "taskName": "여권 수령",
+              "ruleType": "keyword"
+            },
+            {
+              "taskName": "여권 교부",
+              "ruleType": "keyword"
+            }
+          ],
+          "waiting": {
+            "count": 2,
+            "estimatedMinutes": 6,
+            "updatedAt": "2026-04-10T09:08:00.000+09:00"
+          },
+          "travel": {
             "minutes": 12,
-            "routeName": "종로09",
-            "from": "시청역1호선",
-            "to": "종로구청",
-            "stopCount": 4
+            "distanceKm": 2.7,
+            "breakdown": {
+              "walkMinutes": 5,
+              "transitRideMinutes": 4,
+              "transferEtcMinutes": 3
+            },
+            "steps": [
+              {
+                "type": "walk",
+                "title": "성수역 출구 이동",
+                "minutes": 3,
+                "distanceKm": 0.25,
+                "from": "성수역",
+                "to": "버스 정류장"
+              },
+              {
+                "type": "bus",
+                "title": "마을버스 탑승",
+                "minutes": 4,
+                "routeName": "성동08",
+                "from": "성수역 정류장",
+                "to": "성동구청",
+                "stopCount": 3
+              },
+              {
+                "type": "transfer-etc",
+                "title": "청사 출입",
+                "minutes": 2,
+                "from": "성동구청",
+                "to": "민원동"
+              },
+              {
+                "type": "walk",
+                "title": "수령 창구까지 도보",
+                "minutes": 3,
+                "distanceKm": 0.22,
+                "from": "민원동",
+                "to": "성동구청 민원여권과"
+              }
+            ]
           },
-          {
-            "type": "walk",
-            "title": "민원실까지 도보",
-            "minutes": 1,
-            "distanceKm": 0.1,
-            "from": "종로구청 정류장",
-            "to": "종로구청 여권 민원실"
+          "recommendation": {
+            "rank": 1,
+            "totalMinutes": 18,
+            "reason": "성수권에서는 가장 가까워 빠르게 수령만 마치고 돌아오기 좋습니다."
           }
-        ]
-      },
-      "recommendation": {
-        "rank": 1,
-        "totalMinutes": 43,
-        "reason": "대기시간 비중이 커 총 소요시간을 먼저 확인하는 편이 좋습니다."
-      }
+        },
+        {
+          "id": "jongno-passport-office",
+          "name": "종로구청 여권 민원실",
+          "address": "서울 종로구 삼봉로 43",
+          "coordinates": {
+            "lat": 37.5721,
+            "lng": 126.9794
+          },
+          "supportedPurposeIds": ["passport-reissue", "passport-pickup"],
+          "supportedTaskMatches": [
+            {
+              "taskName": "여권 수령",
+              "ruleType": "keyword"
+            }
+          ],
+          "waiting": {
+            "count": 4,
+            "estimatedMinutes": 12,
+            "updatedAt": "2026-04-10T09:07:00.000+09:00"
+          },
+          "travel": {
+            "minutes": 24,
+            "distanceKm": 6.8,
+            "breakdown": {
+              "walkMinutes": 6,
+              "transitRideMinutes": 14,
+              "transferEtcMinutes": 4
+            },
+            "steps": [
+              {
+                "type": "walk",
+                "title": "2호선 승강장 이동",
+                "minutes": 2,
+                "distanceKm": 0.15,
+                "from": "성수역",
+                "to": "2호선 승강장"
+              },
+              {
+                "type": "subway",
+                "title": "2호선 탑승",
+                "minutes": 14,
+                "routeName": "2호선",
+                "from": "성수역",
+                "to": "을지로입구역",
+                "stopCount": 6
+              },
+              {
+                "type": "transfer-etc",
+                "title": "종로 방향 이동",
+                "minutes": 3,
+                "from": "을지로입구역",
+                "to": "종로구청 방향"
+              },
+              {
+                "type": "walk",
+                "title": "민원실까지 도보",
+                "minutes": 5,
+                "distanceKm": 0.38,
+                "from": "종로구청 방향",
+                "to": "종로구청 여권 민원실"
+              }
+            ]
+          },
+          "recommendation": {
+            "rank": 2,
+            "totalMinutes": 36,
+            "reason": "지하철 이동은 단순하지만 이동시간이 늘어 두 번째 대안입니다."
+          }
+        },
+        {
+          "id": "jung-gu-civil-service",
+          "name": "중구청 민원여권과",
+          "address": "서울 중구 창경궁로 17",
+          "coordinates": {
+            "lat": 37.5641,
+            "lng": 126.9979
+          },
+          "supportedPurposeIds": [
+            "passport-reissue",
+            "passport-pickup",
+            "certificate-issuance"
+          ],
+          "supportedTaskMatches": [
+            {
+              "taskName": "여권 교부",
+              "ruleType": "keyword"
+            }
+          ],
+          "waiting": {
+            "count": 7,
+            "estimatedMinutes": 21,
+            "updatedAt": "2026-04-10T09:06:00.000+09:00"
+          },
+          "travel": {
+            "minutes": 20,
+            "distanceKm": 5.9,
+            "breakdown": {
+              "walkMinutes": 4,
+              "transitRideMinutes": 11,
+              "transferEtcMinutes": 5
+            },
+            "steps": [
+              {
+                "type": "walk",
+                "title": "성수역 출구 이동",
+                "minutes": 2,
+                "distanceKm": 0.14,
+                "from": "성수역",
+                "to": "버스 정류장"
+              },
+              {
+                "type": "bus",
+                "title": "간선버스 탑승",
+                "minutes": 11,
+                "routeName": "2014",
+                "from": "성수역 정류장",
+                "to": "을지로6가",
+                "stopCount": 7
+              },
+              {
+                "type": "transfer-etc",
+                "title": "횡단보도 및 청사 이동",
+                "minutes": 3,
+                "from": "을지로6가",
+                "to": "중구청 방향"
+              },
+              {
+                "type": "walk",
+                "title": "민원실까지 도보",
+                "minutes": 4,
+                "distanceKm": 0.3,
+                "from": "중구청 방향",
+                "to": "중구청 민원여권과"
+              }
+            ]
+          },
+          "recommendation": {
+            "rank": 3,
+            "totalMinutes": 41,
+            "reason": "대기와 이동이 모두 길어 예비안으로만 제시합니다."
+          }
+        }
+      ]
     },
     {
-      "id": "jung-gu-civil-service",
-      "name": "중구청 민원여권과",
-      "address": "서울 중구 창경궁로 17",
-      "coordinates": {
-        "lat": 37.5641,
-        "lng": 126.9979
-      },
-      "supportedPurposeIds": [
-        "passport-reissue",
-        "passport-pickup",
-        "certificate-issuance"
-      ],
-      "supportedTaskMatches": [
-        {
-          "taskName": "여권 재발급",
-          "ruleType": "keyword"
+      "request": {
+        "purposeId": "certificate-issuance",
+        "originLabel": "홍대입구역",
+        "origin": {
+          "lat": 37.5573,
+          "lng": 126.9245
         },
-        {
-          "taskName": "증명서 발급",
-          "ruleType": "keyword"
-        }
-      ],
-      "waiting": {
-        "count": 11,
-        "estimatedMinutes": 33,
-        "updatedAt": "2026-04-10T08:55:00.000+09:00"
+        "mode": "demo"
       },
-      "travel": {
-        "minutes": 16,
-        "distanceKm": 2.6,
-        "breakdown": {
-          "walkMinutes": 4,
-          "transitRideMinutes": 9,
-          "transferEtcMinutes": 3
-        },
-        "steps": [
-          {
-            "type": "walk",
-            "title": "도보 이동",
-            "minutes": 2,
-            "distanceKm": 0.2,
-            "from": "서울시청",
-            "to": "시청역"
+      "meta": {
+        "contractVersion": "2026-04-stage-7",
+        "requestedAt": "2026-04-10T09:15:00.000Z",
+        "mode": "demo",
+        "dataSource": "demo-sample",
+        "scenarioId": "demo-seoul-hongdae-certificate",
+        "purposeMappingVersion": "2026-04-stage-4"
+      },
+      "summary": {
+        "totalCandidateCount": 1,
+        "returnedRecommendationCount": 1
+      },
+      "recommendations": [
+        {
+          "id": "jung-gu-civil-service",
+          "name": "중구청 민원여권과",
+          "address": "서울 중구 창경궁로 17",
+          "coordinates": {
+            "lat": 37.5641,
+            "lng": 126.9979
           },
-          {
-            "type": "subway",
-            "title": "지하철 탑승",
-            "minutes": 9,
-            "routeName": "1호선",
-            "from": "시청역",
-            "to": "종로5가역",
-            "stopCount": 2
+          "supportedPurposeIds": [
+            "passport-reissue",
+            "passport-pickup",
+            "certificate-issuance"
+          ],
+          "supportedTaskMatches": [
+            {
+              "taskName": "통합서류 발급",
+              "ruleType": "keyword"
+            },
+            {
+              "taskName": "증명서 발급",
+              "ruleType": "keyword"
+            }
+          ],
+          "waiting": {
+            "count": 14,
+            "estimatedMinutes": 42,
+            "updatedAt": "2026-04-10T09:12:00.000+09:00"
           },
-          {
-            "type": "transfer-etc",
-            "title": "환승/기타",
-            "minutes": 3,
-            "from": "종로5가역",
-            "to": "중구청 방향"
+          "travel": {
+            "minutes": 27,
+            "distanceKm": 7.4,
+            "breakdown": {
+              "walkMinutes": 6,
+              "transitRideMinutes": 16,
+              "transferEtcMinutes": 5
+            },
+            "steps": [
+              {
+                "type": "walk",
+                "title": "홍대입구역 승강장 이동",
+                "minutes": 3,
+                "distanceKm": 0.2,
+                "from": "홍대입구역",
+                "to": "2호선 승강장"
+              },
+              {
+                "type": "subway",
+                "title": "2호선 탑승",
+                "minutes": 16,
+                "routeName": "2호선",
+                "from": "홍대입구역",
+                "to": "을지로4가역",
+                "stopCount": 7
+              },
+              {
+                "type": "transfer-etc",
+                "title": "출구 및 청사 이동",
+                "minutes": 4,
+                "from": "을지로4가역",
+                "to": "중구청 방향"
+              },
+              {
+                "type": "walk",
+                "title": "증명서 창구까지 도보",
+                "minutes": 4,
+                "distanceKm": 0.32,
+                "from": "중구청 방향",
+                "to": "중구청 민원여권과"
+              }
+            ]
           },
-          {
-            "type": "walk",
-            "title": "민원실까지 도보",
-            "minutes": 2,
-            "distanceKm": 0.2,
-            "from": "중구청 인근",
-            "to": "중구청 민원여권과"
+          "recommendation": {
+            "rank": 1,
+            "totalMinutes": 69,
+            "reason": "증명서 창구는 분리돼 있지만 홍대권에서는 이동이 긴 편이라 시간을 넉넉히 잡아야 합니다."
           }
-        ]
+        }
+      ]
+    },
+    {
+      "request": {
+        "purposeId": "family-relation-certificate",
+        "originLabel": "강남역",
+        "origin": {
+          "lat": 37.4979,
+          "lng": 127.0276
+        },
+        "mode": "demo"
       },
-      "recommendation": {
-        "rank": 2,
-        "totalMinutes": 49,
-        "reason": "대기시간 비중이 커 총 소요시간을 먼저 확인하는 편이 좋습니다."
-      }
+      "meta": {
+        "contractVersion": "2026-04-stage-7",
+        "requestedAt": "2026-04-10T09:20:00.000Z",
+        "mode": "demo",
+        "dataSource": "demo-sample",
+        "scenarioId": "demo-seoul-gangnam-family",
+        "purposeMappingVersion": "2026-04-stage-4"
+      },
+      "summary": {
+        "totalCandidateCount": 1,
+        "returnedRecommendationCount": 1
+      },
+      "recommendations": [
+        {
+          "id": "seongdong-civil-service",
+          "name": "성동구청 민원여권과",
+          "address": "서울 성동구 고산자로 270",
+          "coordinates": {
+            "lat": 37.5634,
+            "lng": 127.0369
+          },
+          "supportedPurposeIds": [
+            "passport-pickup",
+            "family-relation-certificate",
+            "resident-registration"
+          ],
+          "supportedTaskMatches": [
+            {
+              "taskName": "가족관계등록신고",
+              "ruleType": "keyword"
+            },
+            {
+              "taskName": "혼인·출생 신고",
+              "ruleType": "alias"
+            }
+          ],
+          "waiting": {
+            "count": 1,
+            "estimatedMinutes": 3,
+            "updatedAt": "2026-04-10T09:18:00.000+09:00"
+          },
+          "travel": {
+            "minutes": 29,
+            "distanceKm": 8.8,
+            "breakdown": {
+              "walkMinutes": 5,
+              "transitRideMinutes": 18,
+              "transferEtcMinutes": 6
+            },
+            "steps": [
+              {
+                "type": "walk",
+                "title": "강남역 승강장 이동",
+                "minutes": 2,
+                "distanceKm": 0.16,
+                "from": "강남역",
+                "to": "2호선 승강장"
+              },
+              {
+                "type": "subway",
+                "title": "2호선 탑승",
+                "minutes": 18,
+                "routeName": "2호선",
+                "from": "강남역",
+                "to": "왕십리역",
+                "stopCount": 8
+              },
+              {
+                "type": "transfer-etc",
+                "title": "출구 이동과 청사 진입",
+                "minutes": 4,
+                "from": "왕십리역",
+                "to": "성동구청 방향"
+              },
+              {
+                "type": "walk",
+                "title": "가족관계 창구까지 도보",
+                "minutes": 5,
+                "distanceKm": 0.4,
+                "from": "성동구청 방향",
+                "to": "성동구청 민원여권과"
+              }
+            ]
+          },
+          "recommendation": {
+            "rank": 1,
+            "totalMinutes": 32,
+            "reason": "대기는 거의 없지만 강남권에서 환승이 한 번 필요해 이동 여유를 보는 편이 좋습니다."
+          }
+        }
+      ]
+    },
+    {
+      "request": {
+        "purposeId": "resident-registration",
+        "originLabel": "건대입구역",
+        "origin": {
+          "lat": 37.5404,
+          "lng": 127.0693
+        },
+        "mode": "demo"
+      },
+      "meta": {
+        "contractVersion": "2026-04-stage-7",
+        "requestedAt": "2026-04-10T09:25:00.000Z",
+        "mode": "demo",
+        "dataSource": "demo-sample",
+        "scenarioId": "demo-seoul-konkuk-resident",
+        "purposeMappingVersion": "2026-04-stage-4"
+      },
+      "summary": {
+        "totalCandidateCount": 1,
+        "returnedRecommendationCount": 1
+      },
+      "recommendations": [
+        {
+          "id": "seongdong-civil-service",
+          "name": "성동구청 민원여권과",
+          "address": "서울 성동구 고산자로 270",
+          "coordinates": {
+            "lat": 37.5634,
+            "lng": 127.0369
+          },
+          "supportedPurposeIds": [
+            "passport-pickup",
+            "family-relation-certificate",
+            "resident-registration"
+          ],
+          "supportedTaskMatches": [
+            {
+              "taskName": "주민등록 등본/초본",
+              "ruleType": "keyword"
+            },
+            {
+              "taskName": "전입 및 주민등록",
+              "ruleType": "keyword"
+            }
+          ],
+          "waiting": {
+            "count": 11,
+            "estimatedMinutes": 33,
+            "updatedAt": "2026-04-10T09:22:00.000+09:00"
+          },
+          "travel": {
+            "minutes": 9,
+            "distanceKm": 2.1,
+            "breakdown": {
+              "walkMinutes": 4,
+              "transitRideMinutes": 3,
+              "transferEtcMinutes": 2
+            },
+            "steps": [
+              {
+                "type": "walk",
+                "title": "버스 정류장까지 도보",
+                "minutes": 2,
+                "distanceKm": 0.15,
+                "from": "건대입구역",
+                "to": "건대입구역 정류장"
+              },
+              {
+                "type": "bus",
+                "title": "지선버스 탑승",
+                "minutes": 3,
+                "routeName": "2222",
+                "from": "건대입구역 정류장",
+                "to": "성동구청",
+                "stopCount": 2
+              },
+              {
+                "type": "transfer-etc",
+                "title": "청사 출입",
+                "minutes": 1,
+                "from": "성동구청",
+                "to": "민원동"
+              },
+              {
+                "type": "walk",
+                "title": "주민등록 창구까지 도보",
+                "minutes": 3,
+                "distanceKm": 0.22,
+                "from": "민원동",
+                "to": "성동구청 민원여권과"
+              }
+            ]
+          },
+          "recommendation": {
+            "rank": 1,
+            "totalMinutes": 42,
+            "reason": "가깝지만 점심 직전 대기가 길어 방문 시점을 조정할 가치가 있습니다."
+          }
+        }
+      ]
     }
   ]
 }

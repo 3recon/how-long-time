@@ -1,5 +1,7 @@
 import sample from "./recommendation-sample.json";
 
-import type { RecommendResponse } from "@/types/recommend";
+import type { DemoRecommendationDataset } from "../../lightsail-backend/src/data/demo/recommendation-sample";
 
-export const demoRecommendationSample = sample as RecommendResponse;
+export const demoRecommendationDataset = sample as DemoRecommendationDataset;
+
+export const demoRecommendationScenarios = demoRecommendationDataset.scenarios;
