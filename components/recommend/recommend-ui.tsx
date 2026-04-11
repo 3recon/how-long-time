@@ -170,11 +170,11 @@ export function Eyebrow(props: { children: ReactNode }) {
 
 export function StatChip(props: { label: string; value: string }) {
   return (
-    <div className="rounded-2xl border border-[rgba(17,17,17,0.14)] bg-white px-4 py-3 shadow-[0_16px_34px_rgba(17,17,17,0.06)]">
-      <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[rgba(17,17,17,0.72)]">
+    <div className="rounded-2xl border border-[rgba(17,17,17,0.14)] bg-white px-4 py-3 text-center shadow-[0_16px_34px_rgba(17,17,17,0.06)]">
+      <p className="text-[13px] font-semibold tracking-[-0.02em] text-[rgba(17,17,17,0.82)]">
         {props.label}
       </p>
-      <p className="mt-1 text-lg font-semibold tracking-[-0.03em]">
+      <p className="mt-1 text-[1.85rem] font-semibold leading-none tracking-[-0.04em] tabular-nums">
         {props.value}
       </p>
     </div>
@@ -194,7 +194,7 @@ export function PurposeOptionCard(props: {
       className={`group w-full rounded-[24px] border px-4 py-4 text-left transition-all duration-200 ${
         props.selected
           ? "border-[var(--accent-blue)] bg-[linear-gradient(180deg,rgba(244,238,223,0.98)_0%,rgba(255,253,248,1)_100%)] shadow-[0_24px_48px_rgba(31,58,95,0.12)]"
-          : "border-[rgba(17,17,17,0.08)] bg-white/94 hover:-translate-y-0.5 hover:border-[rgba(17,17,17,0.16)] hover:shadow-[0_18px_32px_rgba(17,17,17,0.08)]"
+          : "border-[rgba(17,17,17,0.12)] bg-white/94 hover:-translate-y-0.5 hover:border-[rgba(17,17,17,0.18)] hover:shadow-[0_18px_32px_rgba(17,17,17,0.08)]"
       }`}
       aria-pressed={props.selected}
     >
@@ -246,7 +246,7 @@ export function RecommendationCard(props: {
         <button
           type="button"
           onClick={props.onSelect}
-          className="min-w-0 flex-1 text-left"
+          className="min-w-0 flex-1 rounded-[18px] text-left focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[rgba(36,92,154,0.14)]"
           aria-pressed={props.selected}
         >
           <div className="flex flex-wrap items-center gap-2">
@@ -263,7 +263,7 @@ export function RecommendationCard(props: {
             <h3 className="text-lg font-semibold tracking-[-0.03em]">
               {formatOfficeDisplayName(props.office.name)}
             </h3>
-            <p className="text-sm leading-6 text-[var(--muted)]">
+            <p className="text-sm leading-6 text-[rgba(91,100,114,0.92)]">
               {props.office.address}
             </p>
           </div>
@@ -298,7 +298,7 @@ export function RecommendationCard(props: {
         <button
           type="button"
           onClick={props.onToggleDetails}
-          className="inline-flex min-h-11 items-center justify-center rounded-2xl border border-[rgba(31,58,95,0.22)] bg-white px-4 text-sm font-semibold text-[var(--accent-strong)] shadow-[0_12px_24px_rgba(17,17,17,0.06)] transition hover:-translate-y-0.5 hover:border-[var(--accent-blue)] hover:shadow-[0_16px_30px_rgba(31,58,95,0.12)]"
+          className="inline-flex min-h-11 items-center justify-center rounded-2xl border border-[rgba(31,58,95,0.22)] bg-white px-4 text-sm font-semibold text-[var(--accent-strong)] shadow-[0_12px_24px_rgba(17,17,17,0.06)] transition hover:-translate-y-0.5 hover:border-[var(--accent-blue)] hover:shadow-[0_16px_30px_rgba(31,58,95,0.12)] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[rgba(36,92,154,0.14)]"
           aria-expanded={props.expanded}
           aria-controls={detailsId}
         >

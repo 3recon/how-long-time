@@ -217,7 +217,7 @@ export function RouteStepsList(props: { steps: RouteStepItem[] }) {
   }
 
   return (
-    <div className="rounded-[24px] border border-[rgba(17,17,17,0.08)] bg-white p-4 shadow-[0_16px_32px_rgba(17,17,17,0.05)]">
+    <div className="rounded-[24px] border border-[rgba(17,17,17,0.12)] bg-white p-4 shadow-[0_16px_32px_rgba(17,17,17,0.05)]">
       <ol className="space-y-3">
         {props.steps.map((step, index) => (
           <li
@@ -231,7 +231,7 @@ export function RouteStepsList(props: { steps: RouteStepItem[] }) {
               ) : null}
             </div>
 
-            <div className="min-w-0 rounded-2xl bg-[rgba(250,245,232,0.56)] px-3 py-3">
+            <div className="min-w-0 rounded-2xl bg-[rgba(250,245,232,0.72)] px-3 py-3">
               <div className="flex flex-wrap items-center gap-2">
                 {step.lineName ? (
                   <span className="rounded-full bg-[rgba(31,58,95,0.1)] px-2 py-0.5 text-xs font-semibold text-[var(--accent-strong)]">

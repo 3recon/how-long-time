@@ -33,8 +33,7 @@ const INVALID_BODY =
   "\uc8fc\uc18c\uc5d0 \ud544\uc694\ud55c \ucd94\ucc9c \uc870\uac74\uc774 \ubd80\uc871\ud569\ub2c8\ub2e4. \uccab \ud654\uba74\uc5d0\uc11c \ucd9c\ubc1c\uc9c0\uc640 \ubbfc\uc6d0 \ubaa9\uc801\uc744 \ub2e4\uc2dc \uc785\ub825\ud574 \uc8fc\uc138\uc694.";
 const BACK_TO_FORM_LABEL =
   "\uc785\ub825 \ud654\uba74\uc73c\ub85c \ub3cc\uc544\uac00\uae30";
-const RESTART_LABEL =
-  "\ucc98\uc74c\ubd80\ud130 \ub2e4\uc2dc \uc2dc\uc791";
+const RESTART_LABEL = "\uc7ac\uc2dc\uc791";
 const LOADING_LABEL =
   "\uacb0\uacfc \ud654\uba74\uc744 \uc900\ube44\ud558\uace0 \uc788\uc2b5\ub2c8\ub2e4.";
 const EMPTY_MESSAGE =
@@ -261,14 +260,14 @@ export function RecommendResultsPage(props: {
     <main className="relative min-h-dvh overflow-hidden">
       <div className="relative mx-auto flex w-full max-w-[1680px] flex-col gap-4 px-4 py-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between gap-4">
-          <div className="justify-self-start rounded-full border border-[rgba(17,17,17,0.1)] bg-white/78 px-4 py-2 shadow-[0_10px_24px_rgba(17,17,17,0.05)] backdrop-blur-sm">
+          <div className="justify-self-start rounded-full border border-[rgba(17,17,17,0.14)] bg-white px-4 py-2 shadow-[0_10px_24px_rgba(17,17,17,0.05)]">
             <h2 className="text-xl font-semibold tracking-[-0.04em]">
               소요 시간 비교
             </h2>
           </div>
           <Link
             href="/"
-            className="inline-flex min-h-10 items-center justify-center rounded-[18px] border border-[var(--foreground)] bg-[var(--foreground)] px-3.5 text-[13px] font-semibold text-white shadow-[0_14px_28px_rgba(17,17,17,0.14)]"
+            className="inline-flex min-h-10 items-center justify-center rounded-[18px] border border-[var(--foreground)] bg-[var(--foreground)] px-3.5 text-[13px] font-semibold text-white shadow-[0_14px_28px_rgba(17,17,17,0.14)] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[rgba(36,92,154,0.14)]"
           >
             {RESTART_LABEL}
           </Link>

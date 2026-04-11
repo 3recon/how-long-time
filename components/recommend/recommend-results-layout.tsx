@@ -31,11 +31,11 @@ export function RecommendResultsLayout(props: {
     : null;
 
   return (
-    <div className="grid min-w-0 gap-4 lg:h-[calc(100dvh-7.5rem)] lg:min-h-[760px] lg:grid-cols-[minmax(0,1.08fr)_minmax(360px,1fr)] lg:overflow-hidden xl:grid-cols-[minmax(0,1.08fr)_minmax(420px,1fr)]">
-      <div className="min-w-0 lg:flex lg:h-full lg:min-h-0 lg:flex-col">
-        <section className="soft-card min-w-0 rounded-[28px] border-[rgba(17,17,17,0.08)] p-5 sm:p-6 lg:flex lg:h-full lg:min-h-0 lg:flex-col lg:overflow-hidden lg:p-5">
+    <div className="grid min-w-0 gap-4 lg:grid-cols-[minmax(0,1.08fr)_minmax(360px,1fr)] lg:items-start xl:grid-cols-[minmax(0,1.08fr)_minmax(420px,1fr)]">
+      <div className="min-w-0 lg:flex lg:max-h-[calc(100dvh-8rem)] lg:min-h-[680px] lg:flex-col">
+        <section className="soft-card min-w-0 rounded-[28px] border-[rgba(17,17,17,0.12)] p-5 sm:p-6 lg:flex lg:h-full lg:min-h-0 lg:flex-col lg:overflow-hidden lg:p-5">
           {recommendations.length > 0 ? (
-            <div className="space-y-4 lg:min-h-0 lg:flex-1 lg:overflow-auto lg:pr-1 lg:[scrollbar-gutter:stable]">
+            <div className="space-y-4 lg:min-h-0 lg:flex-1 lg:overflow-auto lg:pr-2 lg:[scrollbar-gutter:stable]">
               {recommendations.map((office) => (
                 <RecommendationCard
                   key={office.id}
@@ -61,7 +61,7 @@ export function RecommendResultsLayout(props: {
         </section>
       </div>
 
-      <section className="min-w-0 lg:h-full lg:min-h-0">
+      <section className="min-w-0 lg:sticky lg:top-4 lg:max-h-[calc(100dvh-8rem)] lg:min-h-[680px]">
         <KakaoMapPanel
           appKey={props.appKey}
           origin={origin}

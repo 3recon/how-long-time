@@ -222,7 +222,7 @@ export function RecommendRequestPage(props: {
 
   return (
     <main className="relative min-h-dvh overflow-hidden">
-      <div className="relative mx-auto flex min-h-dvh w-full max-w-[1040px] flex-col justify-center px-4 py-6 sm:px-6 lg:px-8">
+      <div className="relative mx-auto flex min-h-dvh w-full max-w-[1040px] flex-col justify-start px-4 py-10 sm:px-6 sm:py-12 lg:justify-center lg:px-8">
         <h1 className="-mt-[30px] mb-6 text-center text-[3.5rem] font-semibold leading-[0.92] tracking-[-0.08em] text-balance sm:text-[5rem]">
           민원, <span className="text-[#245c9a]">어디가?</span>
         </h1>
@@ -261,7 +261,7 @@ export function RecommendRequestPage(props: {
                   <button
                     type="button"
                     onClick={handleConfirmOriginSelection}
-                    className="min-h-12 rounded-2xl border border-[rgba(17,17,17,0.16)] bg-white px-4 text-sm font-semibold whitespace-nowrap text-[var(--foreground)] shadow-[0_10px_24px_rgba(17,17,17,0.06)]"
+                    className="min-h-12 rounded-2xl border border-[rgba(17,17,17,0.16)] bg-white px-4 text-sm font-semibold whitespace-nowrap text-[var(--foreground)] shadow-[0_10px_24px_rgba(17,17,17,0.06)] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[rgba(36,92,154,0.14)]"
                   >
                     선택
                   </button>
@@ -269,7 +269,7 @@ export function RecommendRequestPage(props: {
                     type="button"
                     onClick={handleUseCurrentLocation}
                     disabled={isLocating || isSubmitting}
-                    className="min-h-12 rounded-2xl border border-[#245c9a] bg-[#245c9a] px-4 text-sm font-semibold whitespace-nowrap text-white shadow-[0_14px_28px_rgba(36,92,154,0.24)] hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:translate-y-0"
+                    className="min-h-12 rounded-2xl border border-[#245c9a] bg-[#245c9a] px-4 text-sm font-semibold whitespace-nowrap text-white shadow-[0_14px_28px_rgba(36,92,154,0.24)] hover:-translate-y-0.5 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[rgba(36,92,154,0.18)] disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:translate-y-0"
                   >
                     {isLocating ? "위치 확인 중..." : "현재 위치"}
                   </button>
@@ -301,7 +301,7 @@ export function RecommendRequestPage(props: {
               <button
                 type="button"
                 onClick={openPurposePicker}
-                className={`w-full rounded-[28px] border px-4 py-5 text-left shadow-[0_20px_42px_rgba(17,17,17,0.06)] transition-all duration-200 hover:-translate-y-0.5 ${
+                className={`w-full rounded-[28px] border px-4 py-5 text-left shadow-[0_20px_42px_rgba(17,17,17,0.06)] transition-all duration-200 hover:-translate-y-0.5 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[rgba(36,92,154,0.14)] ${
                   selectedPurpose
                     ? "border-[rgba(211,166,63,0.55)] bg-[linear-gradient(180deg,rgba(244,238,223,0.98)_0%,rgba(255,253,248,1)_100%)]"
                     : "border-[rgba(17,17,17,0.14)] bg-white"
@@ -342,7 +342,7 @@ export function RecommendRequestPage(props: {
             <button
               type="submit"
               disabled={isLocating || isSubmitting}
-              className="min-h-14 w-full rounded-[22px] border border-[#245c9a] bg-[#245c9a] px-5 text-base font-semibold text-white shadow-[0_20px_44px_rgba(36,92,154,0.22)] hover:-translate-y-0.5 hover:border-[#245c9a] hover:bg-[#245c9a] disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:translate-y-0"
+              className="min-h-14 w-full rounded-[22px] border border-[#245c9a] bg-[#245c9a] px-5 text-base font-semibold text-white shadow-[0_20px_44px_rgba(36,92,154,0.22)] hover:-translate-y-0.5 hover:border-[#245c9a] hover:bg-[#245c9a] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[rgba(36,92,154,0.18)] disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:translate-y-0"
             >
               추천 요청
             </button>
@@ -373,7 +373,7 @@ export function RecommendRequestPage(props: {
                 <button
                   type="button"
                   onClick={() => setIsPurposePickerOpen(false)}
-                  className="flex h-11 w-11 flex-none items-center justify-center rounded-2xl border border-[rgba(17,17,17,0.14)] bg-white text-lg shadow-[0_12px_24px_rgba(17,17,17,0.08)]"
+                  className="flex h-11 w-11 flex-none items-center justify-center rounded-2xl border border-[rgba(17,17,17,0.14)] bg-white text-lg shadow-[0_12px_24px_rgba(17,17,17,0.08)] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[rgba(36,92,154,0.14)]"
                   aria-label="민원 목적 선택 닫기"
                 >
                   ×
@@ -404,7 +404,7 @@ export function RecommendRequestPage(props: {
                   <button
                     type="button"
                     onClick={() => setIsPurposePickerOpen(false)}
-                    className="min-h-11 rounded-2xl border border-[rgba(17,17,17,0.1)] bg-white px-4 text-sm font-semibold text-[var(--foreground)]"
+                    className="min-h-11 rounded-2xl border border-[rgba(17,17,17,0.1)] bg-white px-4 text-sm font-semibold text-[var(--foreground)] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[rgba(36,92,154,0.14)]"
                   >
                     취소
                   </button>
@@ -419,7 +419,7 @@ export function RecommendRequestPage(props: {
                       setIsPurposePickerOpen(false);
                     }}
                     disabled={!draftPurposeId}
-                    className="min-h-11 rounded-2xl border border-[#245c9a] bg-[#245c9a] px-5 text-sm font-semibold text-white shadow-[0_16px_32px_rgba(36,92,154,0.22)] disabled:cursor-not-allowed disabled:opacity-50"
+                    className="min-h-11 rounded-2xl border border-[#245c9a] bg-[#245c9a] px-5 text-sm font-semibold text-white shadow-[0_16px_32px_rgba(36,92,154,0.22)] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[rgba(36,92,154,0.18)] disabled:cursor-not-allowed disabled:opacity-50"
                   >
                     확인
                   </button>

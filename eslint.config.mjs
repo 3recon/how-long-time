@@ -13,6 +13,7 @@ const eslintConfig = defineConfig([
     ".next/**",
     "out/**",
     "build/**",
+    "lightsail-backend/dist/**",
     "next-env.d.ts",
     "bootstrap-temp/**",
   ]),
